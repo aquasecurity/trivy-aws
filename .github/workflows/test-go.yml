@@ -1,0 +1,39 @@
+name: test go
+
+on:
+  pull_request:
+  merge_group:
+  schedule:
+  - cron:  0 23 * * *
+
+jobs:
+  build:
+    name: building defsec
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-go@v3
+      if: matrix.os != 'windows-latest'
+      with:
+        go-version-file: go.mod
+        cache: true
+        cache-dependency-path: go.sum
+    - uses: actions/setup-go@v3
+      if: matrix.os == 'windows-latest'
+      with:
+        go-version-file: go.mod
+        cache: false
+
+    - name: Run non-localstack tests
+      if: matrix.os != 'ubuntu-latest'
+      run: make test-no-localstack
+      shell: bash
+    - name: Run full tests
+      if: matrix.os == 'ubuntu-latest'
+      run: make test
+      shell: bash
