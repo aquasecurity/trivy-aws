@@ -8,7 +8,7 @@ import (
 	api "github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
 	agTypes "github.com/aws/aws-sdk-go-v2/service/apigatewayv2/types"
 
-	"github.com/nikpivkin/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 )
 
 func (a *adapter) getAPIsV2() ([]v2.API, error) {

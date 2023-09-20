@@ -12,9 +12,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 
-	"github.com/nikpivkin/trivy-aws/pkg/concurrency"
-	"github.com/nikpivkin/trivy-aws/pkg/errs"
-	"github.com/nikpivkin/trivy-aws/pkg/progress"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/errs"
+	"github.com/aquasecurity/trivy-aws/pkg/progress"
 )
 
 var registeredAdapters []ServiceAdapter

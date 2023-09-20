@@ -1,4 +1,4 @@
-module github.com/nikpivkin/trivy-aws
+module github.com/aquasecurity/trivy-aws
 
 go 1.20
 

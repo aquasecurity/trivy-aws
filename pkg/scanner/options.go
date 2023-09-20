@@ -3,8 +3,8 @@ package scanner
 import (
 	"github.com/aquasecurity/defsec/pkg/scanners/options"
 
-	"github.com/nikpivkin/trivy-aws/pkg/concurrency"
-	"github.com/nikpivkin/trivy-aws/pkg/progress"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/progress"
 )
 
 type ConfigurableAWSScanner interface {

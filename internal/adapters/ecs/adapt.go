@@ -4,7 +4,7 @@ import (
 	"github.com/aquasecurity/defsec/pkg/state"
 	ecsapi "github.com/aws/aws-sdk-go-v2/service/ecs"
 
-	"github.com/nikpivkin/trivy-aws/internal/adapters"
+	"github.com/aquasecurity/trivy-aws/internal/adapters"
 )
 
 type adapter struct {

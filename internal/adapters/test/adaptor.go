@@ -14,8 +14,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
-	"github.com/nikpivkin/trivy-aws/internal/adapters"
-	"github.com/nikpivkin/trivy-aws/pkg/progress"
+	"github.com/aquasecurity/trivy-aws/internal/adapters"
+	"github.com/aquasecurity/trivy-aws/pkg/progress"
 )
 
 func getOrCreateLocalStack(ctx context.Context) (*localstack.Stack, error) {

@@ -10,7 +10,7 @@ import (
 	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 
-	"github.com/nikpivkin/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 )
 
 func (a *adapter) adaptServerCertificates(state *state.State) error {

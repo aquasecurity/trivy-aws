@@ -8,7 +8,7 @@ import (
 	api "github.com/aws/aws-sdk-go-v2/service/apigateway"
 	agTypes "github.com/aws/aws-sdk-go-v2/service/apigateway/types"
 
-	"github.com/nikpivkin/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 )
 
 func (a *adapter) getDomainNamesv1() ([]v1.DomainName, error) {

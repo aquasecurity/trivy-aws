@@ -10,8 +10,8 @@ import (
 	vpcTypes "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/nikpivkin/trivy-aws/internal/adapters"
-	"github.com/nikpivkin/trivy-aws/internal/adapters/test"
+	"github.com/aquasecurity/trivy-aws/internal/adapters"
+	"github.com/aquasecurity/trivy-aws/internal/adapters/test"
 )
 
 type rule struct {

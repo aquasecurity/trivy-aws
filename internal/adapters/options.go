@@ -3,8 +3,8 @@ package adapters
 import (
 	"github.com/aquasecurity/defsec/pkg/debug"
 
-	"github.com/nikpivkin/trivy-aws/pkg/concurrency"
-	"github.com/nikpivkin/trivy-aws/pkg/progress"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/progress"
 )
 
 type Options struct {

@@ -20,10 +20,10 @@ import (
 	"github.com/simar7/trivy-misconf-rules/pkg/rego"
 	"github.com/simar7/trivy-misconf-rules/pkg/rules"
 
-	"github.com/nikpivkin/trivy-aws/internal/adapters"
-	"github.com/nikpivkin/trivy-aws/pkg/concurrency"
-	"github.com/nikpivkin/trivy-aws/pkg/errs"
-	"github.com/nikpivkin/trivy-aws/pkg/progress"
+	"github.com/aquasecurity/trivy-aws/internal/adapters"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/errs"
+	"github.com/aquasecurity/trivy-aws/pkg/progress"
 )
 
 var _ ConfigurableAWSScanner = (*Scanner)(nil)
