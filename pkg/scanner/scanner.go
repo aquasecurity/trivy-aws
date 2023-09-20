@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
 	"io"
 	"io/fs"
 	"os"
@@ -16,9 +15,10 @@ import (
 	"github.com/aquasecurity/defsec/pkg/scan"
 	"github.com/aquasecurity/defsec/pkg/scanners/options"
 	"github.com/aquasecurity/defsec/pkg/state"
-	"github.com/aquasecurity/defsec/pkg/types"
-	"github.com/simar7/trivy-misconf-rules/pkg/rego"
-	"github.com/simar7/trivy-misconf-rules/pkg/rules"
+	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy-policies/pkg/rego"
+	"github.com/aquasecurity/trivy-policies/pkg/rules"
+	"github.com/aquasecurity/trivy-policies/pkg/types"
 
 	"github.com/aquasecurity/trivy-aws/internal/adapters"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
@@ -27,11 +27,6 @@ import (
 )
 
 var _ ConfigurableAWSScanner = (*Scanner)(nil)
-
-type RegisteredRule interface {
-	Rule() scan.Rule
-	Evaluate(s *state.State) scan.Results
-}
 
 type Scanner struct {
 	sync.Mutex
@@ -102,12 +97,12 @@ func (s *Scanner) SetUseEmbeddedLibraries(b bool) {
 	s.loadEmbeddedLibraries = b
 }
 
-func (s *Scanner) SetTraceWriter(_ io.Writer)        {}
-func (s *Scanner) SetPerResultTracingEnabled(b bool) {}
-func (s *Scanner) SetDataDirs(_ ...string)           {}
-func (s *Scanner) SetPolicyNamespaces(_ ...string)   {}
-func (s *Scanner) SetSkipRequiredCheck(_ bool)       {}
-func (s *Scanner) SetRegoErrorLimit(_ int)           {}
+func (s *Scanner) SetTraceWriter(io.Writer)        {}
+func (s *Scanner) SetPerResultTracingEnabled(bool) {}
+func (s *Scanner) SetDataDirs(...string)           {}
+func (s *Scanner) SetPolicyNamespaces(...string)   {}
+func (s *Scanner) SetSkipRequiredCheck(bool)       {}
+func (s *Scanner) SetRegoErrorLimit(int)           {}
 
 func AllSupportedServices() []string {
 	return adapters.AllServices()
@@ -184,12 +179,12 @@ func (s *Scanner) Scan(ctx context.Context, cloudState *state.State) (results sc
 				return nil, ctx.Err()
 			default:
 			}
-			if rule.Rule().RegoPackage != "" {
+			if rule.GetRule().RegoPackage != "" {
 				continue
 			}
 			ruleResults := rule.Evaluate(cloudState)
 			if len(ruleResults) > 0 {
-				s.debug.Log("Found %d results for %s", len(ruleResults), rule.Rule().AVDID)
+				s.debug.Log("Found %d results for %s", len(ruleResults), rule.GetRule().AVDID)
 				results = append(results, ruleResults...)
 			}
 		}
@@ -209,32 +204,11 @@ func (s *Scanner) Scan(ctx context.Context, cloudState *state.State) (results sc
 	return append(results, regoResults...), nil
 }
 
-// TODO
-func (s *Scanner) getRules() []RegisteredRule {
+func (s *Scanner) getRules() []types.RegisteredRule {
 	if len(s.frameworks) > 0 { // Only for maintaining backwards compat
-		return getRegisteredRules(s.frameworks...)
+		return rules.GetRegistered(s.frameworks...)
 	}
-	return getSpecRules(s.spec)
-}
-
-func getRegisteredRules(frameworks ...framework.Framework) []RegisteredRule {
-	var specRules []RegisteredRule
-	for _, r := range rules.GetRegistered(frameworks...) {
-		rule := r
-		specRules = append(specRules, &rule)
-	}
-
-	return specRules
-}
-
-func getSpecRules(spec string) []RegisteredRule {
-	var specRules []RegisteredRule
-	for _, r := range rules.GetSpecRules(spec) {
-		rule := r
-		specRules = append(specRules, &rule)
-	}
-
-	return specRules
+	return rules.GetSpecRules(s.spec)
 }
 
 func (s *Scanner) initRegoScanner() (*rego.Scanner, error) {
@@ -257,7 +231,7 @@ func (s *Scanner) initRegoScanner() (*rego.Scanner, error) {
 		}
 	}
 
-	regoScanner := rego.NewScanner(types.SourceCloud, s.options...)
+	regoScanner := rego.NewScanner(defsecTypes.SourceCloud, s.options...)
 	regoScanner.SetParentDebugLogger(s.debug)
 	if err := regoScanner.LoadPolicies(s.loadEmbeddedLibraries, s.loadEmbeddedPolicies, srcFS, s.policyDirs, s.policyReaders); err != nil {
 		return nil, err
