@@ -5,7 +5,7 @@ import (
 	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
 	ecsapi "github.com/aws/aws-sdk-go-v2/service/ecs"
 
-	"github.com/nikpivkin/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 )
 
 func (a *adapter) getTaskDefinitions() ([]ecs.TaskDefinition, error) {

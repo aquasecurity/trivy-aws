@@ -19,10 +19,12 @@ github.com/alecthomas/chroma v0.10.0/go.mod h1:jtJATyUxlIORhUOFNA9NZDWGAQ8wpxQQq
 github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be h1:9AeTilPcZAjCFIImctFaOjnTIavg87rW78vTPkQqLI8=
 github.com/apparentlymart/go-textseg/v13 v13.0.0 h1:Y+KvPE1NYz0xl601PVImeQfFyEy6iT90AvPUL1NNfNw=
 github.com/apparentlymart/go-textseg/v13 v13.0.0/go.mod h1:ZK2fH7c4NqDTLtiYLvIkEghdlcqw7yxLeM89kiTRPUo=
-github.com/aquasecurity/defsec v0.92.1-0.20230905012348-ae6078ba0df9 h1:bB32QdxDTfqZ5oYT+HB3Txqh7jF1Fo2H0xEGDU9BvLo=
-github.com/aquasecurity/defsec v0.92.1-0.20230905012348-ae6078ba0df9/go.mod h1:uZIC1NjU5R49619WvZOlhWRpCEf/7KD3Lm8nDKRjq+o=
+github.com/aquasecurity/defsec v0.92.1-0.20230918174123-78adefe70b50 h1:W9HkJuhsThNaQg3DX8VVlFA9lnA6SjKUU0CLmFO5Dos=
+github.com/aquasecurity/defsec v0.92.1-0.20230918174123-78adefe70b50/go.mod h1:BiRuveI3ATEzIwyg6SUeU7MHuPFczAmYmFmdYQLdSSU=
 github.com/aquasecurity/go-mock-aws v0.0.0-20230810212901-d6feebd39060 h1:V7nC90NpRDEubNpNEgRDtTfLH3RKQlZeY9/HSqxEze8=
 github.com/aquasecurity/go-mock-aws v0.0.0-20230810212901-d6feebd39060/go.mod h1:QAMVTITMGE8AY3qkAIhYCNuQV2tTxzdmt7ZOP0SZwZs=
+github.com/aquasecurity/trivy-policies v0.0.6-0.20230920041520-fc4059f58c9e h1:I1nz5FGwyhqVKCm9fdea6DBvwHFAg0AFl7AjNNBVj9I=
+github.com/aquasecurity/trivy-policies v0.0.6-0.20230920041520-fc4059f58c9e/go.mod h1:rnMbnfUDCaT+pU1sgin/mVi8m+FO+kktmgD34sGMKR0=
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0 h1:jfIu9sQUG6Ig+0+Ap1h4unLjW6YQJpKZVmUzxsD4E/Q=
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0/go.mod h1:t2tdKJDJF9BV14lnkjHmOQgcvEKgtqs5a1N3LNdJhGE=
 github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 h1:0CwZNZbxp69SHPdPJAN/hZIm0C4OItdklCFmMRWYpio=
@@ -243,8 +245,6 @@ github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RR
 github.com/moby/term v0.5.0 h1:xt8Q1nalod/v7BqbG21f8mQPqH+xAaC9C3N3wfWbVP0=
 github.com/morikuni/aec v1.0.0 h1:nP9CBfwrvYnBRgY6qfDQkygYDmYwOilePFkwzv4dU8A=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
-github.com/nikpivkin/trivy-misconf-rules v0.0.0-20230907132359-49c15967beb6 h1:CWaMfqf31vbrYBns1fNlJCakLhFzpYCSBf8br6eHvRI=
-github.com/nikpivkin/trivy-misconf-rules v0.0.0-20230907132359-49c15967beb6/go.mod h1:7T4/1/NPHsQgE47w5CaYuCm/zj+UwRv+sI9QyFZk7Lc=
 github.com/open-policy-agent/opa v0.56.0 h1:FUSb6MyckjuffOMshEG8P+HGnckxkJ8ENZJHEzAddhk=
 github.com/open-policy-agent/opa v0.56.0/go.mod h1:un01L10fkolr00KJMDSqGb2FXCjVyVQOybLtHOfSEfY=
 github.com/opencontainers/go-digest v1.0.0 h1:apOUWs51W5PlhuyGyz9FCeeBIOUDA/6nW8Oi/yOhh5U=

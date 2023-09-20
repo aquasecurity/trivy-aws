@@ -11,7 +11,7 @@ import (
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"github.com/liamg/iamgo"
 
-	"github.com/nikpivkin/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 )
 
 func (a *adapter) adaptPolicies(state *state.State) error {

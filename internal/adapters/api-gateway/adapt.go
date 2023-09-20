@@ -5,7 +5,7 @@ import (
 	apiv1 "github.com/aws/aws-sdk-go-v2/service/apigateway"
 	apiv2 "github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
 
-	"github.com/nikpivkin/trivy-aws/internal/adapters"
+	"github.com/aquasecurity/trivy-aws/internal/adapters"
 )
 
 type adapter struct {

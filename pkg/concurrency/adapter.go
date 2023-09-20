@@ -5,7 +5,7 @@ import (
 
 	"github.com/aquasecurity/defsec/pkg/state"
 
-	"github.com/nikpivkin/trivy-aws/pkg/progress"
+	"github.com/aquasecurity/trivy-aws/pkg/progress"
 )
 
 type Context interface {

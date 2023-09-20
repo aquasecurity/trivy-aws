@@ -1,10 +1,11 @@
-module github.com/nikpivkin/trivy-aws
+module github.com/aquasecurity/trivy-aws
 
 go 1.20
 
 require (
-	github.com/aquasecurity/defsec v0.92.0
+	github.com/aquasecurity/defsec v0.92.1-0.20230918174123-78adefe70b50
 	github.com/aquasecurity/go-mock-aws v0.0.0-20230810212901-d6feebd39060
+	github.com/aquasecurity/trivy-policies v0.0.6-0.20230920041520-fc4059f58c9e
 	github.com/aws/aws-sdk-go v1.45.3
 	github.com/aws/aws-sdk-go-v2 v1.21.0
 	github.com/aws/aws-sdk-go-v2/config v1.18.39
@@ -45,7 +46,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.21.5
 	github.com/aws/aws-sdk-go-v2/service/workspaces v1.29.5
 	github.com/liamg/iamgo v0.0.9
-	github.com/simar7/trivy-misconf-rules v0.0.4
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
 )
@@ -140,7 +140,3 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
-
-replace github.com/simar7/trivy-misconf-rules => github.com/nikpivkin/trivy-misconf-rules v0.0.0-20230907132359-49c15967beb6
-
-replace github.com/aquasecurity/defsec => github.com/aquasecurity/defsec v0.92.1-0.20230905012348-ae6078ba0df9

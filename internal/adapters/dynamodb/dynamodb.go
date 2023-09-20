@@ -8,8 +8,8 @@ import (
 	dynamodbApi "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	dynamodbTypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 
-	"github.com/nikpivkin/trivy-aws/internal/adapters"
-	"github.com/nikpivkin/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/internal/adapters"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 )
 
 type adapter struct {

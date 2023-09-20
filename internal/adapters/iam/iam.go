@@ -6,7 +6,7 @@ import (
 	"github.com/aquasecurity/defsec/pkg/types"
 	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
 
-	"github.com/nikpivkin/trivy-aws/internal/adapters"
+	"github.com/aquasecurity/trivy-aws/internal/adapters"
 )
 
 type adapter struct {
