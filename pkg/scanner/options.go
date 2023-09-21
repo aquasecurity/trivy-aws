@@ -1,7 +1,7 @@
 package scanner
 
 import (
-	"github.com/aquasecurity/defsec/pkg/scanners/options"
+	"github.com/aquasecurity/trivy-iac/pkg/scanners/options"
 
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy-aws/pkg/progress"
