@@ -5,9 +5,8 @@ go 1.20
 require (
 	github.com/aquasecurity/defsec v0.92.1-0.20230918174123-78adefe70b50
 	github.com/aquasecurity/go-mock-aws v0.0.0-20230810212901-d6feebd39060
-	github.com/aquasecurity/trivy-iac v0.0.0-20230920210612-1dd1b79c4b1d
 	github.com/aquasecurity/trivy-policies v0.0.6-0.20230920041520-fc4059f58c9e
-	github.com/aws/aws-sdk-go v1.45.3
+	github.com/aws/aws-sdk-go v1.45.15
 	github.com/aws/aws-sdk-go-v2 v1.21.0
 	github.com/aws/aws-sdk-go-v2/config v1.18.39
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.37
@@ -141,5 +140,6 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gotest.tools/v3 v3.5.0 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
