@@ -31,7 +31,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.20.6
 	github.com/aws/aws-sdk-go-v2/service/emr v1.28.5
 	github.com/aws/aws-sdk-go-v2/service/iam v1.22.5
-	github.com/aws/aws-sdk-go-v2/service/kafka v1.22.5
+	github.com/aws/aws-sdk-go-v2/service/kafka v1.22.6
 	github.com/aws/aws-sdk-go-v2/service/kinesis v1.18.5
 	github.com/aws/aws-sdk-go-v2/service/kms v1.24.5
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.39.5
