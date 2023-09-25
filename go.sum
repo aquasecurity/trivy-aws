@@ -25,8 +25,6 @@ github.com/aquasecurity/defsec v0.92.1-0.20230918174123-78adefe70b50 h1:W9HkJuhs
 github.com/aquasecurity/defsec v0.92.1-0.20230918174123-78adefe70b50/go.mod h1:BiRuveI3ATEzIwyg6SUeU7MHuPFczAmYmFmdYQLdSSU=
 github.com/aquasecurity/go-mock-aws v0.0.0-20230810212901-d6feebd39060 h1:V7nC90NpRDEubNpNEgRDtTfLH3RKQlZeY9/HSqxEze8=
 github.com/aquasecurity/go-mock-aws v0.0.0-20230810212901-d6feebd39060/go.mod h1:QAMVTITMGE8AY3qkAIhYCNuQV2tTxzdmt7ZOP0SZwZs=
-github.com/aquasecurity/trivy-iac v0.0.0-20230920210612-1dd1b79c4b1d h1:SZ1W/EsdsGp8wQTsO3qF/BswVP9GYnSfVk7JiPkeHys=
-github.com/aquasecurity/trivy-iac v0.0.0-20230920210612-1dd1b79c4b1d/go.mod h1:ui5P9fHAkmcEIBM7sJ4QvwOBv18c0ekWCcgkpjRGjlc=
 github.com/aquasecurity/trivy-policies v0.0.6-0.20230920041520-fc4059f58c9e h1:I1nz5FGwyhqVKCm9fdea6DBvwHFAg0AFl7AjNNBVj9I=
 github.com/aquasecurity/trivy-policies v0.0.6-0.20230920041520-fc4059f58c9e/go.mod h1:rnMbnfUDCaT+pU1sgin/mVi8m+FO+kktmgD34sGMKR0=
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0 h1:jfIu9sQUG6Ig+0+Ap1h4unLjW6YQJpKZVmUzxsD4E/Q=
@@ -88,8 +86,8 @@ github.com/aws/aws-sdk-go-v2/service/elasticache v1.29.3 h1:VT1Yq9MPp/sQhrfeHkC0
 github.com/aws/aws-sdk-go-v2/service/elasticache v1.29.3/go.mod h1:WTAOgZesN8YgaTo0aNJPB4ufoN/QpxAHeC2HRxKay+M=
 github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.21.3 h1:CAWMcMnRYCBaeMnycTwZs+0BcuepIMfyP3F0r1VfgPc=
 github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.21.3/go.mod h1:CbJHS0jJJNd2dZOakkG5TBbT8OHz+T0UBzR1ClIdezI=
-github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.20.5 h1:Wem3awMAewdXG1RQ9198hglIGjEuhxGqGSaMoFGCQbQ=
-github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.20.5/go.mod h1:L9XcF8QdOpGUDPccs9VZPlNhrpfPEKFDl/vb3C+iZbs=
+github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.20.6 h1:5n5h2hr9zdB9RdbO0vaWKur97g7153I1/RmrwZC9IcA=
+github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.20.6/go.mod h1:L9XcF8QdOpGUDPccs9VZPlNhrpfPEKFDl/vb3C+iZbs=
 github.com/aws/aws-sdk-go-v2/service/emr v1.28.5 h1:vxH+NcTi8Kc3451Ymw2HrIqq9LCPMh9VOxuBH2gzBW0=
 github.com/aws/aws-sdk-go-v2/service/emr v1.28.5/go.mod h1:zS0OkiqKPhWhUwdpe5i0pzlm6sP0A2YZzSaGzRKa+p8=
 github.com/aws/aws-sdk-go-v2/service/iam v1.22.5 h1:qGv+oW4uV1T3kbE9uSYEfdZbo38OqxgRxxfStfDr4BU=
@@ -422,5 +420,6 @@ gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gotest.tools/v3 v3.5.0 h1:Ljk6PdHdOhAb5aDMWXjDLMMhph+BpztA4v1QdqEW2eY=
+gotest.tools/v3 v3.5.0/go.mod h1:isy3WKz7GK6uNw/sbHzfKBLvlvXwUyV06n6brMxxopU=
 sigs.k8s.io/yaml v1.3.0 h1:a2VclLzOGrwOHDiV8EfBGhvjHvP46CtW5j6POvhYGGo=
 sigs.k8s.io/yaml v1.3.0/go.mod h1:GeOyir5tyXNByN85N/dRIT9es5UQNerPYEKK56eTBm8=
