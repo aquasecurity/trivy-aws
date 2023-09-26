@@ -8,13 +8,13 @@ import (
 	"testing"
 
 	localstack "github.com/aquasecurity/go-mock-aws"
+	aws2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
-	"github.com/aquasecurity/trivy-aws/internal/adapters"
 	"github.com/aquasecurity/trivy-aws/pkg/progress"
 )
 
@@ -42,7 +42,7 @@ func getOrCreateLocalStack(ctx context.Context) (*localstack.Stack, error) {
 	return stack, nil
 }
 
-func CreateLocalstackAdapter(t *testing.T) (*adapters.RootAdapter, *localstack.Stack, error) {
+func CreateLocalstackAdapter(t *testing.T) (*aws2.RootAdapter, *localstack.Stack, error) {
 	ctx := context.Background()
 	l, err := getOrCreateLocalStack(ctx)
 	require.NoError(t, err)
@@ -50,7 +50,7 @@ func CreateLocalstackAdapter(t *testing.T) (*adapters.RootAdapter, *localstack.S
 	cfg, err := createTestConfig(ctx, l)
 	require.NoError(t, err)
 
-	ra := adapters.NewRootAdapter(ctx, cfg, progress.NoProgress)
+	ra := aws2.NewRootAdapter(ctx, cfg, progress.NoProgress)
 	require.NotNil(t, ra)
 	return ra, l, err
 }
