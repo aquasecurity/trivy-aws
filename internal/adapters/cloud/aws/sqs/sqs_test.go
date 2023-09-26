@@ -8,13 +8,12 @@ import (
 	"github.com/aquasecurity/defsec/pkg/state"
 	localstack "github.com/aquasecurity/go-mock-aws"
 	aws2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	sqsapi "github.com/aws/aws-sdk-go-v2/service/sqs"
 	sqsTypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/aquasecurity/trivy-aws/internal/adapters/test"
 )
 
 type queueDetails struct {

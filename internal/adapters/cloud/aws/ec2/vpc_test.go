@@ -6,12 +6,11 @@ import (
 	"github.com/aquasecurity/defsec/pkg/providers/aws/ec2"
 	"github.com/aquasecurity/defsec/pkg/state"
 	aws2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	vpcApi "github.com/aws/aws-sdk-go-v2/service/ec2"
 	vpcTypes "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/stretchr/testify/require"
-
-	"github.com/aquasecurity/trivy-aws/internal/adapters/test"
 )
 
 type rule struct {

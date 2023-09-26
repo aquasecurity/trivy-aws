@@ -8,12 +8,11 @@ import (
 	"github.com/aquasecurity/defsec/pkg/providers/aws/sns"
 	"github.com/aquasecurity/defsec/pkg/state"
 	aws2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	snsapi "github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/aquasecurity/trivy-aws/internal/adapters/test"
 )
 
 type topicDetails struct {
