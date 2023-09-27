@@ -16,11 +16,13 @@ import (
 	"github.com/aquasecurity/defsec/pkg/scanners/options"
 	"github.com/aquasecurity/defsec/pkg/state"
 	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	adapter "github.com/aquasecurity/trivy-aws/internal/adapters/cloud"
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	options2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/options"
 	"github.com/aquasecurity/trivy-policies/pkg/rego"
 	"github.com/aquasecurity/trivy-policies/pkg/rules"
 	"github.com/aquasecurity/trivy-policies/pkg/types"
 
-	"github.com/aquasecurity/trivy-aws/internal/adapters"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy-aws/pkg/errs"
 	"github.com/aquasecurity/trivy-aws/pkg/progress"
@@ -105,7 +107,7 @@ func (s *Scanner) SetSkipRequiredCheck(bool)       {}
 func (s *Scanner) SetRegoErrorLimit(int)           {}
 
 func AllSupportedServices() []string {
-	return adapters.AllServices()
+	return aws.AllServices()
 }
 
 func (s *Scanner) SetAWSRegion(region string) {
@@ -138,7 +140,7 @@ func New(opts ...options.ScannerOption) *Scanner {
 }
 
 func (s *Scanner) CreateState(ctx context.Context) (*state.State, error) {
-	cloudState, err := adapters.Adapt(ctx, adapters.Options{
+	cloudState, err := adapter.Adapt(ctx, options2.Options{
 		ProgressTracker:     s.progressTracker,
 		Region:              s.region,
 		Endpoint:            s.endpoint,

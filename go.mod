@@ -3,7 +3,7 @@ module github.com/aquasecurity/trivy-aws
 go 1.20
 
 require (
-	github.com/aquasecurity/defsec v0.92.1-0.20230918174123-78adefe70b50
+	github.com/aquasecurity/defsec v0.92.1-0.20230925225724-4b598f8ffb36
 	github.com/aquasecurity/go-mock-aws v0.0.0-20230810212901-d6feebd39060
 	github.com/aquasecurity/trivy-policies v0.0.6-0.20230920041520-fc4059f58c9e
 	github.com/aws/aws-sdk-go v1.45.15
