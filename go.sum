@@ -66,8 +66,8 @@ github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.27.7 h1:qULF+ElcvjjSEO1+z5x+T
 github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.27.7/go.mod h1:1HKxVrj5wsKy/wb2v07vzTSd+YPV1sDsWxferwPK7PA=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.23.5 h1:/rXnxd9VGnTc5fLuSFKkWCy+kDP6CxXAIMvfJQEfx8U=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.23.5/go.mod h1:5v2ZNXCSwG73rx0k3sCuB1Ju8sbEbG0iUlxCA7D8sV8=
-github.com/aws/aws-sdk-go-v2/service/codebuild v1.21.5 h1:uol+F5F9T1cNSJsBfTOo85i5+qVbxsWhB7JTx9pjFis=
-github.com/aws/aws-sdk-go-v2/service/codebuild v1.21.5/go.mod h1:a0ghZ8nA7qvVSQ69JRKUxIMqVFgXp7pEF8sGYx1ibO0=
+github.com/aws/aws-sdk-go-v2/service/codebuild v1.22.0 h1:S/R9Wt8ICyPFV9B3f2DhcBPPSr1gIbFd4iR6E/kkyos=
+github.com/aws/aws-sdk-go-v2/service/codebuild v1.22.0/go.mod h1:a0ghZ8nA7qvVSQ69JRKUxIMqVFgXp7pEF8sGYx1ibO0=
 github.com/aws/aws-sdk-go-v2/service/docdb v1.23.5 h1:UcFHE3wNm7hOsVolGFJyKGNiv+vzk4DiP3kgmG/2V7k=
 github.com/aws/aws-sdk-go-v2/service/docdb v1.23.5/go.mod h1:2koFrNxz/jYwXiaAVw37p37KveilCeL+jKoeoecCMjk=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.21.5 h1:EeNQ3bDA6hlx3vifHf7LT/l9dh9w7D2XgCdaD11TRU4=
