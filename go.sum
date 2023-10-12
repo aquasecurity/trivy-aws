@@ -53,8 +53,8 @@ github.com/aws/aws-sdk-go-v2/internal/ini v1.3.44 h1:quOJOqlbSfeJTboXLjYXM1M9T52
 github.com/aws/aws-sdk-go-v2/internal/ini v1.3.44/go.mod h1:LNy+P1+1LiRcCsVYr/4zG5n8zWFL0xsvZkOybjbftm8=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.1.4 h1:6lJvvkQ9HmbHZ4h/IEwclwv2mrTW8Uq1SOB/kXy0mfw=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.1.4/go.mod h1:1PrKYwxTM+zjpw9Y41KFtoJCQrJ34Z47Y4VgVbfndjo=
-github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.20.5 h1:1w0ELQMC3AptxEFS4A+vJuhyIuC9IoNN2YxNKK5pSYQ=
-github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.20.5/go.mod h1:zwKhX2c7u7XDz2ToVE+qunfyoy9+3AO0rZynN5TwXCc=
+github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.21.1 h1:3fWAJsw4dLG4eYKHL9lygUWbE0lD+/gkqQC1zmmdAig=
+github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.21.1/go.mod h1:thg9BfQH96QsZg9BMe30WS2av72ZAo7/lTfvUJqjK4s=
 github.com/aws/aws-sdk-go-v2/service/apigateway v1.18.0 h1:rByriM7T0xvKy7eDiNUhFyVgnGupZ7DIifReKDzfk5E=
 github.com/aws/aws-sdk-go-v2/service/apigateway v1.18.0/go.mod h1:OJmEdRP/gDTqY71Cc/eJ/anpvvGHNgf62FyNuah3X48=
 github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.14.5 h1:pLmOgMUiwXOi3oKx2J3feVb9JGVgwJ78RYnOV9UR0BM=
