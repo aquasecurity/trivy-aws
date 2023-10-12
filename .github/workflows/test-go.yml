@@ -17,13 +17,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - uses: actions/setup-go@v3
+    - uses: actions/setup-go@v4
       if: matrix.os != 'windows-latest'
       with:
         go-version-file: go.mod
         cache: true
         cache-dependency-path: go.sum
-    - uses: actions/setup-go@v3
+    - uses: actions/setup-go@v4
       if: matrix.os == 'windows-latest'
       with:
         go-version-file: go.mod
