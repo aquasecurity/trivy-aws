@@ -44,7 +44,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sns v1.21.5
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.24.5
 	github.com/aws/aws-sdk-go-v2/service/sts v1.23.1
-	github.com/aws/aws-sdk-go-v2/service/workspaces v1.29.5
+	github.com/aws/aws-sdk-go-v2/service/workspaces v1.31.1
 	github.com/liamg/iamgo v0.0.9
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
