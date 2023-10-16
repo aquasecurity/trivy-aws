@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/aquasecurity/defsec v0.92.1-0.20230925225724-4b598f8ffb36
 	github.com/aquasecurity/go-mock-aws v0.0.0-20230810212901-d6feebd39060
-	github.com/aquasecurity/trivy-policies v0.0.6-0.20230920041520-fc4059f58c9e
+	github.com/aquasecurity/trivy-policies v0.1.0
 	github.com/aws/aws-sdk-go v1.45.15
 	github.com/aws/aws-sdk-go-v2 v1.21.1
 	github.com/aws/aws-sdk-go-v2/config v1.18.44
@@ -102,7 +102,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/liamg/jfather v0.0.7 // indirect
-	github.com/liamg/memoryfs v1.4.3 // indirect
+	github.com/liamg/memoryfs v1.6.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
