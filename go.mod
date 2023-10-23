@@ -8,10 +8,10 @@ require (
 	github.com/aquasecurity/trivy-iac v0.2.1-0.20231017235100-7079be880c70
 	github.com/aquasecurity/trivy-policies v0.2.1-0.20231017063459-bd8eb4f035d0
 	github.com/aws/aws-sdk-go v1.45.15
-	github.com/aws/aws-sdk-go-v2 v1.21.1
+	github.com/aws/aws-sdk-go-v2 v1.21.2
 	github.com/aws/aws-sdk-go-v2/config v1.18.44
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.42
-	github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.21.1
+	github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.21.2
 	github.com/aws/aws-sdk-go-v2/service/apigateway v1.18.0
 	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.14.5
 	github.com/aws/aws-sdk-go-v2/service/athena v1.31.6
@@ -64,8 +64,8 @@ require (
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.13 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.12 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.42 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.36 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.43 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.37 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.44 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.1.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.14 // indirect
