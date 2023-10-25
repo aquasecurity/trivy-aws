@@ -7,6 +7,7 @@ import (
 
 	"github.com/aquasecurity/defsec/pkg/providers/azure"
 	"github.com/aquasecurity/defsec/pkg/providers/azure/authorization"
+	"github.com/aquasecurity/trivy-iac/pkg/rules"
 
 	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
 
@@ -49,7 +50,7 @@ func TestScanner_GetRegisteredRules(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			for _, i := range tc.scanner.getRules() {
+			for _, i := range rules.GetRegistered() {
 				if _, ok := i.Rule.Frameworks[framework.CIS_AWS_1_2]; !ok {
 					assert.FailNow(t, "unexpected rule found: ", i.Rule.AVDID, tc.name)
 				}

@@ -21,14 +21,10 @@ github.com/apparentlymart/go-textseg/v13 v13.0.0 h1:Y+KvPE1NYz0xl601PVImeQfFyEy6
 github.com/apparentlymart/go-textseg/v13 v13.0.0/go.mod h1:ZK2fH7c4NqDTLtiYLvIkEghdlcqw7yxLeM89kiTRPUo=
 github.com/apparentlymart/go-textseg/v15 v15.0.0 h1:uYvfpb3DyLSCGWnctWKGj857c6ew1u1fNQOlOtuGxQY=
 github.com/apparentlymart/go-textseg/v15 v15.0.0/go.mod h1:K8XmNZdhEBkdlyDdvbmmsvpAG721bKi0joRfFdHIWJ4=
-github.com/aquasecurity/defsec v0.93.2-0.20231010220704-82e20e4c9d72 h1:myA/gpe55MGv88FHxN3YCchrrUM5ze4d+MQ42FeunVw=
-github.com/aquasecurity/defsec v0.93.2-0.20231010220704-82e20e4c9d72/go.mod h1:hSw5Nz91TC34eUmgXrpZSzI6zd7hErpk1QyE+uqtBjc=
+github.com/aquasecurity/defsec v0.93.2-0.20231020041402-7ccc46780c09 h1:dYBDwBnNzDsJr6l+FkrkrvWysAKc6VAO/leOcjvJfaA=
+github.com/aquasecurity/defsec v0.93.2-0.20231020041402-7ccc46780c09/go.mod h1:J30VViSgmoW2Ic/6aqVJO2qvuADsmZ3MYuNxPcU6Vt0=
 github.com/aquasecurity/go-mock-aws v0.0.0-20230810212901-d6feebd39060 h1:V7nC90NpRDEubNpNEgRDtTfLH3RKQlZeY9/HSqxEze8=
 github.com/aquasecurity/go-mock-aws v0.0.0-20230810212901-d6feebd39060/go.mod h1:QAMVTITMGE8AY3qkAIhYCNuQV2tTxzdmt7ZOP0SZwZs=
-github.com/aquasecurity/trivy-iac v0.2.1-0.20231017235100-7079be880c70 h1:8zHCZJ8p/Lvv5RMAex603QpNIUF+FFHYfo5v/16dpEs=
-github.com/aquasecurity/trivy-iac v0.2.1-0.20231017235100-7079be880c70/go.mod h1:LI5mkEHsch6NeWqfe5eE+yd0Jy18yU6I1sS6a0W2sBo=
-github.com/aquasecurity/trivy-policies v0.2.1-0.20231017063459-bd8eb4f035d0 h1:DaUmplSzs3o61bPVw+TyEF4mXyx7fmLfFORhep/QIBE=
-github.com/aquasecurity/trivy-policies v0.2.1-0.20231017063459-bd8eb4f035d0/go.mod h1:95+qxzR/aSisozbOeSHtltIstUhDHzOCeaqYOFQhC80=
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0 h1:jfIu9sQUG6Ig+0+Ap1h4unLjW6YQJpKZVmUzxsD4E/Q=
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0/go.mod h1:t2tdKJDJF9BV14lnkjHmOQgcvEKgtqs5a1N3LNdJhGE=
 github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 h1:0CwZNZbxp69SHPdPJAN/hZIm0C4OItdklCFmMRWYpio=
