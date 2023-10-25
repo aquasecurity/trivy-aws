@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/aquasecurity/defsec v0.93.2-0.20231020041402-7ccc46780c09
 	github.com/aquasecurity/go-mock-aws v0.0.0-20230810212901-d6feebd39060
-	github.com/aquasecurity/trivy-iac v0.3.0
+	github.com/aquasecurity/trivy-iac v0.4.0
 	github.com/aws/aws-sdk-go v1.45.15
 	github.com/aws/aws-sdk-go-v2 v1.21.1
 	github.com/aws/aws-sdk-go-v2/config v1.18.44
@@ -143,7 +143,3 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
-
-replace github.com/aquasecurity/trivy-policies => /Users/simarpreetsingh/repos/trivy-policies
-
-replace github.com/aquasecurity/trivy-iac => /Users/simarpreetsingh/repos/trivy-iac

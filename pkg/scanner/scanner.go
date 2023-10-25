@@ -174,7 +174,6 @@ func (s *Scanner) Scan(ctx context.Context, cloudState *state.State) (results sc
 
 	// evaluate go rules
 	if !s.regoOnly {
-		//for _, rule := range s.getRules() {
 		for _, rule := range rules.GetRegistered() {
 			select {
 			case <-ctx.Done():

@@ -46,13 +46,35 @@ func TestScanner_GetRegisteredRules(t *testing.T) {
 				// we still expect default rules to work
 			},
 		},
+		{
+			name:    "default rules",
+			scanner: &Scanner{},
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			for _, i := range rules.GetRegistered() {
-				if _, ok := i.Rule.Frameworks[framework.CIS_AWS_1_2]; !ok {
-					assert.FailNow(t, "unexpected rule found: ", i.Rule.AVDID, tc.name)
+			if tc.scanner.spec != "" {
+				for _, i := range rules.GetSpecRules(tc.scanner.spec) {
+					if _, ok := i.Rule.Frameworks[framework.CIS_AWS_1_2]; !ok {
+						assert.FailNowf(t, "unexpected rule found", "%s %s", i.Rule.AVDID, tc.name)
+					}
+				}
+			}
+
+			if tc.scanner.frameworks != nil {
+				for _, i := range rules.GetRegistered(tc.scanner.frameworks...) {
+					if _, ok := i.Rule.Frameworks[framework.CIS_AWS_1_2]; !ok {
+						assert.FailNowf(t, "unexpected rule found", "%s %s", i.Rule.AVDID, tc.name)
+					}
+				}
+			}
+
+			if tc.scanner.frameworks == nil && tc.scanner.spec == "" {
+				for _, i := range rules.GetRegistered() {
+					if _, ok := i.Rule.Frameworks[framework.CIS_AWS_1_2]; !ok {
+						assert.FailNowf(t, "unexpected rule found", "%s %s", i.Rule.AVDID, tc.name)
+					}
 				}
 			}
 		})
