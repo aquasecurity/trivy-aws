@@ -5,11 +5,9 @@ import (
 	"io/fs"
 	"testing"
 
+	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
 	"github.com/aquasecurity/defsec/pkg/providers/azure"
 	"github.com/aquasecurity/defsec/pkg/providers/azure/authorization"
-	"github.com/aquasecurity/trivy-iac/pkg/rules"
-
-	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
 
 	"github.com/aquasecurity/defsec/pkg/framework"
 	"github.com/aquasecurity/defsec/pkg/providers/aws"
@@ -32,6 +30,11 @@ type testStruct struct {
 func TestScanner_GetRegisteredRules(t *testing.T) {
 	testCases := []testStruct{
 		{
+			name:      "default rules",
+			scanner:   &Scanner{},
+			fwApplied: framework.Default,
+		},
+		{
 			name: "get framework rules",
 			scanner: &Scanner{
 				frameworks: []framework.Framework{framework.CIS_AWS_1_2},
@@ -53,31 +56,12 @@ func TestScanner_GetRegisteredRules(t *testing.T) {
 			},
 			fwApplied: framework.Default,
 		},
-		{
-			name:      "default rules",
-			scanner:   &Scanner{},
-			fwApplied: framework.Default,
-		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			if tc.scanner.spec != "" {
-				for _, i := range rules.GetSpecRules(tc.scanner.spec) {
-					assertRules(t, i, tc)
-				}
-			}
-
-			if tc.scanner.frameworks != nil {
-				for _, i := range rules.GetRegistered(tc.scanner.frameworks...) {
-					assertRules(t, i, tc)
-				}
-			}
-
-			if tc.scanner.frameworks == nil && tc.scanner.spec == "" {
-				for _, i := range rules.GetRegistered() {
-					assertRules(t, i, tc)
-				}
+			for _, r := range tc.scanner.getRules() {
+				assertRules(t, r, tc)
 			}
 		})
 	}
