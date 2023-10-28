@@ -5,10 +5,9 @@ import (
 	"io/fs"
 	"testing"
 
+	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
 	"github.com/aquasecurity/defsec/pkg/providers/azure"
 	"github.com/aquasecurity/defsec/pkg/providers/azure/authorization"
-
-	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
 
 	"github.com/aquasecurity/defsec/pkg/framework"
 	"github.com/aquasecurity/defsec/pkg/providers/aws"
@@ -17,26 +16,37 @@ import (
 	"github.com/aquasecurity/defsec/pkg/state"
 	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
 	"github.com/aquasecurity/defsec/test/testutil"
+	"github.com/aquasecurity/trivy-iac/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+type testStruct struct {
+	name      string
+	scanner   *Scanner
+	fwApplied framework.Framework
+}
+
 func TestScanner_GetRegisteredRules(t *testing.T) {
-	testCases := []struct {
-		name    string
-		scanner *Scanner
-	}{
+	testCases := []testStruct{
+		{
+			name:      "default rules",
+			scanner:   &Scanner{},
+			fwApplied: framework.Default,
+		},
 		{
 			name: "get framework rules",
 			scanner: &Scanner{
 				frameworks: []framework.Framework{framework.CIS_AWS_1_2},
 			},
+			fwApplied: framework.CIS_AWS_1_2,
 		},
 		{
 			name: "get spec rules",
 			scanner: &Scanner{
 				spec: "awscis1.2",
 			},
+			fwApplied: framework.CIS_AWS_1_2,
 		},
 		{
 			name: "invalid spec",
@@ -44,17 +54,24 @@ func TestScanner_GetRegisteredRules(t *testing.T) {
 				spec: "invalid spec",
 				// we still expect default rules to work
 			},
+			fwApplied: framework.Default,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			for _, i := range tc.scanner.getRules() {
-				if _, ok := i.Rule.Frameworks[framework.CIS_AWS_1_2]; !ok {
-					assert.FailNow(t, "unexpected rule found: ", i.Rule.AVDID, tc.name)
-				}
+			for _, r := range tc.scanner.getRules() {
+				assertRules(t, r, tc)
 			}
 		})
+	}
+}
+
+func assertRules(t *testing.T, r types.RegisteredRule, tc testStruct) {
+	t.Helper()
+
+	if _, ok := r.Rule.Frameworks[tc.fwApplied]; !ok {
+		assert.FailNowf(t, "unexpected rule found", "rule: %s in test case: %s", r.Rule.AVDID, tc.name)
 	}
 }
 

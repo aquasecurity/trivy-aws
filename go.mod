@@ -3,10 +3,9 @@ module github.com/aquasecurity/trivy-aws
 go 1.20
 
 require (
-	github.com/aquasecurity/defsec v0.93.2-0.20231010220704-82e20e4c9d72
+	github.com/aquasecurity/defsec v0.93.2-0.20231020041402-7ccc46780c09
 	github.com/aquasecurity/go-mock-aws v0.0.0-20230810212901-d6feebd39060
-	github.com/aquasecurity/trivy-iac v0.2.1-0.20231017235100-7079be880c70
-	github.com/aquasecurity/trivy-policies v0.2.1-0.20231017063459-bd8eb4f035d0
+	github.com/aquasecurity/trivy-iac v0.4.0
 	github.com/aws/aws-sdk-go v1.45.15
 	github.com/aws/aws-sdk-go-v2 v1.21.1
 	github.com/aws/aws-sdk-go-v2/config v1.18.44
@@ -62,6 +61,7 @@ require (
 	github.com/alecthomas/chroma v0.10.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
+	github.com/aquasecurity/trivy-policies v0.3.1-0.20231021040354-0572a07131c2 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.13 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.12 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.42 // indirect
