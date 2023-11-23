@@ -12,13 +12,13 @@ import (
 
 	"github.com/aquasecurity/defsec/pkg/debug"
 	"github.com/aquasecurity/defsec/pkg/framework"
+	"github.com/aquasecurity/defsec/pkg/rego"
+	"github.com/aquasecurity/defsec/pkg/rules"
 	"github.com/aquasecurity/defsec/pkg/scan"
 	"github.com/aquasecurity/defsec/pkg/scanners/options"
 	"github.com/aquasecurity/defsec/pkg/state"
 	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	"github.com/aquasecurity/trivy-iac/pkg/rego"
-	"github.com/aquasecurity/trivy-iac/pkg/rules"
-	"github.com/aquasecurity/trivy-iac/pkg/types"
+	defsecRules "github.com/aquasecurity/defsec/pkg/types/rules"
 
 	adapter "github.com/aquasecurity/trivy-aws/internal/adapters/cloud"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
@@ -207,7 +207,7 @@ func (s *Scanner) Scan(ctx context.Context, cloudState *state.State) (results sc
 	return append(results, regoResults...), nil
 }
 
-func (s *Scanner) getRules() []types.RegisteredRule {
+func (s *Scanner) getRules() []defsecRules.RegisteredRule {
 	if len(s.frameworks) > 0 { // Only for maintaining backwards compat
 		return rules.GetRegistered(s.frameworks...)
 	}

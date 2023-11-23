@@ -15,8 +15,8 @@ import (
 	"github.com/aquasecurity/defsec/pkg/scanners/options"
 	"github.com/aquasecurity/defsec/pkg/state"
 	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	defsecRules "github.com/aquasecurity/defsec/pkg/types/rules"
 	"github.com/aquasecurity/defsec/test/testutil"
-	"github.com/aquasecurity/trivy-iac/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -67,7 +67,7 @@ func TestScanner_GetRegisteredRules(t *testing.T) {
 	}
 }
 
-func assertRules(t *testing.T, r types.RegisteredRule, tc testStruct) {
+func assertRules(t *testing.T, r defsecRules.RegisteredRule, tc testStruct) {
 	t.Helper()
 
 	if _, ok := r.Rule.Frameworks[tc.fwApplied]; !ok {
