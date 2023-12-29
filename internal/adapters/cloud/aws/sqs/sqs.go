@@ -5,22 +5,22 @@ import (
 	"github.com/aquasecurity/defsec/pkg/providers/aws/sqs"
 	"github.com/aquasecurity/defsec/pkg/state"
 	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	aws2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
-	"github.com/aws/aws-sdk-go-v2/aws"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	sqsApi "github.com/aws/aws-sdk-go-v2/service/sqs"
 	sqsTypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/liamg/iamgo"
 
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 )
 
 type adapter struct {
-	*aws2.RootAdapter
+	*aws.RootAdapter
 	client *sqsApi.Client
 }
 
 func init() {
-	aws2.RegisterServiceAdapter(&adapter{})
+	aws.RegisterServiceAdapter(&adapter{})
 }
 
 func (a *adapter) Provider() string {
@@ -31,7 +31,7 @@ func (a *adapter) Name() string {
 	return "sqs"
 }
 
-func (a *adapter) Adapt(root *aws2.RootAdapter, state *state.State) error {
+func (a *adapter) Adapt(root *aws.RootAdapter, state *state.State) error {
 
 	a.RootAdapter = root
 	a.client = sqsApi.NewFromConfig(root.SessionConfig())
@@ -73,7 +73,7 @@ func (a *adapter) adaptQueue(queueUrl string) (*sqs.Queue, error) {
 
 	// make another call to get the attributes for the Queue
 	queueAttributes, err := a.client.GetQueueAttributes(a.Context(), &sqsApi.GetQueueAttributesInput{
-		QueueUrl: aws.String(queueUrl),
+		QueueUrl: awssdk.String(queueUrl),
 		AttributeNames: []sqsTypes.QueueAttributeName{
 			sqsTypes.QueueAttributeNameSqsManagedSseEnabled,
 			sqsTypes.QueueAttributeNameKmsMasterKeyId,

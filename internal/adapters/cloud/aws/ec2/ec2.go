@@ -8,21 +8,23 @@ import (
 	"github.com/aquasecurity/defsec/pkg/providers/aws/ec2"
 	"github.com/aquasecurity/defsec/pkg/state"
 	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	aws2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
-	"github.com/aws/aws-sdk-go-v2/aws"
+
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	ec2api "github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2Types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/types"
 )
 
 type adapter struct {
-	*aws2.RootAdapter
+	*aws.RootAdapter
 	client *ec2api.Client
 }
 
 func init() {
-	aws2.RegisterServiceAdapter(&adapter{})
+	aws.RegisterServiceAdapter(&adapter{})
 }
 
 func (a *adapter) Provider() string {
@@ -33,7 +35,7 @@ func (a *adapter) Name() string {
 	return "ec2"
 }
 
-func (a *adapter) Adapt(root *aws2.RootAdapter, state *state.State) error {
+func (a *adapter) Adapt(root *aws.RootAdapter, state *state.State) error {
 
 	a.RootAdapter = root
 	a.client = ec2api.NewFromConfig(root.SessionConfig())
@@ -87,7 +89,7 @@ func (a *adapter) getInstances() (instances []ec2.Instance, err error) {
 	input := &ec2api.DescribeInstancesInput{
 		Filters: []ec2Types.Filter{
 			{
-				Name:   aws.String("instance-state-name"),
+				Name:   awssdk.String("instance-state-name"),
 				Values: []string{"running"},
 			},
 		},
@@ -153,10 +155,7 @@ func (a *adapter) adaptInstance(instance ec2Types.Instance) (*ec2.Instance, erro
 	for _, v := range volumes.Volumes {
 		block := volumeBlockMap[*v.VolumeId]
 		if block != nil {
-			block.Encrypted = defsecTypes.BoolDefault(false, block.Metadata)
-			if v.Encrypted != nil {
-				block.Encrypted = defsecTypes.Bool(*v.Encrypted, block.Metadata)
-			}
+			block.Encrypted = types.ToBool(v.Encrypted, block.Metadata)
 		}
 	}
 	return i, nil

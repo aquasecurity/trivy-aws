@@ -3,12 +3,13 @@ package ssm
 import (
 	"github.com/aquasecurity/defsec/pkg/providers/aws/ssm"
 	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	api "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
-	"github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
+	secretsmanagerTypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
 
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/types"
 )
 
 type adapter struct {
@@ -46,7 +47,7 @@ func (a *adapter) getSecrets() ([]ssm.Secret, error) {
 
 	a.Tracker().SetServiceLabel("Discovering secrets...")
 
-	var apiSecrets []types.SecretListEntry
+	var apiSecrets []secretsmanagerTypes.SecretListEntry
 	var input api.ListSecretsInput
 	for {
 		output, err := a.api.ListSecrets(a.Context(), &input)
@@ -65,17 +66,12 @@ func (a *adapter) getSecrets() ([]ssm.Secret, error) {
 	return concurrency.Adapt(apiSecrets, a.RootAdapter, a.adaptSecret), nil
 }
 
-func (a *adapter) adaptSecret(apiSecret types.SecretListEntry) (*ssm.Secret, error) {
+func (a *adapter) adaptSecret(apiSecret secretsmanagerTypes.SecretListEntry) (*ssm.Secret, error) {
 
-	metadata := a.CreateMetadataFromARN(*apiSecret.ARN)
-
-	var kmsKeyId string
-	if apiSecret.KmsKeyId != nil {
-		kmsKeyId = *apiSecret.KmsKeyId
-	}
+	metadata := a.CreateMetadataFromARN(awssdk.ToString(apiSecret.ARN))
 
 	return &ssm.Secret{
 		Metadata: metadata,
-		KMSKeyID: defsecTypes.String(kmsKeyId, metadata),
+		KMSKeyID: types.ToString(apiSecret.KmsKeyId, metadata),
 	}, nil
 }

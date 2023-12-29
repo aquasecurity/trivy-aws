@@ -6,11 +6,12 @@ import (
 	"github.com/aquasecurity/defsec/pkg/providers/aws/lambda"
 	"github.com/aquasecurity/defsec/pkg/state"
 	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	lambdaapi "github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	"github.com/liamg/iamgo"
 
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 )
 
@@ -80,11 +81,13 @@ func (a *adapter) adaptFunction(function types.FunctionConfiguration) (*lambda.F
 	}
 
 	var permissions []lambda.Permission
-	if output, err := a.api.GetPolicy(a.Context(), &lambdaapi.GetPolicyInput{
+	getPolicyResult, err := a.api.GetPolicy(a.Context(), &lambdaapi.GetPolicyInput{
 		FunctionName: function.FunctionName,
 		Qualifier:    function.Version,
-	}); err == nil {
-		parsed, err := iamgo.ParseString(*output.Policy)
+	})
+
+	if err == nil {
+		parsed, err := iamgo.ParseString(awssdk.ToString(getPolicyResult.Policy))
 		if err != nil {
 			return nil, err
 		}

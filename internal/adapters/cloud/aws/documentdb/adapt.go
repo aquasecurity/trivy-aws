@@ -4,11 +4,12 @@ import (
 	"github.com/aquasecurity/defsec/pkg/providers/aws/documentdb"
 	"github.com/aquasecurity/defsec/pkg/state"
 	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	api "github.com/aws/aws-sdk-go-v2/service/docdb"
-	"github.com/aws/aws-sdk-go-v2/service/docdb/types"
+	docdbTypes "github.com/aws/aws-sdk-go-v2/service/docdb/types"
 
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/types"
 )
 
 type adapter struct {
@@ -46,7 +47,7 @@ func (a *adapter) getClusters() ([]documentdb.Cluster, error) {
 
 	a.Tracker().SetServiceLabel("Discovering clusters...")
 
-	var apiClusters []types.DBCluster
+	var apiClusters []docdbTypes.DBCluster
 	var input api.DescribeDBClustersInput
 	for {
 		output, err := a.client.DescribeDBClusters(a.Context(), &input)
@@ -65,23 +66,13 @@ func (a *adapter) getClusters() ([]documentdb.Cluster, error) {
 	return concurrency.Adapt(apiClusters, a.RootAdapter, a.adaptCluster), nil
 }
 
-func (a *adapter) adaptCluster(cluster types.DBCluster) (*documentdb.Cluster, error) {
+func (a *adapter) adaptCluster(cluster docdbTypes.DBCluster) (*documentdb.Cluster, error) {
 
 	metadata := a.CreateMetadataFromARN(*cluster.DBClusterArn)
 
 	var logExports []defsecTypes.StringValue
 	for _, export := range cluster.EnabledCloudwatchLogsExports {
 		logExports = append(logExports, defsecTypes.String(export, metadata))
-	}
-
-	var kmsKeyId string
-	if cluster.KmsKeyId != nil {
-		kmsKeyId = *cluster.KmsKeyId
-	}
-
-	var identifier string
-	if cluster.DBClusterIdentifier != nil {
-		identifier = *cluster.DBClusterIdentifier
 	}
 
 	var instances []documentdb.Instance
@@ -104,11 +95,11 @@ func (a *adapter) adaptCluster(cluster types.DBCluster) (*documentdb.Cluster, er
 
 	return &documentdb.Cluster{
 		Metadata:              metadata,
-		Identifier:            defsecTypes.String(identifier, metadata),
+		Identifier:            types.ToString(cluster.DBClusterIdentifier, metadata),
 		EnabledLogExports:     logExports,
 		Instances:             instances,
-		StorageEncrypted:      defsecTypes.Bool(cluster.StorageEncrypted, metadata),
-		KMSKeyID:              defsecTypes.String(kmsKeyId, metadata),
-		BackupRetentionPeriod: defsecTypes.Int(int(*cluster.BackupRetentionPeriod), metadata),
+		StorageEncrypted:      types.ToBool(cluster.StorageEncrypted, metadata),
+		KMSKeyID:              types.ToString(cluster.KmsKeyId, metadata),
+		BackupRetentionPeriod: types.ToInt(cluster.BackupRetentionPeriod, metadata),
 	}, nil
 }

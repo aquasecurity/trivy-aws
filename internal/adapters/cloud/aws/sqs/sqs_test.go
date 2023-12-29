@@ -7,13 +7,14 @@ import (
 	"github.com/aquasecurity/defsec/pkg/providers/aws/sqs"
 	"github.com/aquasecurity/defsec/pkg/state"
 	localstack "github.com/aquasecurity/go-mock-aws"
-	aws2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
-	"github.com/aws/aws-sdk-go-v2/aws"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	sqsapi "github.com/aws/aws-sdk-go-v2/service/sqs"
 	sqsTypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
 )
 
 type queueDetails struct {
@@ -21,8 +22,11 @@ type queueDetails struct {
 	managedEncryption bool
 }
 
-func (q queueDetails) QueueURL(stack *localstack.Stack) string {
-	return fmt.Sprintf("%s/000000000000/%s", stack.EndpointURL(), q.queueName)
+func (q queueDetails) QueueURL(region string) string {
+	return fmt.Sprintf(
+		"http://sqs.%s.localhost.localstack.cloud:%s/000000000000/%s",
+		region, localstack.Port, q.queueName,
+	)
 }
 
 func Test_SQSQueueEncrypted(t *testing.T) {
@@ -62,21 +66,22 @@ func Test_SQSQueueEncrypted(t *testing.T) {
 
 			assert.Len(t, testState.AWS.SQS.Queues, 1)
 			var got sqs.Queue
+			queueUrl := tt.details.QueueURL(ra.SessionConfig().Region)
 			for _, q := range testState.AWS.SQS.Queues {
-				if q.QueueURL.EqualTo(tt.details.QueueURL(stack)) {
+				if q.QueueURL.EqualTo(queueUrl) {
 					got = q
 					break
 				}
 			}
 
-			assert.Equal(t, tt.details.QueueURL(stack), got.QueueURL.Value())
+			assert.Equal(t, tt.details.QueueURL(ra.SessionConfig().Region), got.QueueURL.Value())
 			assert.Equal(t, tt.details.managedEncryption, got.Encryption.ManagedEncryption.Value())
-			removeQueue(t, ra, tt.details.QueueURL(stack))
+			removeQueue(t, ra, tt.details.QueueURL(ra.SessionConfig().Region))
 		})
 	}
 }
 
-func bootstrapSQSQueue(t *testing.T, ra *aws2.RootAdapter, spec queueDetails) {
+func bootstrapSQSQueue(t *testing.T, ra *aws.RootAdapter, spec queueDetails) {
 
 	api := sqsapi.NewFromConfig(ra.SessionConfig())
 
@@ -86,7 +91,7 @@ func bootstrapSQSQueue(t *testing.T, ra *aws2.RootAdapter, spec queueDetails) {
 	}
 
 	queue, err := api.CreateQueue(ra.Context(), &sqsapi.CreateQueueInput{
-		QueueName: aws.String(spec.queueName),
+		QueueName: awssdk.String(spec.queueName),
 	})
 	require.NoError(t, err)
 
@@ -97,12 +102,10 @@ func bootstrapSQSQueue(t *testing.T, ra *aws2.RootAdapter, spec queueDetails) {
 	require.NoError(t, err)
 }
 
-func removeQueue(t *testing.T, ra *aws2.RootAdapter, queueURL string) {
-
+func removeQueue(t *testing.T, ra *aws.RootAdapter, queueURL string) {
 	api := sqsapi.NewFromConfig(ra.SessionConfig())
-
 	_, err := api.DeleteQueue(ra.Context(), &sqsapi.DeleteQueueInput{
-		QueueUrl: aws.String(queueURL),
+		QueueUrl: awssdk.String(queueURL),
 	})
 	require.NoError(t, err)
 }
