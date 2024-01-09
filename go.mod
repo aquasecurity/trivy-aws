@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/aquasecurity/defsec v0.93.2-0.20231121210951-9b3cc255faff
-	github.com/aquasecurity/go-mock-aws v0.0.0-20230810212901-d6feebd39060
+	github.com/aquasecurity/go-mock-aws v0.0.0-20240109054747-49e4b5da33cb
 	github.com/aws/aws-sdk-go v1.45.15
 	github.com/aws/aws-sdk-go-v2 v1.24.1
 	github.com/aws/aws-sdk-go-v2/config v1.26.2
@@ -143,5 +143,3 @@ require (
 	gotest.tools/v3 v3.5.0 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
-
-replace github.com/aquasecurity/go-mock-aws => github.com/nikpivkin/go-mock-aws v0.0.0-20231229185747-d46fab3493db
