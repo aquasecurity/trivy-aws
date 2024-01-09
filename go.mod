@@ -29,7 +29,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.26.6
 	github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.24.6
 	github.com/aws/aws-sdk-go-v2/service/emr v1.36.0
-	github.com/aws/aws-sdk-go-v2/service/iam v1.28.6
+	github.com/aws/aws-sdk-go-v2/service/iam v1.28.7
 	github.com/aws/aws-sdk-go-v2/service/kafka v1.28.5
 	github.com/aws/aws-sdk-go-v2/service/kinesis v1.24.6
 	github.com/aws/aws-sdk-go-v2/service/kms v1.27.7
