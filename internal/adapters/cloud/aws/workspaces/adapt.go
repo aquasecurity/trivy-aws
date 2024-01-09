@@ -3,12 +3,13 @@ package workspaces
 import (
 	"github.com/aquasecurity/defsec/pkg/providers/aws/workspaces"
 	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	api "github.com/aws/aws-sdk-go-v2/service/workspaces"
-	"github.com/aws/aws-sdk-go-v2/service/workspaces/types"
+	workspaceTypes "github.com/aws/aws-sdk-go-v2/service/workspaces/types"
 
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/types"
 )
 
 type adapter struct {
@@ -46,7 +47,7 @@ func (a *adapter) getWorkspaces() ([]workspaces.WorkSpace, error) {
 
 	a.Tracker().SetServiceLabel("Discovering workspaces...")
 
-	var apiWorkspaces []types.Workspace
+	var apiWorkspaces []workspaceTypes.Workspace
 	var input api.DescribeWorkspacesInput
 	for {
 		output, err := a.api.DescribeWorkspaces(a.Context(), &input)
@@ -65,29 +66,23 @@ func (a *adapter) getWorkspaces() ([]workspaces.WorkSpace, error) {
 	return concurrency.Adapt(apiWorkspaces, a.RootAdapter, a.adaptWorkspace), nil
 }
 
-func (a *adapter) adaptWorkspace(apiWorkspace types.Workspace) (*workspaces.WorkSpace, error) {
+func (a *adapter) adaptWorkspace(apiWorkspace workspaceTypes.Workspace) (*workspaces.WorkSpace, error) {
 
-	metadata := a.CreateMetadata("workspace/" + *apiWorkspace.WorkspaceId)
+	metadata := a.CreateMetadata("workspace/" + awssdk.ToString(apiWorkspace.WorkspaceId))
 	return &workspaces.WorkSpace{
 		Metadata: metadata,
 		RootVolume: workspaces.Volume{
 			Metadata: metadata,
 			Encryption: workspaces.Encryption{
 				Metadata: metadata,
-				Enabled: defsecTypes.Bool(
-					apiWorkspace.RootVolumeEncryptionEnabled != nil && *apiWorkspace.RootVolumeEncryptionEnabled,
-					metadata,
-				),
+				Enabled:  types.ToBool(apiWorkspace.RootVolumeEncryptionEnabled, metadata),
 			},
 		},
 		UserVolume: workspaces.Volume{
 			Metadata: metadata,
 			Encryption: workspaces.Encryption{
 				Metadata: metadata,
-				Enabled: defsecTypes.Bool(
-					apiWorkspace.UserVolumeEncryptionEnabled != nil && *apiWorkspace.UserVolumeEncryptionEnabled,
-					metadata,
-				),
+				Enabled:  types.ToBool(apiWorkspace.UserVolumeEncryptionEnabled, metadata),
 			},
 		},
 	}, nil

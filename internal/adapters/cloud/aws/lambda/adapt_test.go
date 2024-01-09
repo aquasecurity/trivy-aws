@@ -6,12 +6,14 @@ import (
 
 	"github.com/aquasecurity/defsec/pkg/providers/aws/lambda"
 	"github.com/aquasecurity/defsec/pkg/state"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	lambdaapi "github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
 )
 
 type functionDetails struct {
@@ -60,7 +62,7 @@ func Test_Lambda(t *testing.T) {
 				permissions: []permissionDetails{
 					{
 						action:    "lambda:InvokeFunction",
-						principal: "1234567890",
+						principal: "sns.amazonaws.com",
 						source:    "*",
 					},
 				},
@@ -114,8 +116,10 @@ func bootstrapFunction(t *testing.T, ra *aws.RootAdapter, spec functionDetails) 
 		Code: &types.FunctionCode{
 			ZipFile: []byte{80, 75, 05, 06, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00},
 		},
+		Runtime:      types.RuntimeGo1x,
 		FunctionName: &spec.name,
-		Role:         &spec.name,
+		Role:         awssdk.String("arn:aws:iam::123456789012:role/test-role"),
+		Publish:      true, // https://github.com/terraform-aws-modules/terraform-aws-lambda/issues/36#issuecomment-650217274
 		TracingConfig: &types.TracingConfig{
 			Mode: types.TracingMode(spec.tracing),
 		},
@@ -128,7 +132,6 @@ func bootstrapFunction(t *testing.T, ra *aws.RootAdapter, spec functionDetails) 
 		_, err = api.AddPermission(ra.Context(), &lambdaapi.AddPermissionInput{
 			Action:       &perm.action,
 			FunctionName: &spec.name,
-			Qualifier:    output.Version,
 			Principal:    &perm.principal,
 			StatementId:  &statementID,
 			SourceArn:    &perm.source,

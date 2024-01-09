@@ -3,12 +3,12 @@ package mq
 import (
 	"github.com/aquasecurity/defsec/pkg/providers/aws/mq"
 	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	api "github.com/aws/aws-sdk-go-v2/service/mq"
-	"github.com/aws/aws-sdk-go-v2/service/mq/types"
+	mqTypes "github.com/aws/aws-sdk-go-v2/service/mq/types"
 
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/types"
 )
 
 type adapter struct {
@@ -46,7 +46,7 @@ func (a *adapter) getBrokers() ([]mq.Broker, error) {
 
 	a.Tracker().SetServiceLabel("Discovering brokers...")
 
-	var apiBrokers []types.BrokerSummary
+	var apiBrokers []mqTypes.BrokerSummary
 	var input api.ListBrokersInput
 	for {
 		output, err := a.api.ListBrokers(a.Context(), &input)
@@ -65,7 +65,7 @@ func (a *adapter) getBrokers() ([]mq.Broker, error) {
 	return concurrency.Adapt(apiBrokers, a.RootAdapter, a.adaptBroker), nil
 }
 
-func (a *adapter) adaptBroker(apiBroker types.BrokerSummary) (*mq.Broker, error) {
+func (a *adapter) adaptBroker(apiBroker mqTypes.BrokerSummary) (*mq.Broker, error) {
 
 	metadata := a.CreateMetadataFromARN(*apiBroker.BrokerArn)
 
@@ -78,11 +78,11 @@ func (a *adapter) adaptBroker(apiBroker types.BrokerSummary) (*mq.Broker, error)
 
 	return &mq.Broker{
 		Metadata:     metadata,
-		PublicAccess: defsecTypes.Bool(output.PubliclyAccessible, metadata),
+		PublicAccess: types.ToBool(output.PubliclyAccessible, metadata),
 		Logging: mq.Logging{
 			Metadata: metadata,
-			General:  defsecTypes.Bool(output.Logs != nil && output.Logs.General, metadata),
-			Audit:    defsecTypes.Bool(output.Logs != nil && output.Logs.Audit, metadata),
+			General:  types.ToBool(output.Logs.General, metadata),
+			Audit:    types.ToBool(output.Logs.Audit, metadata),
 		},
 	}, nil
 }

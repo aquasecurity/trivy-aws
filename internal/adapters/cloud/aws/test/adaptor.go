@@ -8,13 +8,14 @@ import (
 	"testing"
 
 	localstack "github.com/aquasecurity/go-mock-aws"
-	aws2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
-	"github.com/aws/aws-sdk-go-v2/aws"
+
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/progress"
 )
 
@@ -23,7 +24,7 @@ func getOrCreateLocalStack(ctx context.Context) (*localstack.Stack, error) {
 	stack := localstack.New()
 
 	initScripts, err := localstack.WithInitScriptMount(
-		"../test/init-scripts",
+		"../test/init-scripts/init-aws.sh",
 		"Bootstrap Complete")
 	if err != nil {
 		return nil, err
@@ -42,7 +43,7 @@ func getOrCreateLocalStack(ctx context.Context) (*localstack.Stack, error) {
 	return stack, nil
 }
 
-func CreateLocalstackAdapter(t *testing.T) (*aws2.RootAdapter, *localstack.Stack, error) {
+func CreateLocalstackAdapter(t *testing.T) (*aws.RootAdapter, *localstack.Stack, error) {
 	ctx := context.Background()
 	l, err := getOrCreateLocalStack(ctx)
 	require.NoError(t, err)
@@ -50,16 +51,16 @@ func CreateLocalstackAdapter(t *testing.T) (*aws2.RootAdapter, *localstack.Stack
 	cfg, err := createTestConfig(ctx, l)
 	require.NoError(t, err)
 
-	ra := aws2.NewRootAdapter(ctx, cfg, progress.NoProgress)
+	ra := aws.NewRootAdapter(ctx, cfg, progress.NoProgress)
 	require.NotNil(t, ra)
 	return ra, l, err
 }
 
-func createTestConfig(ctx context.Context, l *localstack.Stack) (aws.Config, error) {
+func createTestConfig(ctx context.Context, l *localstack.Stack) (awssdk.Config, error) {
 	return config.LoadDefaultConfig(ctx,
 		config.WithRegion("us-east-1"),
-		config.WithEndpointResolverWithOptions(aws.EndpointResolverWithOptionsFunc(func(_, _ string, _ ...interface{}) (aws.Endpoint, error) {
-			return aws.Endpoint{
+		config.WithEndpointResolverWithOptions(awssdk.EndpointResolverWithOptionsFunc(func(_, _ string, _ ...interface{}) (awssdk.Endpoint, error) {
+			return awssdk.Endpoint{
 				PartitionID:       "aws",
 				SigningRegion:     "us-east-1",
 				URL:               l.EndpointURL(),

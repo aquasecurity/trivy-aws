@@ -5,12 +5,13 @@ import (
 
 	"github.com/aquasecurity/defsec/pkg/providers/aws/redshift"
 	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	api "github.com/aws/aws-sdk-go-v2/service/redshift"
-	"github.com/aws/aws-sdk-go-v2/service/redshift/types"
+	redshiftTypes "github.com/aws/aws-sdk-go-v2/service/redshift/types"
 
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/types"
 )
 
 type adapter struct {
@@ -65,7 +66,7 @@ func (a *adapter) getClusters() ([]redshift.Cluster, error) {
 
 	a.Tracker().SetServiceLabel("Discovering clusters...")
 
-	var apiClusters []types.Cluster
+	var apiClusters []redshiftTypes.Cluster
 	var input api.DescribeClustersInput
 	for {
 		output, err := a.api.DescribeClusters(a.Context(), &input)
@@ -84,9 +85,9 @@ func (a *adapter) getClusters() ([]redshift.Cluster, error) {
 	return concurrency.Adapt(apiClusters, a.RootAdapter, a.adaptCluster), nil
 }
 
-func (a *adapter) adaptCluster(apiCluster types.Cluster) (*redshift.Cluster, error) {
+func (a *adapter) adaptCluster(apiCluster redshiftTypes.Cluster) (*redshift.Cluster, error) {
 
-	metadata := a.CreateMetadataFromARN(*apiCluster.ClusterNamespaceArn)
+	metadata := a.CreateMetadataFromARN(awssdk.ToString(apiCluster.ClusterNamespaceArn))
 
 	output, err := a.api.DescribeLoggingStatus(a.Context(), &api.DescribeLoggingStatusInput{
 		ClusterIdentifier: apiCluster.ClusterIdentifier,
@@ -95,47 +96,27 @@ func (a *adapter) adaptCluster(apiCluster types.Cluster) (*redshift.Cluster, err
 		output = nil
 	}
 
-	var loggingenabled bool
-	if output != nil {
-		loggingenabled = output.LoggingEnabled
-	}
-
-	var kmsKeyId string
-	if apiCluster.KmsKeyId != nil {
-		kmsKeyId = *apiCluster.KmsKeyId
-	}
-
-	var subnetGroupName string
-	if apiCluster.ClusterSubnetGroupName != nil {
-		subnetGroupName = *apiCluster.ClusterSubnetGroupName
-	}
-
-	var port int
-	if apiCluster.Endpoint != nil {
-		port = int(apiCluster.Endpoint.Port)
-	}
-
 	return &redshift.Cluster{
 		Metadata:                         metadata,
-		ClusterIdentifier:                defsecTypes.String(*apiCluster.ClusterIdentifier, metadata),
-		AllowVersionUpgrade:              defsecTypes.Bool(apiCluster.AllowVersionUpgrade, metadata),
-		NumberOfNodes:                    defsecTypes.Int(int(apiCluster.NumberOfNodes), metadata),
-		NodeType:                         defsecTypes.String(*apiCluster.NodeType, metadata),
-		PubliclyAccessible:               defsecTypes.Bool(apiCluster.PubliclyAccessible, metadata),
-		VpcId:                            defsecTypes.String(*apiCluster.VpcId, metadata),
-		MasterUsername:                   defsecTypes.String(*apiCluster.MasterUsername, metadata),
-		AutomatedSnapshotRetentionPeriod: defsecTypes.Int(int(apiCluster.ManualSnapshotRetentionPeriod), metadata),
-		LoggingEnabled:                   defsecTypes.Bool(loggingenabled, metadata),
+		ClusterIdentifier:                types.ToString(apiCluster.ClusterIdentifier, metadata),
+		AllowVersionUpgrade:              types.ToBool(apiCluster.AllowVersionUpgrade, metadata),
+		NumberOfNodes:                    types.ToInt(apiCluster.NumberOfNodes, metadata),
+		NodeType:                         types.ToString(apiCluster.NodeType, metadata),
+		PubliclyAccessible:               types.ToBool(apiCluster.PubliclyAccessible, metadata),
+		VpcId:                            types.ToString(apiCluster.VpcId, metadata),
+		MasterUsername:                   types.ToString(apiCluster.MasterUsername, metadata),
+		AutomatedSnapshotRetentionPeriod: types.ToInt(apiCluster.ManualSnapshotRetentionPeriod, metadata),
+		LoggingEnabled:                   types.ToBool(output.LoggingEnabled, metadata),
 		EndPoint: redshift.EndPoint{
 			Metadata: metadata,
-			Port:     defsecTypes.Int(port, metadata),
+			Port:     types.ToInt(apiCluster.Endpoint.Port, metadata),
 		},
 		Encryption: redshift.Encryption{
 			Metadata: metadata,
-			Enabled:  defsecTypes.Bool(apiCluster.Encrypted, metadata),
-			KMSKeyID: defsecTypes.String(kmsKeyId, metadata),
+			Enabled:  types.ToBool(apiCluster.Encrypted, metadata),
+			KMSKeyID: types.ToString(apiCluster.KmsKeyId, metadata),
 		},
-		SubnetGroupName: defsecTypes.String(subnetGroupName, metadata),
+		SubnetGroupName: types.ToString(apiCluster.ClusterSubnetGroupName, metadata),
 	}, nil
 }
 
@@ -143,7 +124,7 @@ func (a *adapter) getSecurityGroups() ([]redshift.SecurityGroup, error) {
 
 	a.Tracker().SetServiceLabel("Discovering security groups...")
 
-	var apiGroups []types.ClusterSecurityGroup
+	var apiGroups []redshiftTypes.ClusterSecurityGroup
 	var input api.DescribeClusterSecurityGroupsInput
 	for {
 		output, err := a.api.DescribeClusterSecurityGroups(a.Context(), &input)
@@ -162,18 +143,13 @@ func (a *adapter) getSecurityGroups() ([]redshift.SecurityGroup, error) {
 	return concurrency.Adapt(apiGroups, a.RootAdapter, a.adaptSecurityGroup), nil
 }
 
-func (a *adapter) adaptSecurityGroup(apiSG types.ClusterSecurityGroup) (*redshift.SecurityGroup, error) {
+func (a *adapter) adaptSecurityGroup(apiSG redshiftTypes.ClusterSecurityGroup) (*redshift.SecurityGroup, error) {
 
-	metadata := a.CreateMetadata("securitygroup:" + *apiSG.ClusterSecurityGroupName)
-
-	description := defsecTypes.StringDefault("", metadata)
-	if apiSG.Description != nil {
-		description = defsecTypes.String(*apiSG.Description, metadata)
-	}
+	metadata := a.CreateMetadata("securitygroup:" + awssdk.ToString(apiSG.ClusterSecurityGroupName))
 
 	return &redshift.SecurityGroup{
 		Metadata:    metadata,
-		Description: description,
+		Description: types.ToString(apiSG.Description, metadata),
 	}, nil
 }
 
@@ -181,7 +157,7 @@ func (a *adapter) getReservedNodes() ([]redshift.ReservedNode, error) {
 
 	a.Tracker().SetServiceLabel("Discovering reserved nodes...")
 
-	var apiReservednodes []types.ReservedNode
+	var apiReservednodes []redshiftTypes.ReservedNode
 	var input api.DescribeReservedNodesInput
 	for {
 		output, err := a.api.DescribeReservedNodes(a.Context(), &input)
@@ -200,11 +176,11 @@ func (a *adapter) getReservedNodes() ([]redshift.ReservedNode, error) {
 	return concurrency.Adapt(apiReservednodes, a.RootAdapter, a.adaptnode), nil
 }
 
-func (a *adapter) adaptnode(node types.ReservedNode) (*redshift.ReservedNode, error) {
-	metadata := a.CreateMetadata(*node.ReservedNodeId)
+func (a *adapter) adaptnode(node redshiftTypes.ReservedNode) (*redshift.ReservedNode, error) {
+	metadata := a.CreateMetadata(awssdk.ToString(node.ReservedNodeId))
 	return &redshift.ReservedNode{
 		Metadata: metadata,
-		NodeType: defsecTypes.String(*node.NodeType, metadata),
+		NodeType: types.ToString(node.NodeType, metadata),
 	}, nil
 }
 
@@ -212,7 +188,7 @@ func (a *adapter) getParameters() ([]redshift.ClusterParameter, error) {
 
 	a.Tracker().SetServiceLabel("Discovering cluster parameters ...")
 
-	var apiClusters []types.Parameter
+	var apiClusters []redshiftTypes.Parameter
 	var input api.DescribeClusterParameterGroupsInput
 	output, err := a.api.DescribeClusterParameterGroups(a.Context(), &input)
 	if err != nil {
@@ -241,14 +217,14 @@ func (a *adapter) getParameters() ([]redshift.ClusterParameter, error) {
 	return concurrency.Adapt(apiClusters, a.RootAdapter, a.adaptParameter), nil
 }
 
-func (a *adapter) adaptParameter(parameter types.Parameter) (*redshift.ClusterParameter, error) {
+func (a *adapter) adaptParameter(parameter redshiftTypes.Parameter) (*redshift.ClusterParameter, error) {
 
-	metadata := a.CreateMetadata(*parameter.ParameterName)
+	metadata := a.CreateMetadata(awssdk.ToString(parameter.ParameterName))
 
 	return &redshift.ClusterParameter{
 		Metadata:       metadata,
-		ParameterName:  defsecTypes.String(*parameter.ParameterName, metadata),
-		ParameterValue: defsecTypes.String(*parameter.ParameterValue, metadata),
+		ParameterName:  types.ToString(parameter.ParameterName, metadata),
+		ParameterValue: types.ToString(parameter.ParameterValue, metadata),
 	}, nil
 
 }

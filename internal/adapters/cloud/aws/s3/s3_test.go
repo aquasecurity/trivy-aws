@@ -6,13 +6,14 @@ import (
 
 	"github.com/aquasecurity/defsec/pkg/providers/aws/s3"
 	"github.com/aquasecurity/defsec/pkg/state"
-	aws2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
-	"github.com/aws/aws-sdk-go-v2/aws"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	s3api "github.com/aws/aws-sdk-go-v2/service/s3"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
 )
 
 type publicAccessBlock struct {
@@ -85,7 +86,7 @@ func Test_S3BucketACLs(t *testing.T) {
 			err = s3Adapter.Adapt(ra, testState)
 			require.NoError(t, err)
 
-			require.Len(t, testState.AWS.S3.Buckets, 2)
+			require.Len(t, testState.AWS.S3.Buckets, 1)
 			var got s3.Bucket
 			for _, b := range testState.AWS.S3.Buckets {
 				if b.Name.Value() == tt.details.bucketName {
@@ -96,7 +97,10 @@ func Test_S3BucketACLs(t *testing.T) {
 
 			assert.Equal(t, tt.details.bucketName, got.Name.Value())
 			assert.Equal(t, tt.details.acl, got.ACL.Value())
-			assert.Equal(t, tt.details.encrypted, got.Encryption.Enabled.Value())
+			if tt.details.encrypted {
+				// Amazon S3 now applies server-side encryption with Amazon S3 managed keys (SSE-S3)
+				assert.Equal(t, string(s3types.ServerSideEncryptionAes256), got.Encryption.Algorithm.Value())
+			}
 			removeBucket(t, ra, tt.details)
 		})
 	}
@@ -140,14 +144,13 @@ func Test_S3BucketLogging(t *testing.T) {
 			err = s3Adapter.Adapt(ra, testState)
 			require.NoError(t, err)
 
-			assert.Len(t, testState.AWS.S3.Buckets, 2)
-			var got s3.Bucket
-			for _, b := range testState.AWS.S3.Buckets {
-				if b.Name.Value() == tt.details.bucketName {
-					got = b
-					break
-				}
+			if tt.details.loggingEnabled {
+				assert.Len(t, testState.AWS.S3.Buckets, 2)
+			} else {
+				assert.Len(t, testState.AWS.S3.Buckets, 1)
 			}
+
+			got := findBucketByName(testState.AWS.S3.Buckets, tt.details.bucketName)
 
 			assert.Equal(t, tt.details.bucketName, got.Name.Value())
 			if tt.details.loggingEnabled {
@@ -198,14 +201,8 @@ func Test_S3BucketVersioning(t *testing.T) {
 			err = s3Adapter.Adapt(ra, testState)
 			require.NoError(t, err)
 
-			assert.Len(t, testState.AWS.S3.Buckets, 2)
-			var got s3.Bucket
-			for _, b := range testState.AWS.S3.Buckets {
-				if b.Name.Value() == tt.details.bucketName {
-					got = b
-					break
-				}
-			}
+			assert.Len(t, testState.AWS.S3.Buckets, 1)
+			got := findBucketByName(testState.AWS.S3.Buckets, tt.details.bucketName)
 
 			assert.Equal(t, tt.details.bucketName, got.Name.Value())
 			if tt.details.loggingEnabled {
@@ -276,14 +273,8 @@ func Test_S3PublicAccessBlock(t *testing.T) {
 			err = s3Adapter.Adapt(ra, testState)
 			require.NoError(t, err)
 
-			assert.Len(t, testState.AWS.S3.Buckets, 2)
-			var got s3.Bucket
-			for _, b := range testState.AWS.S3.Buckets {
-				if b.Name.Value() == tt.details.bucketName {
-					got = b
-					break
-				}
-			}
+			assert.Len(t, testState.AWS.S3.Buckets, 1)
+			got := findBucketByName(testState.AWS.S3.Buckets, tt.details.bucketName)
 
 			assert.Equal(t, tt.details.bucketName, got.Name.Value())
 			if tt.details.publicAccessBlock != nil {
@@ -299,12 +290,12 @@ func Test_S3PublicAccessBlock(t *testing.T) {
 	}
 }
 
-func bootstrapBucket(t *testing.T, ra *aws2.RootAdapter, spec bucketDetails) {
+func bootstrapBucket(t *testing.T, ra *aws.RootAdapter, spec bucketDetails) {
 
 	api := s3api.NewFromConfig(ra.SessionConfig())
 
 	_, err := api.CreateBucket(ra.Context(), &s3api.CreateBucketInput{
-		Bucket: aws.String(spec.bucketName),
+		Bucket: awssdk.String(spec.bucketName),
 
 		ACL: aclToCannedACL(spec.acl),
 	})
@@ -329,14 +320,14 @@ func bootstrapBucket(t *testing.T, ra *aws2.RootAdapter, spec bucketDetails) {
 
 func bootstrapBucketEncryption(t *testing.T, api *s3api.Client, ctx context.Context, spec bucketDetails) {
 	_, err := api.PutBucketEncryption(ctx, &s3api.PutBucketEncryptionInput{
-		Bucket: aws.String(spec.bucketName),
+		Bucket: awssdk.String(spec.bucketName),
 		ServerSideEncryptionConfiguration: &s3types.ServerSideEncryptionConfiguration{
 			Rules: []s3types.ServerSideEncryptionRule{
 				{
 					ApplyServerSideEncryptionByDefault: &s3types.ServerSideEncryptionByDefault{
 						SSEAlgorithm: s3types.ServerSideEncryptionAes256,
 					},
-					BucketKeyEnabled: true,
+					BucketKeyEnabled: awssdk.Bool(true),
 				},
 			},
 		},
@@ -346,18 +337,23 @@ func bootstrapBucketEncryption(t *testing.T, api *s3api.Client, ctx context.Cont
 }
 
 func bootstrapBucketLogging(t *testing.T, api *s3api.Client, ctx context.Context, spec bucketDetails) {
-	_, err := api.PutBucketLogging(ctx, &s3api.PutBucketLoggingInput{
-		Bucket: aws.String(spec.bucketName),
+	_, err := api.CreateBucket(ctx, &s3api.CreateBucketInput{
+		Bucket: &spec.loggingTargetBucket,
+	})
+	require.NoError(t, err)
+
+	_, err = api.PutBucketLogging(ctx, &s3api.PutBucketLoggingInput{
+		Bucket: awssdk.String(spec.bucketName),
 		BucketLoggingStatus: &s3types.BucketLoggingStatus{
 			LoggingEnabled: &s3types.LoggingEnabled{
-				TargetBucket: aws.String(spec.loggingTargetBucket),
-				TargetPrefix: aws.String("/logs"),
+				TargetBucket: awssdk.String(spec.loggingTargetBucket),
+				TargetPrefix: awssdk.String("/logs"),
 				TargetGrants: []s3types.TargetGrant{
 					{
 						Permission: s3types.BucketLogsPermissionWrite,
 						Grantee: &s3types.Grantee{
 							Type: s3types.TypeGroup,
-							URI:  aws.String("http://acs.amazonaws.com/groups/s3/LogDelivery"),
+							URI:  awssdk.String("http://acs.amazonaws.com/groups/s3/LogDelivery"),
 						},
 					},
 				},
@@ -369,7 +365,7 @@ func bootstrapBucketLogging(t *testing.T, api *s3api.Client, ctx context.Context
 
 func bootstrapBucketVersioning(t *testing.T, api *s3api.Client, ctx context.Context, spec bucketDetails) {
 	_, err := api.PutBucketVersioning(ctx, &s3api.PutBucketVersioningInput{
-		Bucket: aws.String(spec.bucketName),
+		Bucket: awssdk.String(spec.bucketName),
 		VersioningConfiguration: &s3types.VersioningConfiguration{
 			Status: s3types.BucketVersioningStatusEnabled,
 		},
@@ -379,12 +375,12 @@ func bootstrapBucketVersioning(t *testing.T, api *s3api.Client, ctx context.Cont
 
 func createPublicAccessBlock(t *testing.T, api *s3api.Client, ctx context.Context, spec bucketDetails) {
 	_, err := api.PutPublicAccessBlock(ctx, &s3api.PutPublicAccessBlockInput{
-		Bucket: aws.String(spec.bucketName),
+		Bucket: awssdk.String(spec.bucketName),
 		PublicAccessBlockConfiguration: &s3types.PublicAccessBlockConfiguration{
-			BlockPublicAcls:       spec.publicAccessBlock.blockPublicAcls,
-			IgnorePublicAcls:      spec.publicAccessBlock.ignorePublicAcls,
-			RestrictPublicBuckets: spec.publicAccessBlock.restrictPublicBuckets,
-			BlockPublicPolicy:     spec.publicAccessBlock.blockPublicPolicy,
+			BlockPublicAcls:       awssdk.Bool(spec.publicAccessBlock.blockPublicAcls),
+			IgnorePublicAcls:      awssdk.Bool(spec.publicAccessBlock.ignorePublicAcls),
+			RestrictPublicBuckets: awssdk.Bool(spec.publicAccessBlock.restrictPublicBuckets),
+			BlockPublicPolicy:     awssdk.Bool(spec.publicAccessBlock.blockPublicPolicy),
 		},
 	})
 	require.NoError(t, err)
@@ -403,12 +399,21 @@ func aclToCannedACL(acl string) s3types.BucketCannedACL {
 	}
 }
 
-func removeBucket(t *testing.T, ra *aws2.RootAdapter, spec bucketDetails) {
+func removeBucket(t *testing.T, ra *aws.RootAdapter, spec bucketDetails) {
 
 	api := s3api.NewFromConfig(ra.SessionConfig())
 
 	_, err := api.DeleteBucket(ra.Context(), &s3api.DeleteBucketInput{
-		Bucket: aws.String(spec.bucketName),
+		Bucket: awssdk.String(spec.bucketName),
 	})
 	require.NoError(t, err)
+}
+
+func findBucketByName(buckets []s3.Bucket, name string) s3.Bucket {
+	for _, b := range buckets {
+		if b.Name.Value() == name {
+			return b
+		}
+	}
+	return s3.Bucket{}
 }

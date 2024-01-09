@@ -4,11 +4,12 @@ import (
 	"github.com/aquasecurity/defsec/pkg/providers/aws/neptune"
 	"github.com/aquasecurity/defsec/pkg/state"
 	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	api "github.com/aws/aws-sdk-go-v2/service/neptune"
-	"github.com/aws/aws-sdk-go-v2/service/neptune/types"
+	neptuneTypes "github.com/aws/aws-sdk-go-v2/service/neptune/types"
 
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/types"
 )
 
 type adapter struct {
@@ -46,7 +47,7 @@ func (a *adapter) getClusters() ([]neptune.Cluster, error) {
 
 	a.Tracker().SetServiceLabel("Discovering clusters...")
 
-	var apiClusters []types.DBCluster
+	var apiClusters []neptuneTypes.DBCluster
 	var input api.DescribeDBClustersInput
 	for {
 		output, err := a.api.DescribeDBClusters(a.Context(), &input)
@@ -65,14 +66,9 @@ func (a *adapter) getClusters() ([]neptune.Cluster, error) {
 	return concurrency.Adapt(apiClusters, a.RootAdapter, a.adaptCluster), nil
 }
 
-func (a *adapter) adaptCluster(apiCluster types.DBCluster) (*neptune.Cluster, error) {
+func (a *adapter) adaptCluster(apiCluster neptuneTypes.DBCluster) (*neptune.Cluster, error) {
 
 	metadata := a.CreateMetadataFromARN(*apiCluster.DBClusterArn)
-
-	var kmsKeyId string
-	if apiCluster.KmsKeyId != nil {
-		kmsKeyId = *apiCluster.KmsKeyId
-	}
 
 	var auditLogging bool
 	for _, export := range apiCluster.EnabledCloudwatchLogsExports {
@@ -88,7 +84,7 @@ func (a *adapter) adaptCluster(apiCluster types.DBCluster) (*neptune.Cluster, er
 			Metadata: metadata,
 			Audit:    defsecTypes.Bool(auditLogging, metadata),
 		},
-		StorageEncrypted: defsecTypes.Bool(apiCluster.StorageEncrypted, metadata),
-		KMSKeyID:         defsecTypes.String(kmsKeyId, metadata),
+		StorageEncrypted: types.ToBool(apiCluster.StorageEncrypted, metadata),
+		KMSKeyID:         types.ToString(apiCluster.KmsKeyId, metadata),
 	}, nil
 }

@@ -7,13 +7,15 @@ import (
 	"github.com/aquasecurity/defsec/pkg/providers/aws/s3"
 	"github.com/aquasecurity/defsec/pkg/state"
 	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	s3api "github.com/aws/aws-sdk-go-v2/service/s3"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/liamg/iamgo"
 
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/types"
 )
 
 type adapter struct {
@@ -130,10 +132,10 @@ func (a *adapter) getPublicAccessBlock(bucketName *string, metadata defsecTypes.
 	config := publicAccessBlocks.PublicAccessBlockConfiguration
 	pab := s3.NewPublicAccessBlock(metadata)
 
-	pab.BlockPublicACLs = defsecTypes.Bool(config.BlockPublicAcls, metadata)
-	pab.BlockPublicPolicy = defsecTypes.Bool(config.BlockPublicPolicy, metadata)
-	pab.IgnorePublicACLs = defsecTypes.Bool(config.IgnorePublicAcls, metadata)
-	pab.RestrictPublicBuckets = defsecTypes.Bool(config.RestrictPublicBuckets, metadata)
+	pab.BlockPublicACLs = defsecTypes.Bool(awssdk.ToBool(config.BlockPublicAcls), metadata)
+	pab.BlockPublicPolicy = defsecTypes.Bool(awssdk.ToBool(config.BlockPublicPolicy), metadata)
+	pab.IgnorePublicACLs = defsecTypes.Bool(awssdk.ToBool(config.IgnorePublicAcls), metadata)
+	pab.RestrictPublicBuckets = defsecTypes.Bool(awssdk.ToBool(config.RestrictPublicBuckets), metadata)
 
 	return &pab
 }
@@ -200,7 +202,7 @@ func (a *adapter) getBucketEncryption(bucketName *string, metadata defsecTypes.M
 		defaultEncryption := encryption.ServerSideEncryptionConfiguration.Rules[0]
 		algorithm := defaultEncryption.ApplyServerSideEncryptionByDefault.SSEAlgorithm
 		bucketEncryption.Algorithm = defsecTypes.StringDefault(string(algorithm), metadata)
-		bucketEncryption.Enabled = defsecTypes.Bool(defaultEncryption.BucketKeyEnabled, metadata)
+		bucketEncryption.Enabled = types.ToBool(defaultEncryption.BucketKeyEnabled, metadata)
 		if algorithm != "" {
 			bucketEncryption.Enabled = defsecTypes.Bool(true, metadata)
 		}

@@ -5,12 +5,16 @@ import (
 
 	"github.com/aquasecurity/defsec/pkg/providers/aws/ec2"
 	"github.com/aquasecurity/defsec/pkg/state"
-	aws2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
-	"github.com/aws/aws-sdk-go-v2/aws"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	vpcApi "github.com/aws/aws-sdk-go-v2/service/ec2"
 	vpcTypes "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
+	"github.com/liamg/iamgo"
 	"github.com/stretchr/testify/require"
+
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
 )
 
 type rule struct {
@@ -115,6 +119,7 @@ func Test_VPCFlowLogs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			vpcId := bootstrapVPC(t, ra, tt.details)
+			defer destroyVPC(t, ra, vpcId)
 
 			testState := &state.State{}
 			adapter := &adapter{}
@@ -132,9 +137,6 @@ func Test_VPCFlowLogs(t *testing.T) {
 			require.Len(t, testVPCs, 1)
 			vpc := testVPCs[0]
 			require.Equal(t, tt.details.flowLogsEnabled, vpc.FlowLogsEnabled.Value())
-
-			destroyVPC(t, ra, vpcId)
-
 		})
 	}
 }
@@ -190,7 +192,7 @@ func Test_VPCSecurityGroups(t *testing.T) {
 	}
 }
 
-func destroyVPC(t *testing.T, ra *aws2.RootAdapter, id *string) {
+func destroyVPC(t *testing.T, ra *aws.RootAdapter, id *string) {
 	api := vpcApi.NewFromConfig(ra.SessionConfig())
 
 	_, err := api.DeleteVpc(ra.Context(), &vpcApi.DeleteVpcInput{
@@ -200,12 +202,12 @@ func destroyVPC(t *testing.T, ra *aws2.RootAdapter, id *string) {
 	require.NoError(t, err)
 }
 
-func bootstrapVPC(t *testing.T, ra *aws2.RootAdapter, spec vpcDetails) *string {
+func bootstrapVPC(t *testing.T, ra *aws.RootAdapter, spec vpcDetails) *string {
 
 	api := vpcApi.NewFromConfig(ra.SessionConfig())
 
 	vpc, err := api.CreateVpc(ra.Context(), &vpcApi.CreateVpcInput{
-		CidrBlock: aws.String("10.0.0.0/16"),
+		CidrBlock: awssdk.String("10.0.0.0/16"),
 	})
 
 	require.NoError(t, err)
@@ -225,19 +227,58 @@ func bootstrapVPC(t *testing.T, ra *aws2.RootAdapter, spec vpcDetails) *string {
 	return vpc.Vpc.VpcId
 }
 
-func addFlowLogs(t *testing.T, ra *aws2.RootAdapter, api *vpcApi.Client, vpc *vpcApi.CreateVpcOutput) {
+func addFlowLogs(t *testing.T, ra *aws.RootAdapter, api *vpcApi.Client, vpc *vpcApi.CreateVpcOutput) {
+
+	logGroupName := awssdk.String("test")
+	cloudWatchLogsClient := cloudwatchlogs.NewFromConfig(ra.SessionConfig())
+	_, err := cloudWatchLogsClient.CreateLogGroup(ra.Context(), &cloudwatchlogs.CreateLogGroupInput{
+		LogGroupName: logGroupName,
+	})
+	require.NoError(t, err)
+
+	policyBuilder := iamgo.NewPolicyBuilder()
+	doc := policyBuilder.WithStatement(
+		iamgo.NewStatementBuilder().
+			WithActions([]string{
+				"logs:CreateLogGroup",
+				"logs:CreateLogStream",
+				"logs:PutLogEvents",
+				"logs:DescribeLogGroups",
+				"logs:DescribeLogStreams",
+			}).
+			WithResources([]string{"*"}).
+			WithEffect("Allow").
+			Build(),
+	).Build()
+
+	docBytes, err := doc.MarshalJSON()
+	require.NoError(t, err)
+
+	iamClient := iam.NewFromConfig(ra.SessionConfig())
+	createRoleResult, err := iamClient.CreateRole(ra.Context(), &iam.CreateRoleInput{
+		RoleName:                 awssdk.String("test-role"),
+		AssumeRolePolicyDocument: awssdk.String(string(docBytes)),
+	})
+	require.NoError(t, err)
+	require.NotNil(t, createRoleResult.Role)
+
+	require.NoError(t, err)
 	logs, err := api.CreateFlowLogs(ra.Context(), &vpcApi.CreateFlowLogsInput{
-		ResourceIds:        []string{*vpc.Vpc.VpcId},
-		ResourceType:       vpcTypes.FlowLogsResourceTypeVpc,
-		LogDestinationType: vpcTypes.LogDestinationTypeS3,
-		LogDestination:     aws.String("arn:aws:s3:::access-logs"),
+		ResourceIds:              []string{*vpc.Vpc.VpcId},
+		ResourceType:             vpcTypes.FlowLogsResourceTypeVpc,
+		LogDestinationType:       vpcTypes.LogDestinationTypeCloudWatchLogs,
+		DeliverLogsPermissionArn: createRoleResult.Role.Arn,
+		LogGroupName:             logGroupName,
 	})
 
 	require.NoError(t, err)
 	require.NotNil(t, logs)
+	if len(logs.Unsuccessful) > 0 {
+		t.Fatal(awssdk.ToString(logs.Unsuccessful[0].Error.Message))
+	}
 }
 
-func addNacl(t *testing.T, ra *aws2.RootAdapter, spec vpcDetails, api *vpcApi.Client, vpc *vpcApi.CreateVpcOutput) {
+func addNacl(t *testing.T, ra *aws.RootAdapter, spec vpcDetails, api *vpcApi.Client, vpc *vpcApi.CreateVpcOutput) {
 	acl, err := api.CreateNetworkAcl(ra.Context(), &vpcApi.CreateNetworkAclInput{
 		VpcId: vpc.Vpc.VpcId,
 	})
@@ -246,25 +287,25 @@ func addNacl(t *testing.T, ra *aws2.RootAdapter, spec vpcDetails, api *vpcApi.Cl
 	for i, rule := range spec.nacl.naclRules {
 		_, err = api.CreateNetworkAclEntry(ra.Context(), &vpcApi.CreateNetworkAclEntryInput{
 			NetworkAclId: acl.NetworkAcl.NetworkAclId,
-			Egress:       aws.Bool(rule.egress),
+			Egress:       awssdk.Bool(rule.egress),
 			RuleAction:   rule.ruleAction,
-			RuleNumber:   aws.Int32(int32(i)),
-			Protocol:     aws.String(rule.protocol),
-			CidrBlock:    aws.String(rule.cidrBlock),
+			RuleNumber:   awssdk.Int32(int32(i)),
+			Protocol:     awssdk.String(rule.protocol),
+			CidrBlock:    awssdk.String(rule.cidrBlock),
 			PortRange: &vpcTypes.PortRange{
-				From: aws.Int32(80),
-				To:   aws.Int32(80),
+				From: awssdk.Int32(80),
+				To:   awssdk.Int32(80),
 			},
 		})
 		require.NoError(t, err)
 	}
 }
 
-func addSecurityGroup(t *testing.T, ra *aws2.RootAdapter, spec vpcDetails, api *vpcApi.Client, vpc *vpcApi.CreateVpcOutput) {
+func addSecurityGroup(t *testing.T, ra *aws.RootAdapter, spec vpcDetails, api *vpcApi.Client, vpc *vpcApi.CreateVpcOutput) {
 	_, err := api.CreateSecurityGroup(ra.Context(), &vpcApi.CreateSecurityGroupInput{
 		VpcId:       vpc.Vpc.VpcId,
-		GroupName:   aws.String(spec.securityGroup.name),
-		Description: aws.String(spec.securityGroup.description),
+		GroupName:   awssdk.String(spec.securityGroup.name),
+		Description: awssdk.String(spec.securityGroup.description),
 	})
 	require.NoError(t, err)
 }
