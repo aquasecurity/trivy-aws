@@ -5,6 +5,7 @@ import (
 
 	"github.com/aquasecurity/defsec/pkg/providers/aws/redshift"
 	"github.com/aquasecurity/defsec/pkg/state"
+	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	api "github.com/aws/aws-sdk-go-v2/service/redshift"
 	redshiftTypes "github.com/aws/aws-sdk-go-v2/service/redshift/types"
@@ -92,8 +93,10 @@ func (a *adapter) adaptCluster(apiCluster redshiftTypes.Cluster) (*redshift.Clus
 	output, err := a.api.DescribeLoggingStatus(a.Context(), &api.DescribeLoggingStatusInput{
 		ClusterIdentifier: apiCluster.ClusterIdentifier,
 	})
-	if err != nil {
-		output = nil
+
+	loggingEnabled := defsecTypes.BoolDefault(false, metadata)
+	if err == nil {
+		loggingEnabled = types.ToBool(output.LoggingEnabled, metadata)
 	}
 
 	return &redshift.Cluster{
@@ -106,7 +109,7 @@ func (a *adapter) adaptCluster(apiCluster redshiftTypes.Cluster) (*redshift.Clus
 		VpcId:                            types.ToString(apiCluster.VpcId, metadata),
 		MasterUsername:                   types.ToString(apiCluster.MasterUsername, metadata),
 		AutomatedSnapshotRetentionPeriod: types.ToInt(apiCluster.ManualSnapshotRetentionPeriod, metadata),
-		LoggingEnabled:                   types.ToBool(output.LoggingEnabled, metadata),
+		LoggingEnabled:                   loggingEnabled,
 		EndPoint: redshift.EndPoint{
 			Metadata: metadata,
 			Port:     types.ToInt(apiCluster.Endpoint.Port, metadata),
