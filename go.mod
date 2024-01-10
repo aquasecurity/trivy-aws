@@ -15,7 +15,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/athena v1.37.3
 	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.32.5
 	github.com/aws/aws-sdk-go-v2/service/cloudtrail v1.35.6
-	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.32.1
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.32.2
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.30.1
 	github.com/aws/aws-sdk-go-v2/service/codebuild v1.26.5
 	github.com/aws/aws-sdk-go-v2/service/docdb v1.29.6
