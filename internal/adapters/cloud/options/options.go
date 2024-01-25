@@ -1,7 +1,7 @@
 package options
 
 import (
-	"github.com/aquasecurity/defsec/pkg/debug"
+	"github.com/aquasecurity/trivy/pkg/debug"
 
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy-aws/pkg/progress"

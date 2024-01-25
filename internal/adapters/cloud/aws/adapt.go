@@ -4,17 +4,17 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aquasecurity/defsec/pkg/types"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy-aws/pkg/errs"
+	"github.com/aquasecurity/trivy/pkg/types"
 
-	"github.com/aquasecurity/defsec/pkg/debug"
+	"github.com/aquasecurity/trivy/pkg/debug"
 
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 
-	"github.com/aquasecurity/defsec/pkg/state"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/options"
 	"github.com/aquasecurity/trivy-aws/pkg/progress"
+	"github.com/aquasecurity/trivy/pkg/state"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -81,7 +81,7 @@ func (a *RootAdapter) Tracker() progress.ServiceTracker {
 	return a.tracker
 }
 
-func (a *RootAdapter) CreateMetadata(resource string) types.Metadata {
+func (a *RootAdapter) CreateMetadata(resource string) types.MisconfigMetadata {
 
 	// some services don't require region/account id in the ARN
 	// see https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces
@@ -102,8 +102,8 @@ func (a *RootAdapter) CreateMetadata(resource string) types.Metadata {
 	}).String())
 }
 
-func (a *RootAdapter) CreateMetadataFromARN(arn string) types.Metadata {
-	return types.NewRemoteMetadata(arn)
+func (a *RootAdapter) CreateMetadataFromARN(arn string) types.MisconfigMetadata {
+	return types.NewRemoteMisconfigMetadata(arn)
 }
 
 type resolver struct {

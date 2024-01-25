@@ -3,10 +3,10 @@ package s3
 import (
 	"strings"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
-	"github.com/aquasecurity/defsec/pkg/providers/aws/s3"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/providers/aws/iam"
+	"github.com/aquasecurity/trivy/pkg/providers/aws/s3"
+	"github.com/aquasecurity/trivy/pkg/state"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/types"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	s3api "github.com/aws/aws-sdk-go-v2/service/s3"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
@@ -109,7 +109,7 @@ func (a *adapter) adaptBucket(bucket s3types.Bucket) (*s3.Bucket, error) {
 
 }
 
-func (a *adapter) getPublicAccessBlock(bucketName *string, metadata defsecTypes.Metadata) *s3.PublicAccessBlock {
+func (a *adapter) getPublicAccessBlock(bucketName *string, metadata defsecTypes.MisconfigMetadata) *s3.PublicAccessBlock {
 
 	publicAccessBlocks, err := a.api.GetPublicAccessBlock(a.Context(), &s3api.GetPublicAccessBlockInput{
 		Bucket: bucketName,
@@ -140,7 +140,7 @@ func (a *adapter) getPublicAccessBlock(bucketName *string, metadata defsecTypes.
 	return &pab
 }
 
-func (a *adapter) getBucketPolicies(bucketName *string, metadata defsecTypes.Metadata) []iam.Policy {
+func (a *adapter) getBucketPolicies(bucketName *string, metadata defsecTypes.MisconfigMetadata) []iam.Policy {
 	var bucketPolicies []iam.Policy
 
 	bucketPolicy, err := a.api.GetBucketPolicy(a.Context(), &s3api.GetBucketPolicyInput{Bucket: bucketName})
@@ -178,7 +178,7 @@ func (a *adapter) getBucketPolicies(bucketName *string, metadata defsecTypes.Met
 
 }
 
-func (a *adapter) getBucketEncryption(bucketName *string, metadata defsecTypes.Metadata) s3.Encryption {
+func (a *adapter) getBucketEncryption(bucketName *string, metadata defsecTypes.MisconfigMetadata) s3.Encryption {
 	bucketEncryption := s3.Encryption{
 		Metadata:  metadata,
 		Enabled:   defsecTypes.BoolDefault(false, metadata),
@@ -215,7 +215,7 @@ func (a *adapter) getBucketEncryption(bucketName *string, metadata defsecTypes.M
 	return bucketEncryption
 }
 
-func (a *adapter) getBucketVersioning(bucketName *string, metadata defsecTypes.Metadata) s3.Versioning {
+func (a *adapter) getBucketVersioning(bucketName *string, metadata defsecTypes.MisconfigMetadata) s3.Versioning {
 	bucketVersioning := s3.Versioning{
 		Metadata:  metadata,
 		Enabled:   defsecTypes.BoolDefault(false, metadata),
@@ -243,7 +243,7 @@ func (a *adapter) getBucketVersioning(bucketName *string, metadata defsecTypes.M
 	return bucketVersioning
 }
 
-func (a *adapter) getBucketLogging(bucketName *string, metadata defsecTypes.Metadata) s3.Logging {
+func (a *adapter) getBucketLogging(bucketName *string, metadata defsecTypes.MisconfigMetadata) s3.Logging {
 
 	bucketLogging := s3.Logging{
 		Metadata:     metadata,
@@ -265,7 +265,7 @@ func (a *adapter) getBucketLogging(bucketName *string, metadata defsecTypes.Meta
 	return bucketLogging
 }
 
-func (a *adapter) getBucketACL(bucketName *string, metadata defsecTypes.Metadata) defsecTypes.StringValue {
+func (a *adapter) getBucketACL(bucketName *string, metadata defsecTypes.MisconfigMetadata) defsecTypes.StringValue {
 	acl, err := a.api.GetBucketAcl(a.Context(), &s3api.GetBucketAclInput{Bucket: bucketName})
 	if err != nil {
 		a.Debug("Error getting bucket ACL: %s", err)
@@ -292,7 +292,7 @@ func (a *adapter) getBucketACL(bucketName *string, metadata defsecTypes.Metadata
 	return defsecTypes.String(aclValue, metadata)
 }
 
-func (a *adapter) getBucketLifecycle(bucketName *string, metadata defsecTypes.Metadata) []s3.Rules {
+func (a *adapter) getBucketLifecycle(bucketName *string, metadata defsecTypes.MisconfigMetadata) []s3.Rules {
 	output, err := a.api.GetBucketLifecycleConfiguration(a.Context(), &s3api.GetBucketLifecycleConfigurationInput{
 		Bucket: bucketName,
 	})
@@ -309,7 +309,7 @@ func (a *adapter) getBucketLifecycle(bucketName *string, metadata defsecTypes.Me
 	return rules
 }
 
-func (a *adapter) getBucketAccelarate(bucketName *string, metadata defsecTypes.Metadata) defsecTypes.StringValue {
+func (a *adapter) getBucketAccelarate(bucketName *string, metadata defsecTypes.MisconfigMetadata) defsecTypes.StringValue {
 	output, err := a.api.GetBucketAccelerateConfiguration(a.Context(), &s3api.GetBucketAccelerateConfigurationInput{
 		Bucket: bucketName,
 	})
@@ -319,7 +319,7 @@ func (a *adapter) getBucketAccelarate(bucketName *string, metadata defsecTypes.M
 	return defsecTypes.String(string(output.Status), metadata)
 }
 
-func (a *adapter) getBucketLocation(bucketName *string, metadata defsecTypes.Metadata) defsecTypes.StringValue {
+func (a *adapter) getBucketLocation(bucketName *string, metadata defsecTypes.MisconfigMetadata) defsecTypes.StringValue {
 	output, err := a.api.GetBucketLocation(a.Context(), &s3api.GetBucketLocationInput{
 		Bucket: bucketName,
 	})
@@ -329,7 +329,7 @@ func (a *adapter) getBucketLocation(bucketName *string, metadata defsecTypes.Met
 	return defsecTypes.String(string(output.LocationConstraint), metadata)
 }
 
-func (a *adapter) getObjects(bucketName *string, metadata defsecTypes.Metadata) []s3.Contents {
+func (a *adapter) getObjects(bucketName *string, metadata defsecTypes.MisconfigMetadata) []s3.Contents {
 	output, err := a.api.ListObjects(a.Context(), &s3api.ListObjectsInput{
 		Bucket: bucketName,
 	})
@@ -345,7 +345,7 @@ func (a *adapter) getObjects(bucketName *string, metadata defsecTypes.Metadata) 
 	return obj
 }
 
-func (a *adapter) getWebsite(bucketName *string, metadata defsecTypes.Metadata) *s3.Website {
+func (a *adapter) getWebsite(bucketName *string, metadata defsecTypes.MisconfigMetadata) *s3.Website {
 
 	website, err := a.api.GetBucketWebsite(a.Context(), &s3api.GetBucketWebsiteInput{
 		Bucket: bucketName,

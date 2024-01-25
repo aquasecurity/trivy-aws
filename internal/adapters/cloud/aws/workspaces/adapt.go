@@ -1,8 +1,8 @@
 package workspaces
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/workspaces"
-	"github.com/aquasecurity/defsec/pkg/state"
+	"github.com/aquasecurity/trivy/pkg/providers/aws/workspaces"
+	"github.com/aquasecurity/trivy/pkg/state"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	api "github.com/aws/aws-sdk-go-v2/service/workspaces"
 	workspaceTypes "github.com/aws/aws-sdk-go-v2/service/workspaces/types"

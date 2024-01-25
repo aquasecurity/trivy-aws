@@ -3,10 +3,10 @@ package athena
 import (
 	"fmt"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/athena"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy/pkg/providers/aws/athena"
+	"github.com/aquasecurity/trivy/pkg/state"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/types"
 	api "github.com/aws/aws-sdk-go-v2/service/athena"
 	"github.com/aws/aws-sdk-go-v2/service/athena/types"
 
@@ -179,7 +179,7 @@ func (a *adapter) adaptDatabase(database types.Database) (*athena.Database, erro
 		Encryption: athena.EncryptionConfiguration{
 			Metadata: metadata,
 			// see https://stackoverflow.com/questions/72456689/what-does-encryption-configuration-in-terraform-aws-athena-database-resource
-			Type: defsecTypes.String("", defsecTypes.NewUnmanagedMetadata()),
+			Type: defsecTypes.String("", defsecTypes.NewUnmanagedMisconfigMetadata()),
 		},
 	}, nil
 }

@@ -3,8 +3,8 @@ package ec2
 import (
 	"fmt"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/ec2"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/providers/aws/ec2"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/types"
 	ec2api "github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 

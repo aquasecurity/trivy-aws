@@ -5,18 +5,18 @@ import (
 	"io/fs"
 	"testing"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
-	"github.com/aquasecurity/defsec/pkg/providers/azure"
-	"github.com/aquasecurity/defsec/pkg/providers/azure/authorization"
+	"github.com/aquasecurity/trivy/pkg/providers/aws/iam"
+	"github.com/aquasecurity/trivy/pkg/providers/azure"
+	"github.com/aquasecurity/trivy/pkg/providers/azure/authorization"
 
-	"github.com/aquasecurity/defsec/pkg/framework"
-	"github.com/aquasecurity/defsec/pkg/providers/aws"
-	"github.com/aquasecurity/defsec/pkg/providers/aws/rds"
-	"github.com/aquasecurity/defsec/pkg/scanners/options"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	defsecRules "github.com/aquasecurity/defsec/pkg/types/rules"
 	"github.com/aquasecurity/defsec/test/testutil"
+	"github.com/aquasecurity/trivy/pkg/framework"
+	"github.com/aquasecurity/trivy/pkg/providers/aws"
+	"github.com/aquasecurity/trivy/pkg/providers/aws/rds"
+	"github.com/aquasecurity/trivy/pkg/scanners/options"
+	"github.com/aquasecurity/trivy/pkg/state"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/types"
+	defsecRules "github.com/aquasecurity/trivy/pkg/types/rules"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -113,7 +113,7 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: defsecTypes.Metadata{},
+						{Metadata: defsecTypes.MisconfigMetadata{},
 							PublicAccess: defsecTypes.Bool(true, defsecTypes.NewTestMetadata()),
 						},
 					},
@@ -155,7 +155,7 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: defsecTypes.Metadata{},
+						{Metadata: defsecTypes.MisconfigMetadata{},
 							PublicAccess: defsecTypes.Bool(true, defsecTypes.NewTestMetadata()),
 						},
 					},
@@ -197,7 +197,7 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: defsecTypes.Metadata{},
+						{Metadata: defsecTypes.MisconfigMetadata{},
 							PublicAccess: defsecTypes.Bool(true, defsecTypes.NewTestMetadata()),
 						},
 					},
@@ -234,7 +234,7 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: defsecTypes.Metadata{},
+						{Metadata: defsecTypes.MisconfigMetadata{},
 							PublicAccess: defsecTypes.Bool(true, defsecTypes.NewTestMetadata()),
 						},
 					},
@@ -279,7 +279,7 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: defsecTypes.Metadata{},
+						{Metadata: defsecTypes.MisconfigMetadata{},
 							PublicAccess: defsecTypes.Bool(true, defsecTypes.NewTestMetadata()),
 						},
 					},
@@ -359,7 +359,7 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: defsecTypes.Metadata{},
+						{Metadata: defsecTypes.MisconfigMetadata{},
 							PublicAccess: defsecTypes.Bool(true, defsecTypes.NewTestMetadata()),
 						},
 					},
@@ -515,7 +515,7 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: defsecTypes.Metadata{},
+						{Metadata: defsecTypes.MisconfigMetadata{},
 							PublicAccess: defsecTypes.Bool(false, defsecTypes.NewTestMetadata()),
 						},
 					},

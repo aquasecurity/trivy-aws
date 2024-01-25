@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/sqs"
-	"github.com/aquasecurity/defsec/pkg/state"
 	localstack "github.com/aquasecurity/go-mock-aws"
+	"github.com/aquasecurity/trivy/pkg/providers/aws/sqs"
+	"github.com/aquasecurity/trivy/pkg/state"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	sqsapi "github.com/aws/aws-sdk-go-v2/service/sqs"
 	sqsTypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"

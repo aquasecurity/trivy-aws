@@ -1,9 +1,9 @@
 package rds
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/rds"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/providers/aws/rds"
+	"github.com/aquasecurity/trivy/pkg/state"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/types"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	rdsApi "github.com/aws/aws-sdk-go-v2/service/rds"
 	rdsTypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
@@ -359,7 +359,7 @@ func (a *adapter) adaptClassic(dbSecurityGroup rdsTypes.DBSecurityGroup) (*rds.D
 	return dbsg, nil
 }
 
-func getInstanceEncryption(storageEncrypted bool, kmsKeyID *string, metadata defsecTypes.Metadata) rds.Encryption {
+func getInstanceEncryption(storageEncrypted bool, kmsKeyID *string, metadata defsecTypes.MisconfigMetadata) rds.Encryption {
 	encryption := rds.Encryption{
 		Metadata:       metadata,
 		EncryptStorage: defsecTypes.BoolDefault(storageEncrypted, metadata),
@@ -369,7 +369,7 @@ func getInstanceEncryption(storageEncrypted bool, kmsKeyID *string, metadata def
 	return encryption
 }
 
-func getPerformanceInsights(enabled *bool, kmsKeyID *string, metadata defsecTypes.Metadata) rds.PerformanceInsights {
+func getPerformanceInsights(enabled *bool, kmsKeyID *string, metadata defsecTypes.MisconfigMetadata) rds.PerformanceInsights {
 	performanceInsights := rds.PerformanceInsights{
 		Metadata: metadata,
 		Enabled:  types.ToBool(enabled, metadata),

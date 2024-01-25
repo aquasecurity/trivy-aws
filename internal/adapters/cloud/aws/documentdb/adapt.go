@@ -1,9 +1,9 @@
 package documentdb
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/documentdb"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/providers/aws/documentdb"
+	"github.com/aquasecurity/trivy/pkg/state"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/types"
 	api "github.com/aws/aws-sdk-go-v2/service/docdb"
 	docdbTypes "github.com/aws/aws-sdk-go-v2/service/docdb/types"
 

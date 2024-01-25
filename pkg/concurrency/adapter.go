@@ -3,7 +3,7 @@ package concurrency
 import (
 	"sync"
 
-	"github.com/aquasecurity/defsec/pkg/state"
+	"github.com/aquasecurity/trivy/pkg/state"
 
 	"github.com/aquasecurity/trivy-aws/pkg/progress"
 )

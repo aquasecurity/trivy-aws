@@ -10,15 +10,15 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/aquasecurity/defsec/pkg/debug"
-	"github.com/aquasecurity/defsec/pkg/framework"
-	"github.com/aquasecurity/defsec/pkg/rego"
-	"github.com/aquasecurity/defsec/pkg/rules"
-	"github.com/aquasecurity/defsec/pkg/scan"
-	"github.com/aquasecurity/defsec/pkg/scanners/options"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	defsecRules "github.com/aquasecurity/defsec/pkg/types/rules"
+	"github.com/aquasecurity/trivy/pkg/debug"
+	"github.com/aquasecurity/trivy/pkg/framework"
+	"github.com/aquasecurity/trivy/pkg/rego"
+	"github.com/aquasecurity/trivy/pkg/scan"
+	"github.com/aquasecurity/trivy/pkg/scanners/options"
+	"github.com/aquasecurity/trivy/pkg/state"
+	"github.com/aquasecurity/trivy/pkg/trules"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/types"
+	defsecRules "github.com/aquasecurity/trivy/pkg/types/rules"
 
 	adapter "github.com/aquasecurity/trivy-aws/internal/adapters/cloud"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
@@ -209,9 +209,9 @@ func (s *Scanner) Scan(ctx context.Context, cloudState *state.State) (results sc
 
 func (s *Scanner) getRules() []defsecRules.RegisteredRule {
 	if len(s.frameworks) > 0 { // Only for maintaining backwards compat
-		return rules.GetRegistered(s.frameworks...)
+		return trules.GetRegistered(s.frameworks...)
 	}
-	return rules.GetSpecRules(s.spec)
+	return trules.GetSpecRules(s.spec)
 }
 
 func (s *Scanner) initRegoScanner() (*rego.Scanner, error) {

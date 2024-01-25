@@ -1,8 +1,8 @@
 package mq
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/mq"
-	"github.com/aquasecurity/defsec/pkg/state"
+	"github.com/aquasecurity/trivy/pkg/providers/aws/mq"
+	"github.com/aquasecurity/trivy/pkg/state"
 	api "github.com/aws/aws-sdk-go-v2/service/mq"
 	mqTypes "github.com/aws/aws-sdk-go-v2/service/mq/types"
 
