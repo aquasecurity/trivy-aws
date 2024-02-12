@@ -1,7 +1,7 @@
 package types
 
 import (
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 )
 
 func ToString(p *string, m defsecTypes.Metadata) defsecTypes.StringValue {

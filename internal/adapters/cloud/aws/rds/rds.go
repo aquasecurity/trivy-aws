@@ -1,9 +1,9 @@
 package rds
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/rds"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/rds"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	rdsApi "github.com/aws/aws-sdk-go-v2/service/rds"
 	rdsTypes "github.com/aws/aws-sdk-go-v2/service/rds/types"

@@ -1,8 +1,8 @@
 package ec2
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/ec2"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ec2"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	ec2api "github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"

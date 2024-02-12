@@ -3,10 +3,10 @@ package iam
 import (
 	"fmt"
 
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
-	"github.com/aquasecurity/defsec/pkg/state"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
 	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 

@@ -3,10 +3,10 @@ package s3
 import (
 	"strings"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
-	"github.com/aquasecurity/defsec/pkg/providers/aws/s3"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/s3"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	s3api "github.com/aws/aws-sdk-go-v2/service/s3"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"

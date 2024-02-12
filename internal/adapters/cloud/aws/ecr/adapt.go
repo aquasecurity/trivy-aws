@@ -1,11 +1,11 @@
 package ecr
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/ecr"
-	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ecr"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	ecrapi "github.com/aws/aws-sdk-go-v2/service/ecr"
 	"github.com/aws/aws-sdk-go-v2/service/ecr/types"
 	"github.com/liamg/iamgo"

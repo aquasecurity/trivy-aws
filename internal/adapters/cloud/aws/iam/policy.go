@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"github.com/liamg/iamgo"

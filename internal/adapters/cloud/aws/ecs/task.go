@@ -1,8 +1,8 @@
 package ecs
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/ecs"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ecs"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	ecsapi "github.com/aws/aws-sdk-go-v2/service/ecs"
 
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"

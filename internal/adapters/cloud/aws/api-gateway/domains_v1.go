@@ -3,8 +3,8 @@ package api_gateway
 import (
 	"fmt"
 
-	v1 "github.com/aquasecurity/defsec/pkg/providers/aws/apigateway/v1"
-	"github.com/aquasecurity/defsec/pkg/types"
+	v1 "github.com/aquasecurity/trivy/pkg/iac/providers/aws/apigateway/v1"
+	"github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/apigateway"
 	agTypes "github.com/aws/aws-sdk-go-v2/service/apigateway/types"
 

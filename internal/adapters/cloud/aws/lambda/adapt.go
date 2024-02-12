@@ -3,9 +3,9 @@ package lambda
 import (
 	"strings"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/lambda"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/lambda"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	lambdaapi "github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"

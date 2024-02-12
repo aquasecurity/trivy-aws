@@ -1,10 +1,10 @@
 package emr
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/emr"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/emr"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/emr"
 	"github.com/aws/aws-sdk-go-v2/service/emr/types"
 

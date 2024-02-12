@@ -4,17 +4,17 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aquasecurity/defsec/pkg/types"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy-aws/pkg/errs"
+	"github.com/aquasecurity/trivy/pkg/iac/types"
 
-	"github.com/aquasecurity/defsec/pkg/debug"
+	"github.com/aquasecurity/trivy/pkg/iac/debug"
 
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 
-	"github.com/aquasecurity/defsec/pkg/state"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/options"
 	"github.com/aquasecurity/trivy-aws/pkg/progress"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/config"

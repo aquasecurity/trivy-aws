@@ -3,9 +3,9 @@ package iam
 import (
 	"fmt"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
-	"github.com/aquasecurity/defsec/pkg/state"
-	"github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	"github.com/aquasecurity/trivy/pkg/iac/types"
 	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 
