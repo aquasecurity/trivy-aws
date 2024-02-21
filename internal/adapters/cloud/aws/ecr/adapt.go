@@ -5,7 +5,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ecr"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	ecrapi "github.com/aws/aws-sdk-go-v2/service/ecr"
 	"github.com/aws/aws-sdk-go-v2/service/ecr/types"
 	"github.com/liamg/iamgo"
@@ -93,9 +93,9 @@ func (a *adapter) adaptRepository(apiRepository types.Repository) (*ecr.Reposito
 		if err != nil {
 			return nil, err
 		}
-		name := defsecTypes.StringDefault("", metadata)
+		name := trivyTypes.StringDefault("", metadata)
 		if output.RepositoryName != nil {
-			name = defsecTypes.String(*output.RepositoryName, metadata)
+			name = trivyTypes.String(*output.RepositoryName, metadata)
 		}
 		policies = append(policies, iam.Policy{
 			Metadata: metadata,
@@ -104,7 +104,7 @@ func (a *adapter) adaptRepository(apiRepository types.Repository) (*ecr.Reposito
 				Metadata: metadata,
 				Parsed:   *parsed,
 			},
-			Builtin: defsecTypes.Bool(false, metadata),
+			Builtin: trivyTypes.Bool(false, metadata),
 		})
 	}
 
@@ -112,14 +112,14 @@ func (a *adapter) adaptRepository(apiRepository types.Repository) (*ecr.Reposito
 		Metadata: metadata,
 		ImageScanning: ecr.ImageScanning{
 			Metadata:   metadata,
-			ScanOnPush: defsecTypes.Bool(scanOnPush, metadata),
+			ScanOnPush: trivyTypes.Bool(scanOnPush, metadata),
 		},
-		ImageTagsImmutable: defsecTypes.Bool(immutable, metadata),
+		ImageTagsImmutable: trivyTypes.Bool(immutable, metadata),
 		Policies:           policies,
 		Encryption: ecr.Encryption{
 			Metadata: metadata,
-			Type:     defsecTypes.String(encType, metadata),
-			KMSKeyID: defsecTypes.String(encKey, metadata),
+			Type:     trivyTypes.String(encType, metadata),
+			KMSKeyID: trivyTypes.String(encKey, metadata),
 		},
 	}, nil
 }

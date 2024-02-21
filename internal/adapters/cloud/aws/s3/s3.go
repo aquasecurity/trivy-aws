@@ -6,7 +6,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/s3"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	s3api "github.com/aws/aws-sdk-go-v2/service/s3"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
@@ -84,9 +84,9 @@ func (a *adapter) adaptBucket(bucket s3types.Bucket) (*s3.Bucket, error) {
 
 	bucketMetadata := a.CreateMetadata(*bucket.Name)
 
-	name := defsecTypes.StringDefault("", bucketMetadata)
+	name := trivyTypes.StringDefault("", bucketMetadata)
 	if bucket.Name != nil {
-		name = defsecTypes.String(*bucket.Name, bucketMetadata)
+		name = trivyTypes.String(*bucket.Name, bucketMetadata)
 	}
 
 	b := s3.Bucket{
@@ -109,7 +109,7 @@ func (a *adapter) adaptBucket(bucket s3types.Bucket) (*s3.Bucket, error) {
 
 }
 
-func (a *adapter) getPublicAccessBlock(bucketName *string, metadata defsecTypes.Metadata) *s3.PublicAccessBlock {
+func (a *adapter) getPublicAccessBlock(bucketName *string, metadata trivyTypes.Metadata) *s3.PublicAccessBlock {
 
 	publicAccessBlocks, err := a.api.GetPublicAccessBlock(a.Context(), &s3api.GetPublicAccessBlockInput{
 		Bucket: bucketName,
@@ -132,15 +132,15 @@ func (a *adapter) getPublicAccessBlock(bucketName *string, metadata defsecTypes.
 	config := publicAccessBlocks.PublicAccessBlockConfiguration
 	pab := s3.NewPublicAccessBlock(metadata)
 
-	pab.BlockPublicACLs = defsecTypes.Bool(awssdk.ToBool(config.BlockPublicAcls), metadata)
-	pab.BlockPublicPolicy = defsecTypes.Bool(awssdk.ToBool(config.BlockPublicPolicy), metadata)
-	pab.IgnorePublicACLs = defsecTypes.Bool(awssdk.ToBool(config.IgnorePublicAcls), metadata)
-	pab.RestrictPublicBuckets = defsecTypes.Bool(awssdk.ToBool(config.RestrictPublicBuckets), metadata)
+	pab.BlockPublicACLs = trivyTypes.Bool(awssdk.ToBool(config.BlockPublicAcls), metadata)
+	pab.BlockPublicPolicy = trivyTypes.Bool(awssdk.ToBool(config.BlockPublicPolicy), metadata)
+	pab.IgnorePublicACLs = trivyTypes.Bool(awssdk.ToBool(config.IgnorePublicAcls), metadata)
+	pab.RestrictPublicBuckets = trivyTypes.Bool(awssdk.ToBool(config.RestrictPublicBuckets), metadata)
 
 	return &pab
 }
 
-func (a *adapter) getBucketPolicies(bucketName *string, metadata defsecTypes.Metadata) []iam.Policy {
+func (a *adapter) getBucketPolicies(bucketName *string, metadata trivyTypes.Metadata) []iam.Policy {
 	var bucketPolicies []iam.Policy
 
 	bucketPolicy, err := a.api.GetBucketPolicy(a.Context(), &s3api.GetBucketPolicyInput{Bucket: bucketName})
@@ -165,12 +165,12 @@ func (a *adapter) getBucketPolicies(bucketName *string, metadata defsecTypes.Met
 
 		bucketPolicies = append(bucketPolicies, iam.Policy{
 			Metadata: metadata,
-			Name:     defsecTypes.StringDefault("", metadata),
+			Name:     trivyTypes.StringDefault("", metadata),
 			Document: iam.Document{
 				Metadata: metadata,
 				Parsed:   *policyDocument,
 			},
-			Builtin: defsecTypes.Bool(false, metadata),
+			Builtin: trivyTypes.Bool(false, metadata),
 		})
 	}
 
@@ -178,12 +178,12 @@ func (a *adapter) getBucketPolicies(bucketName *string, metadata defsecTypes.Met
 
 }
 
-func (a *adapter) getBucketEncryption(bucketName *string, metadata defsecTypes.Metadata) s3.Encryption {
+func (a *adapter) getBucketEncryption(bucketName *string, metadata trivyTypes.Metadata) s3.Encryption {
 	bucketEncryption := s3.Encryption{
 		Metadata:  metadata,
-		Enabled:   defsecTypes.BoolDefault(false, metadata),
-		Algorithm: defsecTypes.StringDefault("", metadata),
-		KMSKeyId:  defsecTypes.StringDefault("", metadata),
+		Enabled:   trivyTypes.BoolDefault(false, metadata),
+		Algorithm: trivyTypes.StringDefault("", metadata),
+		KMSKeyId:  trivyTypes.StringDefault("", metadata),
 	}
 
 	encryption, err := a.api.GetBucketEncryption(a.Context(), &s3api.GetBucketEncryptionInput{Bucket: bucketName})
@@ -201,25 +201,25 @@ func (a *adapter) getBucketEncryption(bucketName *string, metadata defsecTypes.M
 	if encryption.ServerSideEncryptionConfiguration != nil && len(encryption.ServerSideEncryptionConfiguration.Rules) > 0 {
 		defaultEncryption := encryption.ServerSideEncryptionConfiguration.Rules[0]
 		algorithm := defaultEncryption.ApplyServerSideEncryptionByDefault.SSEAlgorithm
-		bucketEncryption.Algorithm = defsecTypes.StringDefault(string(algorithm), metadata)
+		bucketEncryption.Algorithm = trivyTypes.StringDefault(string(algorithm), metadata)
 		bucketEncryption.Enabled = types.ToBool(defaultEncryption.BucketKeyEnabled, metadata)
 		if algorithm != "" {
-			bucketEncryption.Enabled = defsecTypes.Bool(true, metadata)
+			bucketEncryption.Enabled = trivyTypes.Bool(true, metadata)
 		}
 		kmsKeyId := defaultEncryption.ApplyServerSideEncryptionByDefault.KMSMasterKeyID
 		if kmsKeyId != nil {
-			bucketEncryption.KMSKeyId = defsecTypes.StringDefault(*kmsKeyId, metadata)
+			bucketEncryption.KMSKeyId = trivyTypes.StringDefault(*kmsKeyId, metadata)
 		}
 	}
 
 	return bucketEncryption
 }
 
-func (a *adapter) getBucketVersioning(bucketName *string, metadata defsecTypes.Metadata) s3.Versioning {
+func (a *adapter) getBucketVersioning(bucketName *string, metadata trivyTypes.Metadata) s3.Versioning {
 	bucketVersioning := s3.Versioning{
 		Metadata:  metadata,
-		Enabled:   defsecTypes.BoolDefault(false, metadata),
-		MFADelete: defsecTypes.BoolDefault(false, metadata),
+		Enabled:   trivyTypes.BoolDefault(false, metadata),
+		MFADelete: trivyTypes.BoolDefault(false, metadata),
 	}
 
 	versioning, err := a.api.GetBucketVersioning(a.Context(), &s3api.GetBucketVersioningInput{Bucket: bucketName})
@@ -235,20 +235,20 @@ func (a *adapter) getBucketVersioning(bucketName *string, metadata defsecTypes.M
 	}
 
 	if versioning.Status == s3types.BucketVersioningStatusEnabled {
-		bucketVersioning.Enabled = defsecTypes.Bool(true, metadata)
+		bucketVersioning.Enabled = trivyTypes.Bool(true, metadata)
 	}
 
-	bucketVersioning.MFADelete = defsecTypes.Bool(versioning.MFADelete == s3types.MFADeleteStatusEnabled, metadata)
+	bucketVersioning.MFADelete = trivyTypes.Bool(versioning.MFADelete == s3types.MFADeleteStatusEnabled, metadata)
 
 	return bucketVersioning
 }
 
-func (a *adapter) getBucketLogging(bucketName *string, metadata defsecTypes.Metadata) s3.Logging {
+func (a *adapter) getBucketLogging(bucketName *string, metadata trivyTypes.Metadata) s3.Logging {
 
 	bucketLogging := s3.Logging{
 		Metadata:     metadata,
-		Enabled:      defsecTypes.BoolDefault(false, metadata),
-		TargetBucket: defsecTypes.StringDefault("", metadata),
+		Enabled:      trivyTypes.BoolDefault(false, metadata),
+		TargetBucket: trivyTypes.StringDefault("", metadata),
 	}
 
 	logging, err := a.api.GetBucketLogging(a.Context(), &s3api.GetBucketLoggingInput{Bucket: bucketName})
@@ -258,18 +258,18 @@ func (a *adapter) getBucketLogging(bucketName *string, metadata defsecTypes.Meta
 	}
 
 	if logging.LoggingEnabled != nil {
-		bucketLogging.Enabled = defsecTypes.Bool(true, metadata)
-		bucketLogging.TargetBucket = defsecTypes.StringDefault(*logging.LoggingEnabled.TargetBucket, metadata)
+		bucketLogging.Enabled = trivyTypes.Bool(true, metadata)
+		bucketLogging.TargetBucket = trivyTypes.StringDefault(*logging.LoggingEnabled.TargetBucket, metadata)
 	}
 
 	return bucketLogging
 }
 
-func (a *adapter) getBucketACL(bucketName *string, metadata defsecTypes.Metadata) defsecTypes.StringValue {
+func (a *adapter) getBucketACL(bucketName *string, metadata trivyTypes.Metadata) trivyTypes.StringValue {
 	acl, err := a.api.GetBucketAcl(a.Context(), &s3api.GetBucketAclInput{Bucket: bucketName})
 	if err != nil {
 		a.Debug("Error getting bucket ACL: %s", err)
-		return defsecTypes.StringDefault("private", metadata)
+		return trivyTypes.StringDefault("private", metadata)
 	}
 
 	aclValue := "private"
@@ -289,10 +289,10 @@ func (a *adapter) getBucketACL(bucketName *string, metadata defsecTypes.Metadata
 		}
 	}
 
-	return defsecTypes.String(aclValue, metadata)
+	return trivyTypes.String(aclValue, metadata)
 }
 
-func (a *adapter) getBucketLifecycle(bucketName *string, metadata defsecTypes.Metadata) []s3.Rules {
+func (a *adapter) getBucketLifecycle(bucketName *string, metadata trivyTypes.Metadata) []s3.Rules {
 	output, err := a.api.GetBucketLifecycleConfiguration(a.Context(), &s3api.GetBucketLifecycleConfigurationInput{
 		Bucket: bucketName,
 	})
@@ -303,33 +303,33 @@ func (a *adapter) getBucketLifecycle(bucketName *string, metadata defsecTypes.Me
 	for _, r := range output.Rules {
 		rules = append(rules, s3.Rules{
 			Metadata: metadata,
-			Status:   defsecTypes.String(string(r.Status), metadata),
+			Status:   trivyTypes.String(string(r.Status), metadata),
 		})
 	}
 	return rules
 }
 
-func (a *adapter) getBucketAccelarate(bucketName *string, metadata defsecTypes.Metadata) defsecTypes.StringValue {
+func (a *adapter) getBucketAccelarate(bucketName *string, metadata trivyTypes.Metadata) trivyTypes.StringValue {
 	output, err := a.api.GetBucketAccelerateConfiguration(a.Context(), &s3api.GetBucketAccelerateConfigurationInput{
 		Bucket: bucketName,
 	})
 	if err != nil {
-		return defsecTypes.StringDefault("", metadata)
+		return trivyTypes.StringDefault("", metadata)
 	}
-	return defsecTypes.String(string(output.Status), metadata)
+	return trivyTypes.String(string(output.Status), metadata)
 }
 
-func (a *adapter) getBucketLocation(bucketName *string, metadata defsecTypes.Metadata) defsecTypes.StringValue {
+func (a *adapter) getBucketLocation(bucketName *string, metadata trivyTypes.Metadata) trivyTypes.StringValue {
 	output, err := a.api.GetBucketLocation(a.Context(), &s3api.GetBucketLocationInput{
 		Bucket: bucketName,
 	})
 	if err != nil {
-		return defsecTypes.StringDefault("", metadata)
+		return trivyTypes.StringDefault("", metadata)
 	}
-	return defsecTypes.String(string(output.LocationConstraint), metadata)
+	return trivyTypes.String(string(output.LocationConstraint), metadata)
 }
 
-func (a *adapter) getObjects(bucketName *string, metadata defsecTypes.Metadata) []s3.Contents {
+func (a *adapter) getObjects(bucketName *string, metadata trivyTypes.Metadata) []s3.Contents {
 	output, err := a.api.ListObjects(a.Context(), &s3api.ListObjectsInput{
 		Bucket: bucketName,
 	})
@@ -345,7 +345,7 @@ func (a *adapter) getObjects(bucketName *string, metadata defsecTypes.Metadata) 
 	return obj
 }
 
-func (a *adapter) getWebsite(bucketName *string, metadata defsecTypes.Metadata) *s3.Website {
+func (a *adapter) getWebsite(bucketName *string, metadata trivyTypes.Metadata) *s3.Website {
 
 	website, err := a.api.GetBucketWebsite(a.Context(), &s3api.GetBucketWebsiteInput{
 		Bucket: bucketName,

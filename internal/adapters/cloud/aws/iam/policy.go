@@ -6,7 +6,7 @@ import (
 
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"github.com/liamg/iamgo"
@@ -66,9 +66,9 @@ func (a *adapter) adaptPolicy(apiPolicy iamtypes.Policy) (*iam.Policy, error) {
 		return nil, err
 	}
 
-	name := defsecTypes.StringDefault("", metadata)
+	name := trivyTypes.StringDefault("", metadata)
 	if apiPolicy.PolicyName != nil {
-		name = defsecTypes.String(*apiPolicy.PolicyName, metadata)
+		name = trivyTypes.String(*apiPolicy.PolicyName, metadata)
 	}
 
 	return &iam.Policy{
@@ -78,7 +78,7 @@ func (a *adapter) adaptPolicy(apiPolicy iamtypes.Policy) (*iam.Policy, error) {
 			Metadata: metadata,
 			Parsed:   *document,
 		},
-		Builtin: defsecTypes.Bool(strings.HasPrefix(*apiPolicy.Arn, "arn:aws:iam::aws:"), metadata),
+		Builtin: trivyTypes.Bool(strings.HasPrefix(*apiPolicy.Arn, "arn:aws:iam::aws:"), metadata),
 	}, nil
 }
 

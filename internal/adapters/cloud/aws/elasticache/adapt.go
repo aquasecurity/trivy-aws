@@ -4,7 +4,7 @@ import (
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/elasticache"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/elasticache"
 	"github.com/aws/aws-sdk-go-v2/service/elasticache/types"
 
@@ -76,19 +76,19 @@ func (a *adapter) getClusters() ([]elasticache.Cluster, error) {
 func (a *adapter) adaptCluster(apiCluster types.CacheCluster) (*elasticache.Cluster, error) {
 	metadata := a.CreateMetadataFromARN(*apiCluster.ARN)
 
-	engine := defsecTypes.StringDefault("", metadata)
+	engine := trivyTypes.StringDefault("", metadata)
 	if apiCluster.Engine != nil {
-		engine = defsecTypes.String(*apiCluster.Engine, metadata)
+		engine = trivyTypes.String(*apiCluster.Engine, metadata)
 	}
 
-	nodeType := defsecTypes.StringDefault("", metadata)
+	nodeType := trivyTypes.StringDefault("", metadata)
 	if apiCluster.CacheNodeType != nil {
-		nodeType = defsecTypes.String(*apiCluster.CacheNodeType, metadata)
+		nodeType = trivyTypes.String(*apiCluster.CacheNodeType, metadata)
 	}
 
-	limit := defsecTypes.IntDefault(0, metadata)
+	limit := trivyTypes.IntDefault(0, metadata)
 	if apiCluster.SnapshotRetentionLimit != nil {
-		limit = defsecTypes.Int(int(*apiCluster.SnapshotRetentionLimit), metadata)
+		limit = trivyTypes.Int(int(*apiCluster.SnapshotRetentionLimit), metadata)
 	}
 
 	return &elasticache.Cluster{
@@ -137,13 +137,13 @@ func (a *adapter) getReplicationGroups() ([]elasticache.ReplicationGroup, error)
 func (a *adapter) adaptReplicationGroup(apiGroup types.ReplicationGroup) (*elasticache.ReplicationGroup, error) {
 	metadata := a.CreateMetadataFromARN(*apiGroup.ARN)
 
-	transitEncrypted := defsecTypes.BoolDefault(false, metadata)
+	transitEncrypted := trivyTypes.BoolDefault(false, metadata)
 	if apiGroup.TransitEncryptionEnabled != nil {
-		transitEncrypted = defsecTypes.Bool(*apiGroup.TransitEncryptionEnabled, metadata)
+		transitEncrypted = trivyTypes.Bool(*apiGroup.TransitEncryptionEnabled, metadata)
 	}
-	atRestEncrypted := defsecTypes.BoolDefault(false, metadata)
+	atRestEncrypted := trivyTypes.BoolDefault(false, metadata)
 	if apiGroup.AtRestEncryptionEnabled != nil {
-		atRestEncrypted = defsecTypes.Bool(*apiGroup.AtRestEncryptionEnabled, metadata)
+		atRestEncrypted = trivyTypes.Bool(*apiGroup.AtRestEncryptionEnabled, metadata)
 	}
 
 	return &elasticache.ReplicationGroup{
@@ -190,9 +190,9 @@ func (a *adapter) getSecurityGroups() ([]elasticache.SecurityGroup, error) {
 
 func (a *adapter) adaptSecurityGroup(apiGroup types.CacheSecurityGroup) (*elasticache.SecurityGroup, error) {
 	metadata := a.CreateMetadataFromARN(*apiGroup.ARN)
-	description := defsecTypes.StringDefault("", metadata)
+	description := trivyTypes.StringDefault("", metadata)
 	if apiGroup.Description != nil {
-		description = defsecTypes.String(*apiGroup.Description, metadata)
+		description = trivyTypes.String(*apiGroup.Description, metadata)
 	}
 	return &elasticache.SecurityGroup{
 		Metadata:    metadata,

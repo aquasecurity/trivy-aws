@@ -1,26 +1,26 @@
 package types
 
 import (
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 )
 
-func ToString(p *string, m defsecTypes.Metadata) defsecTypes.StringValue {
+func ToString(p *string, m trivyTypes.Metadata) trivyTypes.StringValue {
 	if p == nil {
-		return defsecTypes.StringDefault("", m)
+		return trivyTypes.StringDefault("", m)
 	}
-	return defsecTypes.String(*p, m)
+	return trivyTypes.String(*p, m)
 }
 
-func ToBool(p *bool, m defsecTypes.Metadata) defsecTypes.BoolValue {
+func ToBool(p *bool, m trivyTypes.Metadata) trivyTypes.BoolValue {
 	if p == nil {
-		return defsecTypes.BoolDefault(false, m)
+		return trivyTypes.BoolDefault(false, m)
 	}
-	return defsecTypes.Bool(*p, m)
+	return trivyTypes.Bool(*p, m)
 }
 
-func ToInt(p *int32, m defsecTypes.Metadata) defsecTypes.IntValue {
+func ToInt(p *int32, m trivyTypes.Metadata) trivyTypes.IntValue {
 	if p == nil {
-		return defsecTypes.IntDefault(0, m)
+		return trivyTypes.IntDefault(0, m)
 	}
-	return defsecTypes.IntFromInt32(*p, m)
+	return trivyTypes.IntFromInt32(*p, m)
 }

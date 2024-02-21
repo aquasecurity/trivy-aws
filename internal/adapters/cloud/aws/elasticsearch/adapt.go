@@ -4,7 +4,7 @@ import (
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/elasticsearch"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/elasticsearchservice"
 	"github.com/aws/aws-sdk-go-v2/service/elasticsearchservice/types"
 
@@ -122,35 +122,35 @@ func (a *adapter) adaptDomain(apiDomain types.DomainInfo) (*elasticsearch.Domain
 
 	return &elasticsearch.Domain{
 		Metadata:               metadata,
-		DomainName:             defsecTypes.String(*apiDomain.DomainName, metadata),
-		AccessPolicies:         defsecTypes.String(*status.AccessPolicies, metadata),
-		DedicatedMasterEnabled: defsecTypes.Bool(dedicatedMasterEnabled, metadata),
-		VpcId:                  defsecTypes.String(vpcId, metadata),
+		DomainName:             trivyTypes.String(*apiDomain.DomainName, metadata),
+		AccessPolicies:         trivyTypes.String(*status.AccessPolicies, metadata),
+		DedicatedMasterEnabled: trivyTypes.Bool(dedicatedMasterEnabled, metadata),
+		VpcId:                  trivyTypes.String(vpcId, metadata),
 		LogPublishing: elasticsearch.LogPublishing{
 			Metadata:              metadata,
-			AuditEnabled:          defsecTypes.Bool(auditEnabled, metadata),
-			CloudWatchLogGroupArn: defsecTypes.String(cloudWatchLogGroupArn, metadata),
+			AuditEnabled:          trivyTypes.Bool(auditEnabled, metadata),
+			CloudWatchLogGroupArn: trivyTypes.String(cloudWatchLogGroupArn, metadata),
 		},
 		TransitEncryption: elasticsearch.TransitEncryption{
 			Metadata: metadata,
-			Enabled:  defsecTypes.Bool(transitEncryption, metadata),
+			Enabled:  trivyTypes.Bool(transitEncryption, metadata),
 		},
 		AtRestEncryption: elasticsearch.AtRestEncryption{
 			Metadata: metadata,
-			Enabled:  defsecTypes.Bool(atRestEncryption, metadata),
-			KmsKeyId: defsecTypes.String(kmskeyId, metadata),
+			Enabled:  trivyTypes.Bool(atRestEncryption, metadata),
+			KmsKeyId: trivyTypes.String(kmskeyId, metadata),
 		},
 		Endpoint: elasticsearch.Endpoint{
 			Metadata:     metadata,
-			EnforceHTTPS: defsecTypes.Bool(enforceHTTPS, metadata),
-			TLSPolicy:    defsecTypes.String(tlsPolicy, metadata),
+			EnforceHTTPS: trivyTypes.Bool(enforceHTTPS, metadata),
+			TLSPolicy:    trivyTypes.String(tlsPolicy, metadata),
 		},
 		ServiceSoftwareOptions: elasticsearch.ServiceSoftwareOptions{
 			Metadata:        metadata,
-			CurrentVersion:  defsecTypes.String(currentVersion, metadata),
-			NewVersion:      defsecTypes.String(newVersion, metadata),
-			UpdateAvailable: defsecTypes.Bool(updateAvailable, metadata),
-			UpdateStatus:    defsecTypes.String(updatestatus, metadata),
+			CurrentVersion:  trivyTypes.String(currentVersion, metadata),
+			NewVersion:      trivyTypes.String(newVersion, metadata),
+			UpdateAvailable: trivyTypes.Bool(updateAvailable, metadata),
+			UpdateStatus:    trivyTypes.String(updatestatus, metadata),
 		},
 	}, nil
 }

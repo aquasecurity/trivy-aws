@@ -3,7 +3,7 @@ package rds
 import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/rds"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	rdsApi "github.com/aws/aws-sdk-go-v2/service/rds"
 	rdsTypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
@@ -196,14 +196,14 @@ func (a *adapter) adaptDBInstance(dbInstance rdsTypes.DBInstance) (*rds.Instance
 		}
 	}
 
-	var EnabledCloudwatchLogsExports []defsecTypes.StringValue
+	var EnabledCloudwatchLogsExports []trivyTypes.StringValue
 	for _, ecwe := range dbInstance.EnabledCloudwatchLogsExports {
-		EnabledCloudwatchLogsExports = append(EnabledCloudwatchLogsExports, defsecTypes.String(ecwe, metadata))
+		EnabledCloudwatchLogsExports = append(EnabledCloudwatchLogsExports, trivyTypes.String(ecwe, metadata))
 	}
 
-	var ReadReplicaDBInstanceIdentifiers []defsecTypes.StringValue
+	var ReadReplicaDBInstanceIdentifiers []trivyTypes.StringValue
 	for _, rrdbi := range dbInstance.EnabledCloudwatchLogsExports {
-		ReadReplicaDBInstanceIdentifiers = append(ReadReplicaDBInstanceIdentifiers, defsecTypes.String(rrdbi, metadata))
+		ReadReplicaDBInstanceIdentifiers = append(ReadReplicaDBInstanceIdentifiers, trivyTypes.String(rrdbi, metadata))
 	}
 
 	engine := rds.EngineAurora
@@ -222,7 +222,7 @@ func (a *adapter) adaptDBInstance(dbInstance rdsTypes.DBInstance) (*rds.Instance
 		),
 		Encryption:                       getInstanceEncryption(awssdk.ToBool(dbInstance.StorageEncrypted), dbInstance.KmsKeyId, metadata),
 		PublicAccess:                     types.ToBool(dbInstance.PubliclyAccessible, metadata),
-		Engine:                           defsecTypes.String(engine, metadata),
+		Engine:                           trivyTypes.String(engine, metadata),
 		IAMAuthEnabled:                   types.ToBool(dbInstance.IAMDatabaseAuthenticationEnabled, metadata),
 		DeletionProtection:               types.ToBool(dbInstance.DeletionProtection, metadata),
 		DBInstanceArn:                    types.ToString(dbInstance.DBInstanceArn, metadata),
@@ -230,11 +230,11 @@ func (a *adapter) adaptDBInstance(dbInstance rdsTypes.DBInstance) (*rds.Instance
 		DBInstanceIdentifier:             types.ToString(dbInstance.DBInstanceIdentifier, metadata),
 		TagList:                          TagList,
 		EnabledCloudwatchLogsExports:     EnabledCloudwatchLogsExports,
-		EngineVersion:                    defsecTypes.String(engine, metadata),
+		EngineVersion:                    trivyTypes.String(engine, metadata),
 		AutoMinorVersionUpgrade:          types.ToBool(dbInstance.AutoMinorVersionUpgrade, metadata),
 		MultiAZ:                          types.ToBool(dbInstance.MultiAZ, metadata),
 		PubliclyAccessible:               types.ToBool(dbInstance.PubliclyAccessible, metadata),
-		LatestRestorableTime:             defsecTypes.TimeUnresolvable(metadata),
+		LatestRestorableTime:             trivyTypes.TimeUnresolvable(metadata),
 		ReadReplicaDBInstanceIdentifiers: ReadReplicaDBInstanceIdentifiers,
 	}
 
@@ -250,9 +250,9 @@ func (a *adapter) adaptCluster(dbCluster rdsTypes.DBCluster) (*rds.Cluster, erro
 		engine = *dbCluster.Engine
 	}
 
-	var availabilityZones []defsecTypes.StringValue
+	var availabilityZones []trivyTypes.StringValue
 	for _, az := range dbCluster.AvailabilityZones {
-		availabilityZones = append(availabilityZones, defsecTypes.String(az, dbClusterMetadata))
+		availabilityZones = append(availabilityZones, trivyTypes.String(az, dbClusterMetadata))
 	}
 
 	cluster := &rds.Cluster{
@@ -266,8 +266,8 @@ func (a *adapter) adaptCluster(dbCluster rdsTypes.DBCluster) (*rds.Cluster, erro
 		),
 		Encryption:           getInstanceEncryption(awssdk.ToBool(dbCluster.StorageEncrypted), dbCluster.KmsKeyId, dbClusterMetadata),
 		PublicAccess:         types.ToBool(dbCluster.PubliclyAccessible, dbClusterMetadata),
-		Engine:               defsecTypes.String(engine, dbClusterMetadata),
-		LatestRestorableTime: defsecTypes.TimeUnresolvable(dbClusterMetadata),
+		Engine:               trivyTypes.String(engine, dbClusterMetadata),
+		LatestRestorableTime: trivyTypes.TimeUnresolvable(dbClusterMetadata),
 		AvailabilityZones:    availabilityZones,
 		DeletionProtection:   types.ToBool(dbCluster.DeletionProtection, dbClusterMetadata),
 	}
@@ -298,8 +298,8 @@ func (a *adapter) adaptParameterGroup(dbParameterGroup rdsTypes.DBParameterGroup
 	return &rds.ParameterGroups{
 		Metadata:               metadata,
 		Parameters:             parameter,
-		DBParameterGroupName:   defsecTypes.String(awssdk.ToString(dbParameterGroup.DBParameterGroupName), metadata),
-		DBParameterGroupFamily: defsecTypes.String(awssdk.ToString(dbParameterGroup.DBParameterGroupFamily), metadata),
+		DBParameterGroupName:   trivyTypes.String(awssdk.ToString(dbParameterGroup.DBParameterGroupName), metadata),
+		DBParameterGroupFamily: trivyTypes.String(awssdk.ToString(dbParameterGroup.DBParameterGroupFamily), metadata),
 	}, nil
 
 }
@@ -317,10 +317,10 @@ func (a *adapter) adaptDBSnapshots(dbSnapshots rdsTypes.DBSnapshot) (*rds.Snapsh
 	if output.DBSnapshotAttributesResult != nil {
 		for _, r := range output.DBSnapshotAttributesResult.DBSnapshotAttributes {
 
-			var AV []defsecTypes.StringValue
+			var AV []trivyTypes.StringValue
 			if r.AttributeValues != nil {
 				for _, Values := range r.AttributeValues {
-					AV = append(AV, defsecTypes.String(Values, metadata))
+					AV = append(AV, trivyTypes.String(Values, metadata))
 				}
 			}
 			SnapshotAttributes = append(SnapshotAttributes, rds.DBSnapshotAttributes{
@@ -336,13 +336,13 @@ func (a *adapter) adaptDBSnapshots(dbSnapshots rdsTypes.DBSnapshot) (*rds.Snapsh
 		DBSnapshotIdentifier: types.ToString(dbSnapshots.DBSnapshotIdentifier, metadata),
 		DBSnapshotArn:        types.ToString(dbSnapshots.DBSnapshotArn, metadata),
 		Encrypted:            types.ToBool(dbSnapshots.Encrypted, metadata),
-		KmsKeyId:             defsecTypes.String("", metadata),
+		KmsKeyId:             trivyTypes.String("", metadata),
 		SnapshotAttributes:   SnapshotAttributes,
 	}
 
 	// KMSKeyID is only set if Encryption is enabled
 	if snapshots.Encrypted.IsTrue() {
-		snapshots.KmsKeyId = defsecTypes.StringDefault(awssdk.ToString(dbSnapshots.KmsKeyId), metadata)
+		snapshots.KmsKeyId = trivyTypes.StringDefault(awssdk.ToString(dbSnapshots.KmsKeyId), metadata)
 	}
 
 	return snapshots, nil
@@ -359,17 +359,17 @@ func (a *adapter) adaptClassic(dbSecurityGroup rdsTypes.DBSecurityGroup) (*rds.D
 	return dbsg, nil
 }
 
-func getInstanceEncryption(storageEncrypted bool, kmsKeyID *string, metadata defsecTypes.Metadata) rds.Encryption {
+func getInstanceEncryption(storageEncrypted bool, kmsKeyID *string, metadata trivyTypes.Metadata) rds.Encryption {
 	encryption := rds.Encryption{
 		Metadata:       metadata,
-		EncryptStorage: defsecTypes.BoolDefault(storageEncrypted, metadata),
+		EncryptStorage: trivyTypes.BoolDefault(storageEncrypted, metadata),
 		KMSKeyID:       types.ToString(kmsKeyID, metadata),
 	}
 
 	return encryption
 }
 
-func getPerformanceInsights(enabled *bool, kmsKeyID *string, metadata defsecTypes.Metadata) rds.PerformanceInsights {
+func getPerformanceInsights(enabled *bool, kmsKeyID *string, metadata trivyTypes.Metadata) rds.PerformanceInsights {
 	performanceInsights := rds.PerformanceInsights{
 		Metadata: metadata,
 		Enabled:  types.ToBool(enabled, metadata),

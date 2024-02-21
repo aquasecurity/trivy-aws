@@ -4,7 +4,7 @@ import (
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/cloudtrail"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/cloudtrail"
 	"github.com/aws/aws-sdk-go-v2/service/cloudtrail/types"
 
@@ -88,9 +88,9 @@ func (a *adapter) adaptTrail(info types.TrailInfo) (*cloudtrail.Trail, error) {
 		return nil, err
 	}
 
-	cloudWatchLogsArn := defsecTypes.StringDefault("", metadata)
+	cloudWatchLogsArn := trivyTypes.StringDefault("", metadata)
 	if response.Trail.CloudWatchLogsLogGroupArn != nil {
-		cloudWatchLogsArn = defsecTypes.String(*response.Trail.CloudWatchLogsLogGroupArn, metadata)
+		cloudWatchLogsArn = trivyTypes.String(*response.Trail.CloudWatchLogsLogGroupArn, metadata)
 	}
 
 	var bucketName string
@@ -98,14 +98,14 @@ func (a *adapter) adaptTrail(info types.TrailInfo) (*cloudtrail.Trail, error) {
 		bucketName = *response.Trail.S3BucketName
 	}
 
-	name := defsecTypes.StringDefault("", metadata)
+	name := trivyTypes.StringDefault("", metadata)
 	if info.Name != nil {
-		name = defsecTypes.String(*info.Name, metadata)
+		name = trivyTypes.String(*info.Name, metadata)
 	}
 
-	isLogging := defsecTypes.BoolDefault(false, metadata)
+	isLogging := trivyTypes.BoolDefault(false, metadata)
 	if status.IsLogging != nil {
-		isLogging = defsecTypes.Bool(*status.IsLogging, metadata)
+		isLogging = trivyTypes.Bool(*status.IsLogging, metadata)
 	}
 
 	var eventSelectors []cloudtrail.EventSelector
@@ -119,13 +119,13 @@ func (a *adapter) adaptTrail(info types.TrailInfo) (*cloudtrail.Trail, error) {
 		for _, eventSelector := range output.EventSelectors {
 			var resources []cloudtrail.DataResource
 			for _, dataResource := range eventSelector.DataResources {
-				typ := defsecTypes.StringDefault("", metadata)
+				typ := trivyTypes.StringDefault("", metadata)
 				if dataResource.Type != nil {
-					typ = defsecTypes.String(*dataResource.Type, metadata)
+					typ = trivyTypes.String(*dataResource.Type, metadata)
 				}
-				var values defsecTypes.StringValueList
+				var values trivyTypes.StringValueList
 				for _, value := range dataResource.Values {
-					values = append(values, defsecTypes.String(value, metadata))
+					values = append(values, trivyTypes.String(value, metadata))
 				}
 				resources = append(resources, cloudtrail.DataResource{
 					Metadata: metadata,
@@ -136,7 +136,7 @@ func (a *adapter) adaptTrail(info types.TrailInfo) (*cloudtrail.Trail, error) {
 			eventSelectors = append(eventSelectors, cloudtrail.EventSelector{
 				Metadata:      metadata,
 				DataResources: resources,
-				ReadWriteType: defsecTypes.String(string(eventSelector.ReadWriteType), metadata),
+				ReadWriteType: trivyTypes.String(string(eventSelector.ReadWriteType), metadata),
 			})
 		}
 	}
@@ -144,12 +144,12 @@ func (a *adapter) adaptTrail(info types.TrailInfo) (*cloudtrail.Trail, error) {
 	return &cloudtrail.Trail{
 		Metadata:                  metadata,
 		Name:                      name,
-		EnableLogFileValidation:   defsecTypes.Bool(response.Trail.LogFileValidationEnabled != nil && *response.Trail.LogFileValidationEnabled, metadata),
-		IsMultiRegion:             defsecTypes.Bool(response.Trail.IsMultiRegionTrail != nil && *response.Trail.IsMultiRegionTrail, metadata),
+		EnableLogFileValidation:   trivyTypes.Bool(response.Trail.LogFileValidationEnabled != nil && *response.Trail.LogFileValidationEnabled, metadata),
+		IsMultiRegion:             trivyTypes.Bool(response.Trail.IsMultiRegionTrail != nil && *response.Trail.IsMultiRegionTrail, metadata),
 		CloudWatchLogsLogGroupArn: cloudWatchLogsArn,
-		KMSKeyID:                  defsecTypes.String(kmsKeyId, metadata),
+		KMSKeyID:                  trivyTypes.String(kmsKeyId, metadata),
 		IsLogging:                 isLogging,
-		BucketName:                defsecTypes.String(bucketName, metadata),
+		BucketName:                trivyTypes.String(bucketName, metadata),
 		EventSelectors:            eventSelectors,
 	}, nil
 }

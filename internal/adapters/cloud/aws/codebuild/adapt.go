@@ -4,7 +4,7 @@ import (
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/codebuild"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/codebuild"
 
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
@@ -92,7 +92,7 @@ func (a *adapter) adaptProject(name string) (*codebuild.Project, error) {
 		}
 		secondaryArtifactSettings = append(secondaryArtifactSettings, codebuild.ArtifactSettings{
 			Metadata:          metadata,
-			EncryptionEnabled: defsecTypes.Bool(encryptionEnabled, metadata),
+			EncryptionEnabled: trivyTypes.Bool(encryptionEnabled, metadata),
 		})
 	}
 
@@ -100,7 +100,7 @@ func (a *adapter) adaptProject(name string) (*codebuild.Project, error) {
 		Metadata: metadata,
 		ArtifactSettings: codebuild.ArtifactSettings{
 			Metadata:          metadata,
-			EncryptionEnabled: defsecTypes.Bool(encryptionEnabled, metadata),
+			EncryptionEnabled: trivyTypes.Bool(encryptionEnabled, metadata),
 		},
 		SecondaryArtifactSettings: secondaryArtifactSettings,
 	}, nil

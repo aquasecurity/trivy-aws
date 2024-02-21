@@ -4,7 +4,7 @@ import (
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/kinesis"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/kinesis"
 
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
@@ -86,8 +86,8 @@ func (a *adapter) adaptStream(streamName string) (*kinesis.Stream, error) {
 		Metadata: metadata,
 		Encryption: kinesis.Encryption{
 			Metadata: metadata,
-			Type:     defsecTypes.String(string(output.StreamDescription.EncryptionType), metadata),
-			KMSKeyID: defsecTypes.String(kmsKeyId, metadata),
+			Type:     trivyTypes.String(string(output.StreamDescription.EncryptionType), metadata),
+			KMSKeyID: trivyTypes.String(kmsKeyId, metadata),
 		},
 	}, nil
 

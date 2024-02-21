@@ -7,7 +7,7 @@ import (
 
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 
@@ -68,7 +68,7 @@ func (a *adapter) getMFADevices(user iamtypes.User) ([]iam.MFADevice, error) {
 		}
 		devices = append(devices, iam.MFADevice{
 			Metadata:  metadata,
-			IsVirtual: defsecTypes.Bool(isVirtual, metadata),
+			IsVirtual: trivyTypes.Bool(isVirtual, metadata),
 		})
 	}
 
@@ -146,29 +146,29 @@ func (a *adapter) getUserKeys(apiUser iamtypes.User) ([]iam.AccessKey, error) {
 		}
 		for _, apiAccessKey := range output.AccessKeyMetadata {
 
-			lastUsed := defsecTypes.TimeUnresolvable(metadata)
+			lastUsed := trivyTypes.TimeUnresolvable(metadata)
 			if output, err := a.api.GetAccessKeyLastUsed(a.Context(), &iamapi.GetAccessKeyLastUsedInput{
 				AccessKeyId: apiAccessKey.AccessKeyId,
 			}); err == nil {
 				if output.AccessKeyLastUsed != nil && output.AccessKeyLastUsed.LastUsedDate != nil {
-					lastUsed = defsecTypes.Time(*output.AccessKeyLastUsed.LastUsedDate, metadata)
+					lastUsed = trivyTypes.Time(*output.AccessKeyLastUsed.LastUsedDate, metadata)
 				}
 			}
 
-			accessKeyId := defsecTypes.StringDefault("", metadata)
+			accessKeyId := trivyTypes.StringDefault("", metadata)
 			if apiAccessKey.AccessKeyId != nil {
-				accessKeyId = defsecTypes.String(*apiAccessKey.AccessKeyId, metadata)
+				accessKeyId = trivyTypes.String(*apiAccessKey.AccessKeyId, metadata)
 			}
 
-			creationDate := defsecTypes.TimeDefault(time.Now(), metadata)
+			creationDate := trivyTypes.TimeDefault(time.Now(), metadata)
 			if apiAccessKey.CreateDate != nil {
-				creationDate = defsecTypes.Time(*apiAccessKey.CreateDate, metadata)
+				creationDate = trivyTypes.Time(*apiAccessKey.CreateDate, metadata)
 			}
 
 			keys = append(keys, iam.AccessKey{
 				Metadata:     metadata,
 				AccessKeyId:  accessKeyId,
-				Active:       defsecTypes.Bool(apiAccessKey.Status == iamtypes.StatusTypeActive, metadata),
+				Active:       trivyTypes.Bool(apiAccessKey.Status == iamtypes.StatusTypeActive, metadata),
 				CreationDate: creationDate,
 				LastAccess:   lastUsed,
 			})
@@ -206,14 +206,14 @@ func (a *adapter) adaptUser(apiUser iamtypes.User) (*iam.User, error) {
 		return nil, err
 	}
 
-	lastAccess := defsecTypes.TimeUnresolvable(metadata)
+	lastAccess := trivyTypes.TimeUnresolvable(metadata)
 	if apiUser.PasswordLastUsed != nil {
-		lastAccess = defsecTypes.Time(*apiUser.PasswordLastUsed, metadata)
+		lastAccess = trivyTypes.Time(*apiUser.PasswordLastUsed, metadata)
 	}
 
-	username := defsecTypes.StringDefault("", metadata)
+	username := trivyTypes.StringDefault("", metadata)
 	if apiUser.UserName != nil {
-		username = defsecTypes.String(*apiUser.UserName, metadata)
+		username = trivyTypes.String(*apiUser.UserName, metadata)
 	}
 
 	return &iam.User{

@@ -5,7 +5,7 @@ import (
 
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/lambda"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	lambdaapi "github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
@@ -121,8 +121,8 @@ func (a *adapter) adaptFunction(function types.FunctionConfiguration) (*lambda.F
 
 			permissions = append(permissions, lambda.Permission{
 				Metadata:  metadata,
-				Principal: defsecTypes.String(principal, metadata),
-				SourceARN: defsecTypes.String(source, metadata),
+				Principal: trivyTypes.String(principal, metadata),
+				SourceARN: trivyTypes.String(source, metadata),
 			})
 		}
 	}
@@ -131,7 +131,7 @@ func (a *adapter) adaptFunction(function types.FunctionConfiguration) (*lambda.F
 		Metadata: metadata,
 		Tracing: lambda.Tracing{
 			Metadata: metadata,
-			Mode:     defsecTypes.String(tracingMode, metadata),
+			Mode:     trivyTypes.String(tracingMode, metadata),
 		},
 		Permissions: permissions,
 	}, nil

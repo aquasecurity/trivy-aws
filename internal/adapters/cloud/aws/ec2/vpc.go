@@ -2,7 +2,7 @@ package ec2
 
 import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ec2"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	ec2api "github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
@@ -85,13 +85,13 @@ func (a *adapter) adaptSecurityGroup(apiSecurityGroup types.SecurityGroup) (*ec2
 
 	sg := &ec2.SecurityGroup{
 		Metadata:    sgMetadata,
-		IsDefault:   defsecTypes.BoolDefault(apiSecurityGroup.GroupName != nil && *apiSecurityGroup.GroupName == "default", sgMetadata),
-		Description: defsecTypes.String(aws.ToString(apiSecurityGroup.Description), sgMetadata),
-		VPCID:       defsecTypes.StringDefault("", sgMetadata),
+		IsDefault:   trivyTypes.BoolDefault(apiSecurityGroup.GroupName != nil && *apiSecurityGroup.GroupName == "default", sgMetadata),
+		Description: trivyTypes.String(aws.ToString(apiSecurityGroup.Description), sgMetadata),
+		VPCID:       trivyTypes.StringDefault("", sgMetadata),
 	}
 
 	if apiSecurityGroup.VpcId != nil {
-		sg.VPCID = defsecTypes.String(*apiSecurityGroup.VpcId, sgMetadata)
+		sg.VPCID = trivyTypes.String(*apiSecurityGroup.VpcId, sgMetadata)
 	}
 
 	for _, ingress := range apiSecurityGroup.IpPermissions {
@@ -99,8 +99,8 @@ func (a *adapter) adaptSecurityGroup(apiSecurityGroup types.SecurityGroup) (*ec2
 		for _, ipRange := range ingress.IpRanges {
 			sg.IngressRules = append(sg.IngressRules, ec2.SecurityGroupRule{
 				Metadata:    sgMetadata,
-				Description: defsecTypes.String(aws.ToString(ipRange.Description), sgMetadata),
-				CIDRs:       []defsecTypes.StringValue{defsecTypes.String(aws.ToString(ipRange.CidrIp), sgMetadata)},
+				Description: trivyTypes.String(aws.ToString(ipRange.Description), sgMetadata),
+				CIDRs:       []trivyTypes.StringValue{trivyTypes.String(aws.ToString(ipRange.CidrIp), sgMetadata)},
 			})
 		}
 	}
@@ -110,8 +110,8 @@ func (a *adapter) adaptSecurityGroup(apiSecurityGroup types.SecurityGroup) (*ec2
 		for _, ipRange := range egress.IpRanges {
 			sg.EgressRules = append(sg.EgressRules, ec2.SecurityGroupRule{
 				Metadata:    sgMetadata,
-				Description: defsecTypes.String(aws.ToString(ipRange.Description), sgMetadata),
-				CIDRs:       []defsecTypes.StringValue{defsecTypes.String(aws.ToString(ipRange.CidrIp), sgMetadata)},
+				Description: trivyTypes.String(aws.ToString(ipRange.Description), sgMetadata),
+				CIDRs:       []trivyTypes.StringValue{trivyTypes.String(aws.ToString(ipRange.CidrIp), sgMetadata)},
 			})
 		}
 	}
@@ -126,7 +126,7 @@ func (a *adapter) adaptNetworkACL(apiNacl types.NetworkAcl) (*ec2.NetworkACL, er
 
 	nacl := &ec2.NetworkACL{
 		Metadata:      naclMetadata,
-		IsDefaultRule: defsecTypes.BoolDefault(false, naclMetadata),
+		IsDefaultRule: trivyTypes.BoolDefault(false, naclMetadata),
 	}
 
 	for _, entry := range apiNacl.Entries {
@@ -137,10 +137,10 @@ func (a *adapter) adaptNetworkACL(apiNacl types.NetworkAcl) (*ec2.NetworkACL, er
 
 		nacl.Rules = append(nacl.Rules, ec2.NetworkACLRule{
 			Metadata: naclMetadata,
-			Action:   defsecTypes.String(string(entry.RuleAction), naclMetadata),
-			Protocol: defsecTypes.String(aws.ToString(entry.Protocol), naclMetadata),
-			Type:     defsecTypes.String(naclType, naclMetadata),
-			CIDRs:    []defsecTypes.StringValue{defsecTypes.String(aws.ToString(entry.CidrBlock), naclMetadata)},
+			Action:   trivyTypes.String(string(entry.RuleAction), naclMetadata),
+			Protocol: trivyTypes.String(aws.ToString(entry.Protocol), naclMetadata),
+			Type:     trivyTypes.String(naclType, naclMetadata),
+			CIDRs:    []trivyTypes.StringValue{trivyTypes.String(aws.ToString(entry.CidrBlock), naclMetadata)},
 		})
 	}
 	return nacl, nil
@@ -151,14 +151,14 @@ func (a *adapter) adaptVPC(v types.Vpc) (*ec2.VPC, error) {
 	vpcMetadata := a.CreateMetadata("vpc/" + *v.VpcId)
 	vpc := &ec2.VPC{
 		Metadata:        vpcMetadata,
-		ID:              defsecTypes.String(*v.VpcId, vpcMetadata),
-		IsDefault:       defsecTypes.BoolDefault(false, vpcMetadata),
-		FlowLogsEnabled: defsecTypes.BoolDefault(false, vpcMetadata),
+		ID:              trivyTypes.String(*v.VpcId, vpcMetadata),
+		IsDefault:       trivyTypes.BoolDefault(false, vpcMetadata),
+		FlowLogsEnabled: trivyTypes.BoolDefault(false, vpcMetadata),
 		SecurityGroups:  nil, // we link these up afterwards
 	}
 
 	if v.IsDefault != nil {
-		vpc.IsDefault = defsecTypes.BoolDefault(*v.IsDefault, vpcMetadata)
+		vpc.IsDefault = trivyTypes.BoolDefault(*v.IsDefault, vpcMetadata)
 	}
 
 	logs, err := a.client.DescribeFlowLogs(a.Context(), &ec2api.DescribeFlowLogsInput{
@@ -174,7 +174,7 @@ func (a *adapter) adaptVPC(v types.Vpc) (*ec2.VPC, error) {
 	}
 
 	if logs != nil && len(logs.FlowLogs) > 0 {
-		vpc.FlowLogsEnabled = defsecTypes.BoolDefault(true, vpcMetadata)
+		vpc.FlowLogsEnabled = trivyTypes.BoolDefault(true, vpcMetadata)
 	}
 
 	return vpc, nil

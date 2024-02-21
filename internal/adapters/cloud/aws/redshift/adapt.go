@@ -5,7 +5,7 @@ import (
 
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/redshift"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	api "github.com/aws/aws-sdk-go-v2/service/redshift"
 	redshiftTypes "github.com/aws/aws-sdk-go-v2/service/redshift/types"
@@ -94,7 +94,7 @@ func (a *adapter) adaptCluster(apiCluster redshiftTypes.Cluster) (*redshift.Clus
 		ClusterIdentifier: apiCluster.ClusterIdentifier,
 	})
 
-	loggingEnabled := defsecTypes.BoolDefault(false, metadata)
+	loggingEnabled := trivyTypes.BoolDefault(false, metadata)
 	if err == nil {
 		loggingEnabled = types.ToBool(output.LoggingEnabled, metadata)
 	}

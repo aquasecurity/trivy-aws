@@ -17,7 +17,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/scan"
 	"github.com/aquasecurity/trivy/pkg/iac/scanners/options"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	defsecRules "github.com/aquasecurity/trivy/pkg/iac/types/rules"
 
 	adapter "github.com/aquasecurity/trivy-aws/internal/adapters/cloud"
@@ -234,7 +234,7 @@ func (s *Scanner) initRegoScanner() (*rego.Scanner, error) {
 		}
 	}
 
-	regoScanner := rego.NewScanner(defsecTypes.SourceCloud, s.options...)
+	regoScanner := rego.NewScanner(trivyTypes.SourceCloud, s.options...)
 	regoScanner.SetParentDebugLogger(s.debug)
 	if err := regoScanner.LoadPolicies(s.loadEmbeddedLibraries, s.loadEmbeddedPolicies, srcFS, s.policyDirs, s.policyReaders); err != nil {
 		return nil, err

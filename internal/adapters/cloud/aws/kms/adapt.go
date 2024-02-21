@@ -4,7 +4,7 @@ import (
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/kms"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/aws/aws-sdk-go-v2/service/kms/types"
 
@@ -78,7 +78,7 @@ func (a *adapter) adaptKey(apiKey types.KeyListEntry) (*kms.Key, error) {
 
 	return &kms.Key{
 		Metadata:        metadata,
-		Usage:           defsecTypes.String(string(output.KeyMetadata.KeyUsage), metadata),
-		RotationEnabled: defsecTypes.Bool(output.KeyMetadata.ValidTo != nil, metadata),
+		Usage:           trivyTypes.String(string(output.KeyMetadata.KeyUsage), metadata),
+		RotationEnabled: trivyTypes.Bool(output.KeyMetadata.ValidTo != nil, metadata),
 	}, nil
 }

@@ -4,7 +4,7 @@ import (
 	aws2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/dynamodb"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	defsecTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	dynamodbApi "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	dynamodbTypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
@@ -78,20 +78,20 @@ func (a *adapter) adaptTable(tableName string) (*dynamodb.Table, error) {
 	}
 	encryption := dynamodb.ServerSideEncryption{
 		Metadata: tableMetadata,
-		Enabled:  defsecTypes.BoolDefault(false, tableMetadata),
-		KMSKeyID: defsecTypes.StringDefault("", tableMetadata),
+		Enabled:  trivyTypes.BoolDefault(false, tableMetadata),
+		KMSKeyID: trivyTypes.StringDefault("", tableMetadata),
 	}
 	if table.Table.SSEDescription != nil {
 
 		if table.Table.SSEDescription.Status == dynamodbTypes.SSEStatusEnabled {
-			encryption.Enabled = defsecTypes.BoolDefault(true, tableMetadata)
+			encryption.Enabled = trivyTypes.BoolDefault(true, tableMetadata)
 		}
 
 		if table.Table.SSEDescription.KMSMasterKeyArn != nil {
-			encryption.KMSKeyID = defsecTypes.StringDefault(*table.Table.SSEDescription.KMSMasterKeyArn, tableMetadata)
+			encryption.KMSKeyID = trivyTypes.StringDefault(*table.Table.SSEDescription.KMSMasterKeyArn, tableMetadata)
 		}
 	}
-	pitRecovery := defsecTypes.Bool(false, tableMetadata)
+	pitRecovery := trivyTypes.Bool(false, tableMetadata)
 	continuousBackup, err := a.client.DescribeContinuousBackups(a.Context(), &dynamodbApi.DescribeContinuousBackupsInput{
 		TableName: aws.String(tableName),
 	})
@@ -99,7 +99,7 @@ func (a *adapter) adaptTable(tableName string) (*dynamodb.Table, error) {
 	if err != nil && continuousBackup != nil && continuousBackup.ContinuousBackupsDescription != nil &&
 		continuousBackup.ContinuousBackupsDescription.PointInTimeRecoveryDescription != nil {
 		if continuousBackup.ContinuousBackupsDescription.PointInTimeRecoveryDescription.PointInTimeRecoveryStatus == dynamodbTypes.PointInTimeRecoveryStatusEnabled {
-			pitRecovery = defsecTypes.BoolDefault(true, tableMetadata)
+			pitRecovery = trivyTypes.BoolDefault(true, tableMetadata)
 		}
 
 	}
