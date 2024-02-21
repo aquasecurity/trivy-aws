@@ -1,9 +1,9 @@
 package neptune
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/neptune"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/neptune"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/neptune"
 	neptuneTypes "github.com/aws/aws-sdk-go-v2/service/neptune/types"
 
@@ -82,7 +82,7 @@ func (a *adapter) adaptCluster(apiCluster neptuneTypes.DBCluster) (*neptune.Clus
 		Metadata: metadata,
 		Logging: neptune.Logging{
 			Metadata: metadata,
-			Audit:    defsecTypes.Bool(auditLogging, metadata),
+			Audit:    trivyTypes.Bool(auditLogging, metadata),
 		},
 		StorageEncrypted: types.ToBool(apiCluster.StorageEncrypted, metadata),
 		KMSKeyID:         types.ToString(apiCluster.KmsKeyId, metadata),

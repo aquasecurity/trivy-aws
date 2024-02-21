@@ -1,10 +1,10 @@
 package elb
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/elb"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/elb"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 
@@ -102,18 +102,18 @@ func (a *adapter) adaptLoadBalancer(apiLoadBalancer types.LoadBalancer) (*elb.Lo
 				for _, action := range listener.DefaultActions {
 					actions = append(actions, elb.Action{
 						Metadata: metadata,
-						Type:     defsecTypes.String(string(action.Type), metadata),
+						Type:     trivyTypes.String(string(action.Type), metadata),
 					})
 				}
 
-				sslPolicy := defsecTypes.StringDefault("", metadata)
+				sslPolicy := trivyTypes.StringDefault("", metadata)
 				if listener.SslPolicy != nil {
-					sslPolicy = defsecTypes.String(*listener.SslPolicy, metadata)
+					sslPolicy = trivyTypes.String(*listener.SslPolicy, metadata)
 				}
 
 				listeners = append(listeners, elb.Listener{
 					Metadata:       metadata,
-					Protocol:       defsecTypes.String(string(listener.Protocol), metadata),
+					Protocol:       trivyTypes.String(string(listener.Protocol), metadata),
 					TLSPolicy:      sslPolicy,
 					DefaultActions: actions,
 				})
@@ -127,9 +127,9 @@ func (a *adapter) adaptLoadBalancer(apiLoadBalancer types.LoadBalancer) (*elb.Lo
 
 	return &elb.LoadBalancer{
 		Metadata:                metadata,
-		Type:                    defsecTypes.String(string(apiLoadBalancer.Type), metadata),
-		DropInvalidHeaderFields: defsecTypes.Bool(dropInvalidHeaders, metadata),
-		Internal:                defsecTypes.Bool(apiLoadBalancer.Scheme == types.LoadBalancerSchemeEnumInternal, metadata),
+		Type:                    trivyTypes.String(string(apiLoadBalancer.Type), metadata),
+		DropInvalidHeaderFields: trivyTypes.Bool(dropInvalidHeaders, metadata),
+		Internal:                trivyTypes.Bool(apiLoadBalancer.Scheme == types.LoadBalancerSchemeEnumInternal, metadata),
 		Listeners:               listeners,
 	}, nil
 }

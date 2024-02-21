@@ -3,8 +3,8 @@ package ecs
 import (
 	"fmt"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/ecs"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ecs"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	ecsapi "github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 
@@ -65,7 +65,7 @@ func (a *adapter) adaptCluster(arn string) (*ecs.Cluster, error) {
 		Metadata: metadata,
 		Settings: ecs.ClusterSettings{
 			Metadata:                 metadata,
-			ContainerInsightsEnabled: defsecTypes.Bool(enableInsights, metadata),
+			ContainerInsightsEnabled: trivyTypes.Bool(enableInsights, metadata),
 		},
 	}, nil
 }

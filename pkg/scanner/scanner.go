@@ -10,15 +10,15 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/aquasecurity/defsec/pkg/debug"
-	"github.com/aquasecurity/defsec/pkg/framework"
-	"github.com/aquasecurity/defsec/pkg/rego"
-	"github.com/aquasecurity/defsec/pkg/rules"
-	"github.com/aquasecurity/defsec/pkg/scan"
-	"github.com/aquasecurity/defsec/pkg/scanners/options"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	defsecRules "github.com/aquasecurity/defsec/pkg/types/rules"
+	"github.com/aquasecurity/trivy/pkg/iac/debug"
+	"github.com/aquasecurity/trivy/pkg/iac/framework"
+	"github.com/aquasecurity/trivy/pkg/iac/rego"
+	"github.com/aquasecurity/trivy/pkg/iac/rules"
+	"github.com/aquasecurity/trivy/pkg/iac/scan"
+	"github.com/aquasecurity/trivy/pkg/iac/scanners/options"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	defsecRules "github.com/aquasecurity/trivy/pkg/iac/types/rules"
 
 	adapter "github.com/aquasecurity/trivy-aws/internal/adapters/cloud"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
@@ -234,7 +234,7 @@ func (s *Scanner) initRegoScanner() (*rego.Scanner, error) {
 		}
 	}
 
-	regoScanner := rego.NewScanner(defsecTypes.SourceCloud, s.options...)
+	regoScanner := rego.NewScanner(trivyTypes.SourceCloud, s.options...)
 	regoScanner.SetParentDebugLogger(s.debug)
 	if err := regoScanner.LoadPolicies(s.loadEmbeddedLibraries, s.loadEmbeddedPolicies, srcFS, s.policyDirs, s.policyReaders); err != nil {
 		return nil, err

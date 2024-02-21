@@ -5,18 +5,18 @@ import (
 	"io/fs"
 	"testing"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
-	"github.com/aquasecurity/defsec/pkg/providers/azure"
-	"github.com/aquasecurity/defsec/pkg/providers/azure/authorization"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/azure"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/azure/authorization"
 
-	"github.com/aquasecurity/defsec/pkg/framework"
-	"github.com/aquasecurity/defsec/pkg/providers/aws"
-	"github.com/aquasecurity/defsec/pkg/providers/aws/rds"
-	"github.com/aquasecurity/defsec/pkg/scanners/options"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
-	defsecRules "github.com/aquasecurity/defsec/pkg/types/rules"
-	"github.com/aquasecurity/defsec/test/testutil"
+	"github.com/aquasecurity/trivy-aws/internal/testutil"
+	"github.com/aquasecurity/trivy/pkg/iac/framework"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/rds"
+	"github.com/aquasecurity/trivy/pkg/iac/scanners/options"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	defsecRules "github.com/aquasecurity/trivy/pkg/iac/types/rules"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -113,8 +113,8 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: defsecTypes.Metadata{},
-							PublicAccess: defsecTypes.Bool(true, defsecTypes.NewTestMetadata()),
+						{Metadata: trivyTypes.Metadata{},
+							PublicAccess: trivyTypes.Bool(true, trivyTypes.NewTestMetadata()),
 						},
 					},
 				},
@@ -155,8 +155,8 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: defsecTypes.Metadata{},
-							PublicAccess: defsecTypes.Bool(true, defsecTypes.NewTestMetadata()),
+						{Metadata: trivyTypes.Metadata{},
+							PublicAccess: trivyTypes.Bool(true, trivyTypes.NewTestMetadata()),
 						},
 					},
 				},
@@ -197,8 +197,8 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: defsecTypes.Metadata{},
-							PublicAccess: defsecTypes.Bool(true, defsecTypes.NewTestMetadata()),
+						{Metadata: trivyTypes.Metadata{},
+							PublicAccess: trivyTypes.Bool(true, trivyTypes.NewTestMetadata()),
 						},
 					},
 				},
@@ -234,8 +234,8 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: defsecTypes.Metadata{},
-							PublicAccess: defsecTypes.Bool(true, defsecTypes.NewTestMetadata()),
+						{Metadata: trivyTypes.Metadata{},
+							PublicAccess: trivyTypes.Bool(true, trivyTypes.NewTestMetadata()),
 						},
 					},
 				},
@@ -279,8 +279,8 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: defsecTypes.Metadata{},
-							PublicAccess: defsecTypes.Bool(true, defsecTypes.NewTestMetadata()),
+						{Metadata: trivyTypes.Metadata{},
+							PublicAccess: trivyTypes.Bool(true, trivyTypes.NewTestMetadata()),
 						},
 					},
 				},
@@ -359,8 +359,8 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: defsecTypes.Metadata{},
-							PublicAccess: defsecTypes.Bool(true, defsecTypes.NewTestMetadata()),
+						{Metadata: trivyTypes.Metadata{},
+							PublicAccess: trivyTypes.Bool(true, trivyTypes.NewTestMetadata()),
 						},
 					},
 				},
@@ -409,23 +409,23 @@ deny[res] {
 				AWS: aws.AWS{
 					IAM: iam.IAM{
 						PasswordPolicy: iam.PasswordPolicy{
-							MinimumLength: defsecTypes.Int(1, defsecTypes.NewTestMetadata()),
+							MinimumLength: trivyTypes.Int(1, trivyTypes.NewTestMetadata()),
 						}},
 				},
 				Azure: azure.Azure{
 					Authorization: authorization.Authorization{
 						RoleDefinitions: []authorization.RoleDefinition{{
-							Metadata: defsecTypes.NewTestMetadata(),
+							Metadata: trivyTypes.NewTestMetadata(),
 							Permissions: []authorization.Permission{
 								{
-									Metadata: defsecTypes.NewTestMetadata(),
-									Actions: []defsecTypes.StringValue{
-										defsecTypes.String("*", defsecTypes.NewTestMetadata()),
+									Metadata: trivyTypes.NewTestMetadata(),
+									Actions: []trivyTypes.StringValue{
+										trivyTypes.String("*", trivyTypes.NewTestMetadata()),
 									},
 								},
 							},
-							AssignableScopes: []defsecTypes.StringValue{
-								defsecTypes.StringUnresolvable(defsecTypes.NewTestMetadata()),
+							AssignableScopes: []trivyTypes.StringValue{
+								trivyTypes.StringUnresolvable(trivyTypes.NewTestMetadata()),
 							}},
 						}},
 				},
@@ -515,8 +515,8 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: defsecTypes.Metadata{},
-							PublicAccess: defsecTypes.Bool(false, defsecTypes.NewTestMetadata()),
+						{Metadata: trivyTypes.Metadata{},
+							PublicAccess: trivyTypes.Bool(false, trivyTypes.NewTestMetadata()),
 						},
 					},
 				},

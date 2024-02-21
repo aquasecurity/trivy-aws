@@ -1,10 +1,10 @@
 package sqs
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
-	"github.com/aquasecurity/defsec/pkg/providers/aws/sqs"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/sqs"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	sqsApi "github.com/aws/aws-sdk-go-v2/service/sqs"
 	sqsTypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
@@ -90,12 +90,12 @@ func (a *adapter) adaptQueue(queueUrl string) (*sqs.Queue, error) {
 
 	queue := &sqs.Queue{
 		Metadata: queueMetadata,
-		QueueURL: defsecTypes.String(queueUrl, queueMetadata),
+		QueueURL: trivyTypes.String(queueUrl, queueMetadata),
 		Policies: []iam.Policy{},
 		Encryption: sqs.Encryption{
 			Metadata:          queueMetadata,
-			KMSKeyID:          defsecTypes.StringDefault("", queueMetadata),
-			ManagedEncryption: defsecTypes.BoolDefault(false, queueMetadata),
+			KMSKeyID:          trivyTypes.StringDefault("", queueMetadata),
+			ManagedEncryption: trivyTypes.BoolDefault(false, queueMetadata),
 		},
 	}
 
@@ -104,11 +104,11 @@ func (a *adapter) adaptQueue(queueUrl string) (*sqs.Queue, error) {
 	queuePolicy := queueAttributes.Attributes[string(sqsTypes.QueueAttributeNamePolicy)]
 
 	if sseEncrypted == "SSE-SQS" || sseEncrypted == "SSE-KMS" {
-		queue.Encryption.ManagedEncryption = defsecTypes.Bool(true, queueMetadata)
+		queue.Encryption.ManagedEncryption = trivyTypes.Bool(true, queueMetadata)
 	}
 
 	if kmsEncryption != "" {
-		queue.Encryption.KMSKeyID = defsecTypes.String(kmsEncryption, queueMetadata)
+		queue.Encryption.KMSKeyID = trivyTypes.String(kmsEncryption, queueMetadata)
 	}
 
 	if queuePolicy != "" {
@@ -117,12 +117,12 @@ func (a *adapter) adaptQueue(queueUrl string) (*sqs.Queue, error) {
 
 			queue.Policies = append(queue.Policies, iam.Policy{
 				Metadata: queueMetadata,
-				Name:     defsecTypes.StringDefault("", queueMetadata),
+				Name:     trivyTypes.StringDefault("", queueMetadata),
 				Document: iam.Document{
 					Metadata: queueMetadata,
 					Parsed:   *policy,
 				},
-				Builtin: defsecTypes.Bool(false, queueMetadata),
+				Builtin: trivyTypes.Bool(false, queueMetadata),
 			})
 
 		}

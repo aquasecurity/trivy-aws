@@ -3,10 +3,10 @@ package iam
 import (
 	"fmt"
 
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/iam"
-	"github.com/aquasecurity/defsec/pkg/state"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
 	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 
@@ -52,9 +52,9 @@ func (a *adapter) adaptServerCertificate(certInfo iamtypes.ServerCertificateMeta
 
 	metadata := a.CreateMetadataFromARN(*cert.ServerCertificate.ServerCertificateMetadata.Arn)
 
-	expiration := defsecTypes.TimeUnresolvable(metadata)
+	expiration := trivyTypes.TimeUnresolvable(metadata)
 	if cert.ServerCertificate.ServerCertificateMetadata.Expiration != nil {
-		expiration = defsecTypes.Time(*cert.ServerCertificate.ServerCertificateMetadata.Expiration, metadata)
+		expiration = trivyTypes.Time(*cert.ServerCertificate.ServerCertificateMetadata.Expiration, metadata)
 	}
 
 	return &iam.ServerCertificate{

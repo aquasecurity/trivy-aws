@@ -1,10 +1,10 @@
 package eks
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/eks"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/eks"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	eksapi "github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/aws/aws-sdk-go-v2/service/eks/types"
 
@@ -78,11 +78,11 @@ func (a *adapter) adaptCluster(name string) (*eks.Cluster, error) {
 	metadata := a.CreateMetadataFromARN(*output.Cluster.Arn)
 
 	var publicAccess bool
-	var publicCidrs []defsecTypes.StringValue
+	var publicCidrs []trivyTypes.StringValue
 	if output.Cluster.ResourcesVpcConfig != nil {
 		publicAccess = output.Cluster.ResourcesVpcConfig.EndpointPublicAccess
 		for _, cidr := range output.Cluster.ResourcesVpcConfig.PublicAccessCidrs {
-			publicCidrs = append(publicCidrs, defsecTypes.String(cidr, metadata))
+			publicCidrs = append(publicCidrs, trivyTypes.String(cidr, metadata))
 		}
 	}
 
@@ -128,18 +128,18 @@ func (a *adapter) adaptCluster(name string) (*eks.Cluster, error) {
 		Metadata: metadata,
 		Logging: eks.Logging{
 			Metadata:          metadata,
-			API:               defsecTypes.Bool(logAPI, metadata),
-			Audit:             defsecTypes.Bool(logAudit, metadata),
-			Authenticator:     defsecTypes.Bool(logAuth, metadata),
-			ControllerManager: defsecTypes.Bool(logCM, metadata),
-			Scheduler:         defsecTypes.Bool(logSched, metadata),
+			API:               trivyTypes.Bool(logAPI, metadata),
+			Audit:             trivyTypes.Bool(logAudit, metadata),
+			Authenticator:     trivyTypes.Bool(logAuth, metadata),
+			ControllerManager: trivyTypes.Bool(logCM, metadata),
+			Scheduler:         trivyTypes.Bool(logSched, metadata),
 		},
 		Encryption: eks.Encryption{
 			Metadata: metadata,
-			Secrets:  defsecTypes.Bool(secretsEncrypted, metadata),
-			KMSKeyID: defsecTypes.String(encryptionKeyARN, metadata),
+			Secrets:  trivyTypes.Bool(secretsEncrypted, metadata),
+			KMSKeyID: trivyTypes.String(encryptionKeyARN, metadata),
 		},
-		PublicAccessEnabled: defsecTypes.Bool(publicAccess, metadata),
+		PublicAccessEnabled: trivyTypes.Bool(publicAccess, metadata),
 		PublicAccessCIDRs:   publicCidrs,
 	}, nil
 }

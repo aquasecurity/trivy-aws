@@ -1,10 +1,10 @@
 package cloudfront
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/cloudfront"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/cloudfront"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 
@@ -95,7 +95,7 @@ func (a *adapter) adaptDistribution(distribution types.DistributionSummary) (*cl
 	for _, cacheBehaviour := range config.DistributionConfig.CacheBehaviors.Items {
 		cacheBehaviours = append(cacheBehaviours, cloudfront.CacheBehaviour{
 			Metadata:             metadata,
-			ViewerProtocolPolicy: defsecTypes.String(string(cacheBehaviour.ViewerProtocolPolicy), metadata),
+			ViewerProtocolPolicy: trivyTypes.String(string(cacheBehaviour.ViewerProtocolPolicy), metadata),
 		})
 	}
 
@@ -106,19 +106,19 @@ func (a *adapter) adaptDistribution(distribution types.DistributionSummary) (*cl
 
 	return &cloudfront.Distribution{
 		Metadata: metadata,
-		WAFID:    defsecTypes.String(wafID, metadata),
+		WAFID:    trivyTypes.String(wafID, metadata),
 		Logging: cloudfront.Logging{
 			Metadata: metadata,
-			Bucket:   defsecTypes.String(loggingBucket, metadata),
+			Bucket:   trivyTypes.String(loggingBucket, metadata),
 		},
 		DefaultCacheBehaviour: cloudfront.CacheBehaviour{
 			Metadata:             metadata,
-			ViewerProtocolPolicy: defsecTypes.String(defaultCacheBehaviour, metadata),
+			ViewerProtocolPolicy: trivyTypes.String(defaultCacheBehaviour, metadata),
 		},
 		OrdererCacheBehaviours: cacheBehaviours,
 		ViewerCertificate: cloudfront.ViewerCertificate{
 			Metadata:               metadata,
-			MinimumProtocolVersion: defsecTypes.String(minimumProtocolVersion, metadata),
+			MinimumProtocolVersion: trivyTypes.String(minimumProtocolVersion, metadata),
 		},
 	}, nil
 }

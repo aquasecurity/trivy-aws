@@ -1,10 +1,10 @@
 package efs
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/efs"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/efs"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/efs"
 	"github.com/aws/aws-sdk-go-v2/service/efs/types"
 
@@ -67,9 +67,9 @@ func (a *adapter) getFilesystems() ([]efs.FileSystem, error) {
 
 func (a *adapter) adaptFilesystem(apiFilesystem types.FileSystemDescription) (*efs.FileSystem, error) {
 	metadata := a.CreateMetadataFromARN(*apiFilesystem.FileSystemArn)
-	encrypted := defsecTypes.BoolDefault(false, metadata)
+	encrypted := trivyTypes.BoolDefault(false, metadata)
 	if apiFilesystem.Encrypted != nil {
-		encrypted = defsecTypes.Bool(*apiFilesystem.Encrypted, metadata)
+		encrypted = trivyTypes.Bool(*apiFilesystem.Encrypted, metadata)
 	}
 	return &efs.FileSystem{
 		Metadata:  metadata,

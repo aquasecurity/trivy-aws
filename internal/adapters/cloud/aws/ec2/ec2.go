@@ -5,9 +5,9 @@ import (
 
 	"strings"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/ec2"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ec2"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	ec2api "github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -123,8 +123,8 @@ func (a *adapter) adaptInstance(instance ec2Types.Instance) (*ec2.Instance, erro
 
 	i := ec2.NewInstance(instanceMetadata)
 	if instance.MetadataOptions != nil {
-		i.MetadataOptions.HttpTokens = defsecTypes.StringDefault(string(instance.MetadataOptions.HttpTokens), instanceMetadata)
-		i.MetadataOptions.HttpEndpoint = defsecTypes.StringDefault(string(instance.MetadataOptions.HttpEndpoint), instanceMetadata)
+		i.MetadataOptions.HttpTokens = trivyTypes.StringDefault(string(instance.MetadataOptions.HttpTokens), instanceMetadata)
+		i.MetadataOptions.HttpEndpoint = trivyTypes.StringDefault(string(instance.MetadataOptions.HttpEndpoint), instanceMetadata)
 	}
 
 	if instance.BlockDeviceMappings != nil {
@@ -132,7 +132,7 @@ func (a *adapter) adaptInstance(instance ec2Types.Instance) (*ec2.Instance, erro
 			volumeMetadata := a.CreateMetadata(fmt.Sprintf("volume/%s", *blockMapping.Ebs.VolumeId))
 			ebsDevice := &ec2.BlockDevice{
 				Metadata:  volumeMetadata,
-				Encrypted: defsecTypes.BoolDefault(false, volumeMetadata),
+				Encrypted: trivyTypes.BoolDefault(false, volumeMetadata),
 			}
 			if strings.EqualFold(*blockMapping.DeviceName, *instance.RootDeviceName) {
 				// is root block device

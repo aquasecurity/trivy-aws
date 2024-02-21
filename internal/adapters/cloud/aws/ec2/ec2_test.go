@@ -3,9 +3,9 @@ package ec2
 import (
 	"testing"
 
-	"github.com/aquasecurity/defsec/pkg/state"
 	aws2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	ec2api "github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2Types "github.com/aws/aws-sdk-go-v2/service/ec2/types"

@@ -1,8 +1,8 @@
 package ecs
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/ecs"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ecs"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	ecsapi "github.com/aws/aws-sdk-go-v2/service/ecs"
 
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
@@ -54,8 +54,8 @@ func (a *adapter) adaptTaskDefinition(arn string) (*ecs.TaskDefinition, error) {
 				hostPort = int(*apiMapping.HostPort)
 			}
 			portMappings = append(portMappings, ecs.PortMapping{
-				ContainerPort: defsecTypes.Int(containerPort, metadata),
-				HostPort:      defsecTypes.Int(hostPort, metadata),
+				ContainerPort: trivyTypes.Int(containerPort, metadata),
+				HostPort:      trivyTypes.Int(hostPort, metadata),
 			})
 		}
 
@@ -89,14 +89,14 @@ func (a *adapter) adaptTaskDefinition(arn string) (*ecs.TaskDefinition, error) {
 
 		containerDefinitions = append(containerDefinitions, ecs.ContainerDefinition{
 			Metadata:     metadata,
-			Name:         defsecTypes.String(name, metadata),
-			Image:        defsecTypes.String(image, metadata),
-			CPU:          defsecTypes.Int(cpu, metadata),
-			Memory:       defsecTypes.Int(memory, metadata),
-			Essential:    defsecTypes.Bool(essential, metadata),
+			Name:         trivyTypes.String(name, metadata),
+			Image:        trivyTypes.String(image, metadata),
+			CPU:          trivyTypes.Int(cpu, metadata),
+			Memory:       trivyTypes.Int(memory, metadata),
+			Essential:    trivyTypes.Bool(essential, metadata),
 			PortMappings: portMappings,
 			Environment:  envVars,
-			Privileged:   defsecTypes.Bool(apiContainer.Privileged != nil && *apiContainer.Privileged, metadata),
+			Privileged:   trivyTypes.Bool(apiContainer.Privileged != nil && *apiContainer.Privileged, metadata),
 		})
 	}
 
@@ -107,7 +107,7 @@ func (a *adapter) adaptTaskDefinition(arn string) (*ecs.TaskDefinition, error) {
 			Metadata: metadata,
 			EFSVolumeConfiguration: ecs.EFSVolumeConfiguration{
 				Metadata:                 metadata,
-				TransitEncryptionEnabled: defsecTypes.Bool(encrypted, metadata),
+				TransitEncryptionEnabled: trivyTypes.Bool(encrypted, metadata),
 			},
 		})
 	}

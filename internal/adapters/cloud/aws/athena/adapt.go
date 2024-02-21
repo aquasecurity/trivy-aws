@@ -3,10 +3,10 @@ package athena
 import (
 	"fmt"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/athena"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/athena"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/athena"
 	"github.com/aws/aws-sdk-go-v2/service/athena/types"
 
@@ -96,9 +96,9 @@ func (a *adapter) adaptWorkgroup(workgroup types.WorkGroupSummary) (*athena.Work
 
 	}
 
-	name := defsecTypes.StringDefault("", metadata)
+	name := trivyTypes.StringDefault("", metadata)
 	if workgroup.Name != nil {
-		name = defsecTypes.String(*workgroup.Name, metadata)
+		name = trivyTypes.String(*workgroup.Name, metadata)
 	}
 
 	return &athena.Workgroup{
@@ -106,9 +106,9 @@ func (a *adapter) adaptWorkgroup(workgroup types.WorkGroupSummary) (*athena.Work
 		Name:     name,
 		Encryption: athena.EncryptionConfiguration{
 			Metadata: metadata,
-			Type:     defsecTypes.String(encType, metadata),
+			Type:     trivyTypes.String(encType, metadata),
 		},
-		EnforceConfiguration: defsecTypes.Bool(enforce, metadata),
+		EnforceConfiguration: trivyTypes.Bool(enforce, metadata),
 	}, nil
 }
 
@@ -168,9 +168,9 @@ func (a *adapter) getDatabasesForCatalogue(catalog types.DataCatalogSummary) ([]
 
 func (a *adapter) adaptDatabase(database types.Database) (*athena.Database, error) {
 	metadata := a.CreateMetadata("database/" + *database.Name)
-	name := defsecTypes.StringDefault("", metadata)
+	name := trivyTypes.StringDefault("", metadata)
 	if database.Name != nil {
-		name = defsecTypes.String(*database.Name, metadata)
+		name = trivyTypes.String(*database.Name, metadata)
 	}
 
 	return &athena.Database{
@@ -179,7 +179,7 @@ func (a *adapter) adaptDatabase(database types.Database) (*athena.Database, erro
 		Encryption: athena.EncryptionConfiguration{
 			Metadata: metadata,
 			// see https://stackoverflow.com/questions/72456689/what-does-encryption-configuration-in-terraform-aws-athena-database-resource
-			Type: defsecTypes.String("", defsecTypes.NewUnmanagedMetadata()),
+			Type: trivyTypes.String("", trivyTypes.NewUnmanagedMetadata()),
 		},
 	}, nil
 }

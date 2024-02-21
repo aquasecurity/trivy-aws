@@ -3,8 +3,8 @@ package ec2
 import (
 	"fmt"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/ec2"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ec2"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	ec2api "github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
@@ -49,8 +49,8 @@ func (a *adapter) adaptVolume(volume types.Volume) (*ec2.Volume, error) {
 		Metadata: metadata,
 		Encryption: ec2.Encryption{
 			Metadata: metadata,
-			Enabled:  defsecTypes.Bool(encrypted, metadata),
-			KMSKeyID: defsecTypes.String(kmsKeyId, metadata),
+			Enabled:  trivyTypes.Bool(encrypted, metadata),
+			KMSKeyID: trivyTypes.String(kmsKeyId, metadata),
 		},
 	}, nil
 }

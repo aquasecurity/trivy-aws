@@ -1,9 +1,9 @@
 package documentdb
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/documentdb"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/documentdb"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/docdb"
 	docdbTypes "github.com/aws/aws-sdk-go-v2/service/docdb/types"
 
@@ -70,9 +70,9 @@ func (a *adapter) adaptCluster(cluster docdbTypes.DBCluster) (*documentdb.Cluste
 
 	metadata := a.CreateMetadataFromARN(*cluster.DBClusterArn)
 
-	var logExports []defsecTypes.StringValue
+	var logExports []trivyTypes.StringValue
 	for _, export := range cluster.EnabledCloudwatchLogsExports {
-		logExports = append(logExports, defsecTypes.String(export, metadata))
+		logExports = append(logExports, trivyTypes.String(export, metadata))
 	}
 
 	var instances []documentdb.Instance
@@ -89,7 +89,7 @@ func (a *adapter) adaptCluster(cluster docdbTypes.DBCluster) (*documentdb.Cluste
 		}
 		instances = append(instances, documentdb.Instance{
 			Metadata: metadata,
-			KMSKeyID: defsecTypes.String(kmsKeyId, metadata),
+			KMSKeyID: trivyTypes.String(kmsKeyId, metadata),
 		})
 	}
 

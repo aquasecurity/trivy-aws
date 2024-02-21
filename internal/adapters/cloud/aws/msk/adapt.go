@@ -1,16 +1,16 @@
 package msk
 
 import (
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	api "github.com/aws/aws-sdk-go-v2/service/kafka"
 	"github.com/aws/aws-sdk-go-v2/service/kafka/types"
 
-	"github.com/aquasecurity/defsec/pkg/providers/aws/msk"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/msk"
 )
 
 type adapter struct {
@@ -102,12 +102,12 @@ func (a *adapter) adaptCluster(apiCluster types.ClusterInfo) (*msk.Cluster, erro
 		Metadata: metadata,
 		EncryptionInTransit: msk.EncryptionInTransit{
 			Metadata:     metadata,
-			ClientBroker: defsecTypes.String(encInTransitClientBroker, metadata),
+			ClientBroker: trivyTypes.String(encInTransitClientBroker, metadata),
 		},
 		EncryptionAtRest: msk.EncryptionAtRest{
 			Metadata:  metadata,
-			KMSKeyARN: defsecTypes.String(encAtRestKMSKeyId, metadata),
-			Enabled:   defsecTypes.Bool(encAtRestEnabled, metadata),
+			KMSKeyARN: trivyTypes.String(encAtRestKMSKeyId, metadata),
+			Enabled:   trivyTypes.Bool(encAtRestEnabled, metadata),
 		},
 		Logging: msk.Logging{
 			Metadata: metadata,
@@ -115,15 +115,15 @@ func (a *adapter) adaptCluster(apiCluster types.ClusterInfo) (*msk.Cluster, erro
 				Metadata: metadata,
 				S3: msk.S3Logging{
 					Metadata: metadata,
-					Enabled:  defsecTypes.Bool(logS3, metadata),
+					Enabled:  trivyTypes.Bool(logS3, metadata),
 				},
 				Cloudwatch: msk.CloudwatchLogging{
 					Metadata: metadata,
-					Enabled:  defsecTypes.Bool(logCW, metadata),
+					Enabled:  trivyTypes.Bool(logCW, metadata),
 				},
 				Firehose: msk.FirehoseLogging{
 					Metadata: metadata,
-					Enabled:  defsecTypes.Bool(logFH, metadata),
+					Enabled:  trivyTypes.Bool(logFH, metadata),
 				},
 			},
 		},

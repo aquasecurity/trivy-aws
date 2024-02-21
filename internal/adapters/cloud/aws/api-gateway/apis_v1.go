@@ -3,8 +3,8 @@ package api_gateway
 import (
 	"fmt"
 
-	v1 "github.com/aquasecurity/defsec/pkg/providers/aws/apigateway/v1"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
+	v1 "github.com/aquasecurity/trivy/pkg/iac/providers/aws/apigateway/v1"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/apigateway"
 	agTypes "github.com/aws/aws-sdk-go-v2/service/apigateway/types"
 
@@ -71,9 +71,9 @@ func (a *adapter) adaptRestAPIV1(restAPI agTypes.RestApi) (*v1.API, error) {
 		resourcesInput.Position = resourcesOutput.Position
 	}
 
-	name := defsecTypes.StringDefault("", metadata)
+	name := trivyTypes.StringDefault("", metadata)
 	if restAPI.Name != nil {
-		name = defsecTypes.String(*restAPI.Name, metadata)
+		name = trivyTypes.String(*restAPI.Name, metadata)
 	}
 
 	return &v1.API{
@@ -96,15 +96,15 @@ func (a *adapter) adaptStageV1(restAPI agTypes.RestApi, stage agTypes.Stage) v1.
 	for method, setting := range stage.MethodSettings {
 		methodSettings = append(methodSettings, v1.RESTMethodSettings{
 			Metadata:           metadata,
-			Method:             defsecTypes.String(method, metadata),
-			CacheDataEncrypted: defsecTypes.Bool(setting.CacheDataEncrypted, metadata),
-			CacheEnabled:       defsecTypes.Bool(setting.CachingEnabled, metadata),
+			Method:             trivyTypes.String(method, metadata),
+			CacheDataEncrypted: trivyTypes.Bool(setting.CacheDataEncrypted, metadata),
+			CacheEnabled:       trivyTypes.Bool(setting.CachingEnabled, metadata),
 		})
 	}
 
-	name := defsecTypes.StringDefault("", metadata)
+	name := trivyTypes.StringDefault("", metadata)
 	if stage.StageName != nil {
-		name = defsecTypes.String(*stage.StageName, metadata)
+		name = trivyTypes.String(*stage.StageName, metadata)
 	}
 
 	return v1.Stage{
@@ -112,10 +112,10 @@ func (a *adapter) adaptStageV1(restAPI agTypes.RestApi, stage agTypes.Stage) v1.
 		Name:     name,
 		AccessLogging: v1.AccessLogging{
 			Metadata:              metadata,
-			CloudwatchLogGroupARN: defsecTypes.String(logARN, metadata),
+			CloudwatchLogGroupARN: trivyTypes.String(logARN, metadata),
 		},
 		RESTMethodSettings: methodSettings,
-		XRayTracingEnabled: defsecTypes.Bool(stage.TracingEnabled, metadata),
+		XRayTracingEnabled: trivyTypes.Bool(stage.TracingEnabled, metadata),
 	}
 }
 
@@ -130,17 +130,17 @@ func (a *adapter) adaptResourceV1(restAPI agTypes.RestApi, apiResource agTypes.R
 
 	for _, method := range apiResource.ResourceMethods {
 		metadata := a.CreateMetadata(fmt.Sprintf("/restapis/%s/resources/%s/methods/%s", *restAPI.Id, *apiResource.Id, *method.HttpMethod))
-		httpMethod := defsecTypes.StringDefault("", metadata)
+		httpMethod := trivyTypes.StringDefault("", metadata)
 		if method.HttpMethod != nil {
-			httpMethod = defsecTypes.String(*method.HttpMethod, metadata)
+			httpMethod = trivyTypes.String(*method.HttpMethod, metadata)
 		}
-		authType := defsecTypes.StringDefault("", metadata)
+		authType := trivyTypes.StringDefault("", metadata)
 		if method.AuthorizationType != nil {
-			authType = defsecTypes.String(*method.AuthorizationType, metadata)
+			authType = trivyTypes.String(*method.AuthorizationType, metadata)
 		}
-		keyRequired := defsecTypes.BoolDefault(false, metadata)
+		keyRequired := trivyTypes.BoolDefault(false, metadata)
 		if method.ApiKeyRequired != nil {
-			keyRequired = defsecTypes.Bool(*method.ApiKeyRequired, metadata)
+			keyRequired = trivyTypes.Bool(*method.ApiKeyRequired, metadata)
 		}
 		resource.Methods = append(resource.Methods, v1.Method{
 			Metadata:          metadata,

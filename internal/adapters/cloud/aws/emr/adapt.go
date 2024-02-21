@@ -1,10 +1,10 @@
 package emr
 
 import (
-	"github.com/aquasecurity/defsec/pkg/providers/aws/emr"
-	"github.com/aquasecurity/defsec/pkg/state"
-	defsecTypes "github.com/aquasecurity/defsec/pkg/types"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/emr"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/emr"
 	"github.com/aws/aws-sdk-go-v2/service/emr/types"
 
@@ -81,19 +81,19 @@ func (a *adapter) adaptCluster(apiCluster types.ClusterSummary) (*emr.Cluster, e
 		return nil, err
 	}
 
-	name := defsecTypes.StringDefault("", metadata)
+	name := trivyTypes.StringDefault("", metadata)
 	if apiCluster.Name != nil {
-		name = defsecTypes.String(*apiCluster.Name, metadata)
+		name = trivyTypes.String(*apiCluster.Name, metadata)
 	}
 
-	releaseLabel := defsecTypes.StringDefault("", metadata)
+	releaseLabel := trivyTypes.StringDefault("", metadata)
 	if output.Cluster != nil && output.Cluster.ReleaseLabel != nil {
-		releaseLabel = defsecTypes.String(*output.Cluster.ReleaseLabel, metadata)
+		releaseLabel = trivyTypes.String(*output.Cluster.ReleaseLabel, metadata)
 	}
 
-	serviceRole := defsecTypes.StringDefault("", metadata)
+	serviceRole := trivyTypes.StringDefault("", metadata)
 	if output.Cluster != nil && output.Cluster.ServiceRole != nil {
-		serviceRole = defsecTypes.String(*output.Cluster.ServiceRole, metadata)
+		serviceRole = trivyTypes.String(*output.Cluster.ServiceRole, metadata)
 	}
 
 	return &emr.Cluster{
@@ -152,14 +152,14 @@ func (a *adapter) adaptConfig(config types.SecurityConfigurationSummary) (*emr.S
 		return nil, err
 	}
 
-	name := defsecTypes.StringDefault("", metadata)
+	name := trivyTypes.StringDefault("", metadata)
 	if config.Name != nil {
-		name = defsecTypes.String(*config.Name, metadata)
+		name = trivyTypes.String(*config.Name, metadata)
 	}
 
-	secConf := defsecTypes.StringDefault("", metadata)
+	secConf := trivyTypes.StringDefault("", metadata)
 	if output.SecurityConfiguration != nil {
-		secConf = defsecTypes.String(*output.SecurityConfiguration, metadata)
+		secConf = trivyTypes.String(*output.SecurityConfiguration, metadata)
 	}
 
 	return &emr.SecurityConfiguration{
