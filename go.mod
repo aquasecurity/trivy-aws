@@ -5,7 +5,6 @@ go 1.21
 require (
 	github.com/aquasecurity/go-mock-aws v0.0.0-20240109054747-49e4b5da33cb
 	github.com/aquasecurity/trivy v0.49.2-0.20240216090457-32a02a95dd06
-	github.com/aws/aws-sdk-go v1.49.21
 	github.com/aws/aws-sdk-go-v2 v1.24.1
 	github.com/aws/aws-sdk-go-v2/config v1.26.6
 	github.com/aws/aws-sdk-go-v2/credentials v1.16.16

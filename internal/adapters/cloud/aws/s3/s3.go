@@ -10,7 +10,6 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	s3api "github.com/aws/aws-sdk-go-v2/service/s3"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/liamg/iamgo"
 
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
@@ -21,6 +20,11 @@ import (
 type adapter struct {
 	*aws.RootAdapter
 	api *s3api.Client
+}
+
+type awsError interface {
+	error
+	Code() string
 }
 
 func init() {
@@ -116,7 +120,7 @@ func (a *adapter) getPublicAccessBlock(bucketName *string, metadata trivyTypes.M
 	})
 	if err != nil {
 		// nolint
-		if awsError, ok := err.(awserr.Error); ok {
+		if awsError, ok := err.(awsError); ok {
 			if awsError.Code() == "NoSuchPublicAccessBlockConfiguration" {
 				return nil
 			}
@@ -146,7 +150,7 @@ func (a *adapter) getBucketPolicies(bucketName *string, metadata trivyTypes.Meta
 	bucketPolicy, err := a.api.GetBucketPolicy(a.Context(), &s3api.GetBucketPolicyInput{Bucket: bucketName})
 	if err != nil {
 		// nolint
-		if awsError, ok := err.(awserr.Error); ok {
+		if awsError, ok := err.(awsError); ok {
 			if awsError.Code() == "NoSuchBucketPolicy" {
 				return nil
 			}
@@ -189,7 +193,7 @@ func (a *adapter) getBucketEncryption(bucketName *string, metadata trivyTypes.Me
 	encryption, err := a.api.GetBucketEncryption(a.Context(), &s3api.GetBucketEncryptionInput{Bucket: bucketName})
 	if err != nil {
 		// nolint
-		if awsError, ok := err.(awserr.Error); ok {
+		if awsError, ok := err.(awsError); ok {
 			if awsError.Code() == "ServerSideEncryptionConfigurationNotFoundError" {
 				return bucketEncryption
 			}
@@ -225,7 +229,7 @@ func (a *adapter) getBucketVersioning(bucketName *string, metadata trivyTypes.Me
 	versioning, err := a.api.GetBucketVersioning(a.Context(), &s3api.GetBucketVersioningInput{Bucket: bucketName})
 	if err != nil {
 		// nolint
-		if awsError, ok := err.(awserr.Error); ok {
+		if awsError, ok := err.(awsError); ok {
 			if awsError.Code() == "NotImplemented" {
 				return bucketVersioning
 			}
