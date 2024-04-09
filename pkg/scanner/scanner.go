@@ -242,3 +242,7 @@ func (s *Scanner) initRegoScanner() (*rego.Scanner, error) {
 	s.regoScanner = regoScanner
 	return regoScanner, nil
 }
+
+func (s *Scanner) FooBarBaz() error {
+	return nil
+}
