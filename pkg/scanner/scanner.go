@@ -51,6 +51,10 @@ type Scanner struct {
 	regoOnly              bool
 }
 
+func (s *Scanner) SetDisableCauses(bool) {
+	// not implemented
+}
+
 func (s *Scanner) SetRegoOnly(value bool) {
 	s.regoOnly = value
 }
