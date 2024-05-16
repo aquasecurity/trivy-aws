@@ -51,6 +51,8 @@ type Scanner struct {
 	regoOnly              bool
 }
 
+func (s *Scanner) SetIncludeDeprecatedChecks(bool) {}
+
 func (s *Scanner) SetRegoOnly(value bool) {
 	s.regoOnly = value
 }
