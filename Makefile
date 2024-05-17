@@ -2,6 +2,10 @@
 test:
 	go test -race ./...
 
+.PHONY: build
+build:
+	go build -o bin/trivy-aws ./cmd/trivy-aws/main.go
+
 .PHONY: test-no-localstack
 test-no-localstack:
 	go test $$(go list ./... | grep -v internal/adapters | awk -F'github.com/aquasecurity/trivy-aws' '{print "./"$$2}')
