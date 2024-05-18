@@ -1,4 +1,4 @@
-name: trivy-aws
+name: aws-scan
 repository: github.com/aquasecurity/trivy-aws
 version: "0.1.0"
 usage: AWS Trivy plugin
@@ -6,5 +6,5 @@ description: |-
   Trivy AWS plugin for the Trivy security scanner
   https://github.com/aquasecurity/trivy-aws
 platforms:
-  - uri: .\trivy-aws.exe
-    bin: .\trivy-aws.exe
+  - uri: ./trivy-aws
+    bin: ./trivy-aws

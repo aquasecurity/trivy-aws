@@ -4,7 +4,7 @@ test:
 
 .PHONY: build
 build:
-	go build -o bin/trivy-aws ./cmd/trivy-aws/main.go
+	go build -o trivy-aws ./cmd/trivy-aws/main.go
 
 .PHONY: test-no-localstack
 test-no-localstack:
@@ -19,3 +19,7 @@ quality:
 update-aws-deps:
 	@grep aws-sdk-go-v2 go.mod | grep -v '// indirect' | sed 's/^[ [[:blank:]]]*//g' | sed 's/[[:space:]]v.*//g' | xargs go get
 	@go mod tidy
+
+.PHONY: bundle
+bundle:
+	tar -cvzf trivy-aws.tar.gz plugin.yaml trivy-aws LICENSE
