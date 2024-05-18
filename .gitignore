@@ -11,4 +11,4 @@ vendor/
 .vscode/
 .DS_Store
 
-bin/
+trivy-aws*
