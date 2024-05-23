@@ -38,7 +38,7 @@ func NewCmd() *cobra.Command {
 	sort.Strings(services)
 
 	cmd := &cobra.Command{
-		Use:     "aws [flags]",
+		Use:     "aws-scan [flags]",
 		Aliases: []string{},
 		Args:    cobra.ExactArgs(0),
 		Short:   "[EXPERIMENTAL] Scan AWS account",
@@ -49,16 +49,16 @@ The following services are supported:
 - %s
 `, strings.Join(services, "\n- ")),
 		Example: `  # basic scanning
-  $ trivy aws --region us-east-1
+  $ trivy aws-scan --region us-east-1
 
   # limit scan to a single service:
-  $ trivy aws --region us-east-1 --service s3
+  $ trivy aws-scan --region us-east-1 --service s3
 
   # limit scan to multiple services:
-  $ trivy aws --region us-east-1 --service s3 --service ec2
+  $ trivy aws-scan --region us-east-1 --service s3 --service ec2
 
   # force refresh of cache for fresh results
-  $ trivy aws --region us-east-1 --update-cache
+  $ trivy aws-scan --region us-east-1 --update-cache
 `,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if err := awsFlags.Bind(cmd); err != nil {

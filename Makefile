@@ -4,7 +4,7 @@ test:
 
 .PHONY: build
 build:
-	go build -o trivy-aws ./cmd/trivy-aws/main.go
+	CGO_ENABLED=0 go build -ldflags "-s -w" -o trivy-aws ./cmd/trivy-aws/main.go
 
 .PHONY: test-no-localstack
 test-no-localstack:
