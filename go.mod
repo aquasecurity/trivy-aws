@@ -6,7 +6,7 @@ toolchain go1.22.2
 
 require (
 	github.com/aquasecurity/go-mock-aws v0.0.0-20240523055201-a4152219967f
-	github.com/aquasecurity/trivy v0.51.2-0.20240527214045-349caf96bc3d
+	github.com/aquasecurity/trivy v0.51.4
 	github.com/aws/aws-sdk-go-v2 v1.27.0
 	github.com/aws/aws-sdk-go-v2/config v1.27.15
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.15
@@ -154,7 +154,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/v3 v3.5.0 // indirect
-	k8s.io/utils v0.0.0-20231127182322-b307cd553661 // indirect
-	mvdan.cc/sh/v3 v3.8.0 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
