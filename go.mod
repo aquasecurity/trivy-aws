@@ -6,7 +6,7 @@ toolchain go1.22.2
 
 require (
 	github.com/aquasecurity/go-mock-aws v0.0.0-20240523055201-a4152219967f
-	github.com/aquasecurity/trivy v0.51.4
+	github.com/aquasecurity/trivy v0.51.2-0.20240527214045-349caf96bc3d
 	github.com/aws/aws-sdk-go-v2 v1.27.0
 	github.com/aws/aws-sdk-go-v2/config v1.27.15
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.15
@@ -60,7 +60,7 @@ require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/alecthomas/chroma v0.10.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
-	github.com/aquasecurity/trivy-checks v0.10.5-0.20240430045208-6cc735de6b9e // indirect
+	github.com/aquasecurity/trivy-checks v0.10.5-0.20240514040354-93bcb2f8c233 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.2 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.3 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.7 // indirect
@@ -76,6 +76,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.24.2 // indirect
 	github.com/aws/smithy-go v1.20.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
@@ -99,6 +100,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.20.1 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
@@ -133,7 +135,6 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.52.0 // indirect
 	go.opentelemetry.io/otel v1.27.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.27.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.27.0 // indirect
 	go.opentelemetry.io/otel/metric v1.27.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.27.0 // indirect
 	go.opentelemetry.io/otel/trace v1.27.0 // indirect
@@ -145,10 +146,15 @@ require (
 	golang.org/x/text v0.15.0 // indirect
 	golang.org/x/tools v0.19.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20240520151616-dc85e6b867a5 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240515191416-fc5f0ca64291 // indirect
+	google.golang.org/grpc v1.64.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/v3 v3.5.0 // indirect
+	k8s.io/utils v0.0.0-20231127182322-b307cd553661 // indirect
+	mvdan.cc/sh/v3 v3.8.0 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
