@@ -80,9 +80,8 @@ The following services are supported:
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}
-	// cmd.SetFlagErrorFunc(flagErrorFunc)
+
 	awsFlags.AddFlags(cmd)
-	// cmd.SetUsageTemplate(fmt.Sprintf(usageTemplate, awsFlags.Usages(cmd)))
 
 	return cmd
 }
