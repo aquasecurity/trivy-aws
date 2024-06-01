@@ -64,7 +64,7 @@ func Write(ctx context.Context, rep *Report, opt flag.Options, fromCache bool) e
 	if err != nil {
 		return xerrors.Errorf("failed to create output file: %w", err)
 	}
-	defer cleanup()
+	defer func() { _ = cleanup() }()
 
 	if opt.Compliance.Spec.ID != "" {
 		return writeCompliance(ctx, rep, opt, output)
@@ -78,18 +78,11 @@ func Write(ctx context.Context, rep *Report, opt flag.Options, fromCache bool) e
 	var filtered []types.Result
 
 	// filter results
-	for _, resultsAtTime := range rep.Results {
-		for _, res := range resultsAtTime.Results {
-			resCopy := res
-			if err := result.FilterResult(ctx, &resCopy, ignoreConf, opt.FilterOpts()); err != nil {
-				return err
-			}
-			sort.Slice(resCopy.Misconfigurations, func(i, j int) bool {
-				return resCopy.Misconfigurations[i].CauseMetadata.Resource < resCopy.Misconfigurations[j].CauseMetadata.Resource
-			})
-			filtered = append(filtered, resCopy)
-		}
+	filtered, err = filterResults(ctx, rep, opt, ignoreConf, filtered)
+	if err != nil {
+		return err
 	}
+
 	sort.Slice(filtered, func(i, j int) bool {
 		return filtered[i].Target < filtered[j].Target
 	})
@@ -139,6 +132,22 @@ func Write(ctx context.Context, rep *Report, opt flag.Options, fromCache bool) e
 	default:
 		return pkgReport.Write(ctx, base, opt)
 	}
+}
+
+func filterResults(ctx context.Context, rep *Report, opt flag.Options, ignoreConf result.IgnoreConfig, filtered []types.Result) ([]types.Result, error) {
+	for _, resultsAtTime := range rep.Results {
+		for _, res := range resultsAtTime.Results {
+			resCopy := res
+			if err := result.FilterResult(ctx, &resCopy, ignoreConf, opt.FilterOpts()); err != nil {
+				return nil, err
+			}
+			sort.Slice(resCopy.Misconfigurations, func(i, j int) bool {
+				return resCopy.Misconfigurations[i].CauseMetadata.Resource < resCopy.Misconfigurations[j].CauseMetadata.Resource
+			})
+			filtered = append(filtered, resCopy)
+		}
+	}
+	return filtered, nil
 }
 
 func writeCompliance(ctx context.Context, rep *Report, opt flag.Options, output io.Writer) error {

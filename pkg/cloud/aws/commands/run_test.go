@@ -1248,12 +1248,12 @@ Summary Report for compliance: my-custom-spec
 
 			if test.regoPolicy != "" {
 				require.NoError(t, os.MkdirAll(filepath.Join(regoDir, "policies"), 0755))
-				require.NoError(t, os.WriteFile(filepath.Join(regoDir, "policies", "user.rego"), []byte(test.regoPolicy), 0644))
+				require.NoError(t, os.WriteFile(filepath.Join(regoDir, "policies", "user.rego"), []byte(test.regoPolicy), 0600))
 			}
 
 			if test.inputData != "" {
 				require.NoError(t, os.MkdirAll(filepath.Join(regoDir, "data"), 0755))
-				require.NoError(t, os.WriteFile(filepath.Join(regoDir, "data", "data.json"), []byte(test.inputData), 0644))
+				require.NoError(t, os.WriteFile(filepath.Join(regoDir, "data", "data.json"), []byte(test.inputData), 0600))
 			}
 
 			if test.cacheContent != "" {
