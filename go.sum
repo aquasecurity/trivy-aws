@@ -85,8 +85,8 @@ github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.26.6 h1:twI2uRmpb
 github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.26.6/go.mod h1:Tpt4kC8x1HfYuh2rG/6yXZrxjABETERrUl9IdA/IS98=
 github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.25.0 h1:LPEsYRsC6r3edPHO8KlZJNW0xxyfLHMXJ466MdHuBbQ=
 github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.25.0/go.mod h1:CAXUsQvYQVzsXO36npqK3aUlxx2xMSM1Dun3O9jnaEE=
-github.com/aws/aws-sdk-go-v2/service/emr v1.36.0 h1:FdeZ7AYOvyL09KH250Ncz4LF4SB1Vo9l7KZzn/LIrgQ=
-github.com/aws/aws-sdk-go-v2/service/emr v1.36.0/go.mod h1:Drh6y2qLaw/wnDKTIcdqM2m358MIRXsZ2Bj2tjhVLq0=
+github.com/aws/aws-sdk-go-v2/service/emr v1.39.9 h1:WOECnxXdsB3ff3EE2NHtZq+F3/uPd6wXELCy4EcqYAw=
+github.com/aws/aws-sdk-go-v2/service/emr v1.39.9/go.mod h1:vUpOoQjdw+7R0HhhFdNv6jAKFkUh4OAgxGa1nr/3+v8=
 github.com/aws/aws-sdk-go-v2/service/iam v1.28.7 h1:FKPRDYZOO0Eur19vWUL1B40Op0j89KQj3kARjrszMK8=
 github.com/aws/aws-sdk-go-v2/service/iam v1.28.7/go.mod h1:YzMYyQ7S4twfYzLjwP24G1RAxypozVZeNaG1r2jxRms=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.11.2 h1:Ji0DY1xUsUr3I8cHps0G+XM3WWU16lP6yG8qu1GAZAs=
