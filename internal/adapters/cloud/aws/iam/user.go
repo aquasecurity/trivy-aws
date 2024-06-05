@@ -75,34 +75,6 @@ func (a *adapter) getMFADevices(user iamtypes.User) ([]iam.MFADevice, error) {
 	return devices, nil
 }
 
-func (a *adapter) getUserGroups(apiUser iamtypes.User) []iam.Group {
-	var groups []iam.Group
-
-	input := &iamapi.ListGroupsForUserInput{
-		UserName: apiUser.UserName,
-	}
-	for {
-		output, err := a.api.ListGroupsForUser(a.Context(), input)
-		if err != nil {
-			a.Debug("Failed to locate groups attached to user '%s': %s", *apiUser.UserName, err)
-			break
-		}
-		for _, apiGroup := range output.Groups {
-			group, err := a.adaptGroup(apiGroup, nil)
-			if err != nil {
-				a.Debug("Failed to adapt group attached to user '%s': %s", *apiUser.UserName, err)
-				continue
-			}
-			groups = append(groups, *group)
-		}
-		if !output.IsTruncated {
-			break
-		}
-		input.Marker = output.Marker
-	}
-	return groups
-}
-
 func (a *adapter) getUserPolicies(apiUser iamtypes.User) []iam.Policy {
 	var policies []iam.Policy
 	input := &iamapi.ListAttachedUserPoliciesInput{
@@ -192,10 +164,7 @@ func (a *adapter) adaptUser(apiUser iamtypes.User) (*iam.User, error) {
 
 	metadata := a.CreateMetadataFromARN(*apiUser.Arn)
 
-	groups := a.getUserGroups(apiUser)
-
 	policies := a.getUserPolicies(apiUser)
-
 	keys, err := a.getUserKeys(apiUser)
 	if err != nil {
 		return nil, err
@@ -219,7 +188,6 @@ func (a *adapter) adaptUser(apiUser iamtypes.User) (*iam.User, error) {
 	return &iam.User{
 		Metadata:   metadata,
 		Name:       username,
-		Groups:     groups,
 		Policies:   policies,
 		AccessKeys: keys,
 		MFADevices: mfaDevices,
