@@ -9,7 +9,7 @@ require (
 	github.com/aquasecurity/loading v0.0.5
 	github.com/aquasecurity/table v1.8.0
 	github.com/aquasecurity/tml v0.6.1
-	github.com/aquasecurity/trivy v0.51.2-0.20240527214045-349caf96bc3d
+	github.com/aquasecurity/trivy v0.52.0
 	github.com/aquasecurity/trivy-db v0.0.0-20231005141211-4fc651f7ac8d
 	github.com/aws/aws-sdk-go-v2 v1.27.0
 	github.com/aws/aws-sdk-go-v2/config v1.27.15
@@ -80,7 +80,7 @@ require (
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2 // indirect
-	github.com/BurntSushi/toml v1.3.2 // indirect
+	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/CycloneDX/cyclonedx-go v0.8.0 // indirect
 	github.com/GoogleCloudPlatform/docker-credential-gcr v2.0.5+incompatible // indirect
 	github.com/Intevation/gval v1.3.0 // indirect
@@ -102,7 +102,7 @@ require (
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492 // indirect
-	github.com/aquasecurity/trivy-checks v0.10.5-0.20240514040354-93bcb2f8c233 // indirect
+	github.com/aquasecurity/trivy-checks v0.11.0 // indirect
 	github.com/aquasecurity/trivy-java-db v0.0.0-20240109071736-184bd7481d48 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aws/aws-sdk-go v1.53.0 // indirect
@@ -196,7 +196,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-safetemp v1.0.0 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
-	github.com/hashicorp/go-version v1.6.0 // indirect
+	github.com/hashicorp/go-version v1.7.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.20.1 // indirect
@@ -339,7 +339,7 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	helm.sh/helm/v3 v3.15.0 // indirect
+	helm.sh/helm/v3 v3.15.1 // indirect
 	k8s.io/api v0.30.1 // indirect
 	k8s.io/apiextensions-apiserver v0.30.0 // indirect
 	k8s.io/apimachinery v0.30.1 // indirect
