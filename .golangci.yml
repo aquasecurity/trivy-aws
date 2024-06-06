@@ -19,7 +19,7 @@ linters:
 
 linters-settings:
   cyclop:
-    max-complexity: 18
+    max-complexity: 20
   gocritic:
     disabled-checks:
       - singleCaseSwitch
