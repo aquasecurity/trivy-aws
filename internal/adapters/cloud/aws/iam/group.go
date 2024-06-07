@@ -77,21 +77,9 @@ func (a *adapter) adaptGroup(apiGroup iamtypes.Group, state *state.State) (*iam.
 		}
 	}
 
-	var users []iam.User
-	if state != nil {
-		for _, user := range state.AWS.IAM.Users {
-			for _, userGroup := range user.Groups {
-				if userGroup.Name.EqualTo(*apiGroup.GroupName) {
-					users = append(users, user)
-				}
-			}
-		}
-	}
-
 	return &iam.Group{
 		Metadata: metadata,
 		Name:     types.String(*apiGroup.GroupName, metadata),
-		Users:    users,
 		Policies: policies,
 	}, nil
 }
