@@ -8,5 +8,5 @@ description: |-
   Trivy AWS plugin for the Trivy security scanner
   https://github.com/aquasecurity/trivy-aws
 platforms:
-  - uri: ./trivy-aws
+  - uri: https://github.com/aquasecurity/trivy-aws/archive/refs/tags/v0.9.0.tar.gz
     bin: ./trivy-aws
