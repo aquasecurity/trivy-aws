@@ -1,24 +1,49 @@
 name: Release
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "v*"
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        include:
+          - os: ubuntu-latest
+            release_suffix: linux
+          - os: macos-latest
+            release_suffix: darwin
+          - os: windows-latest
+            release_suffix: windows
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Build
-        run: make build
-      - name: Bundle
-        run: make bundle
+
+      - name: Set up Go 1.22
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
+
+      - name: Build Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: make build-linux-amd64 build-linux-arm64 bundle-linux
+
+      - name: Build macOS
+        if: matrix.os == 'macos-latest'
+        run: make build-darwin-amd64 build-darwin-arm64 bundle-darwin
+
+      - name: Build Windows
+        if: matrix.os == 'windows-latest'
+        run: make build-windows-amd64 bundle-windows
+
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            trivy-aws.tar.gz
+            trivy-aws-${{ matrix.release_suffix }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
