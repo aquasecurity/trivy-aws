@@ -2,29 +2,16 @@
 test:
 	go test -race ./...
 
-.PHONY: build
-build:
-	make build-linux-amd64 build-linux-arm64 build-darwin-amd64 build-darwin-arm64 build-windows-amd64
-
-.PHONY: build-linux-amd64
-build-linux-amd64:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o trivy-aws-linux-amd64 ./cmd/trivy-aws/main.go
-
-.PHONY: build-linux-arm64
-build-linux-arm64:
-	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags "-s -w" -o trivy-aws-linux-arm64 ./cmd/trivy-aws/main.go
-
-.PHONY: build-darwin-amd64
-build-darwin-amd64:
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w" -o trivy-aws-darwin-amd64 ./cmd/trivy-aws/main.go
-
-.PHONY: build-darwin-arm64
-build-darwin-arm64:
-	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags "-s -w" -o trivy-aws-darwin-arm64 ./cmd/trivy-aws/main.go
-
-.PHONY: build-windows-amd64
-build-windows-amd64:
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -o trivy-aws-windows-amd64 ./cmd/trivy-aws/main.go
+PLATFORMS = linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64
+OUTPUTS = $(patsubst %,%/trivy-aws,$(PLATFORMS))
+build: $(OUTPUTS)
+# os/arch/trivy-aws
+%/trivy-aws:
+	@mkdir -p $(dir $@); \
+	GOOS=$(word 1,$(subst /, ,$*)); \
+	GOARCH=$(word 2,$(subst /, ,$*)); \
+	CGO_ENABLED=0 GOOS=$$GOOS GOARCH=$$GOARCH go build -ldflags "-s -w" -o trivy-aws-$$GOOS-$$GOARCH ./cmd/trivy-aws/main.go; \
+	tar -cvzf trivy-aws-$$GOOS-$$GOARCH.tar.gz plugin.yaml trivy-aws-$$GOOS-$$GOARCH LICENSE
 
 .PHONY: test-no-localstack
 test-no-localstack:
@@ -39,15 +26,3 @@ quality:
 update-aws-deps:
 	@grep aws-sdk-go-v2 go.mod | grep -v '// indirect' | sed 's/^[ [[:blank:]]]*//g' | sed 's/[[:space:]]v.*//g' | xargs go get
 	@go mod tidy
-
-.PHONY: bundle-linux
-bundle-linux:
-	tar -cvzf trivy-aws-linux.tar.gz plugin.yaml trivy-aws-linux-amd64 trivy-aws-linux-arm64 LICENSE
-
-.PHONY: bundle-darwin
-bundle-darwin:
-	tar -cvzf trivy-aws-darwin.tar.gz plugin.yaml trivy-aws-darwin-amd64 trivy-aws-darwin-arm64 LICENSE
-
-.PHONY: bundle-windows
-bundle-windows:
-	tar -cvzf trivy-aws-windows.tar.gz plugin.yaml trivy-aws-windows-amd64 LICENSE
