@@ -11,25 +11,25 @@ platforms:
   - selector:
       os: darwin
       arch: amd64
-    uri: https://github.com/aquasecurity/trivy-aws/releases/download/v0.11.0/trivy-aws-darwin.tar.gz
+    uri: https://github.com/aquasecurity/trivy-aws/releases/download/v0.11.0/trivy-aws-darwin-amd64.tar.gz
     bin: ./trivy-aws-darwin-amd64
   - selector:
       os: darwin
       arch: arm64
-    uri: https://github.com/aquasecurity/trivy-aws/releases/download/v0.11.0/trivy-aws-darwin.tar.gz
+    uri: https://github.com/aquasecurity/trivy-aws/releases/download/v0.11.0/trivy-aws-darwin-arm64.tar.gz
     bin: ./trivy-aws-darwin-arm64
   - selector:
       os: linux
       arch: amd64
-    uri: https://github.com/aquasecurity/trivy-aws/releases/download/v0.11.0/trivy-aws-linux.tar.gz
+    uri: https://github.com/aquasecurity/trivy-aws/releases/download/v0.11.0/trivy-aws-linux-amd64.tar.gz
     bin: ./trivy-aws-linux-amd64
   - selector:
       os: linux
       arch: arm64
-    uri: https://github.com/aquasecurity/trivy-aws/releases/download/v0.11.0/trivy-aws-linux.tar.gz
+    uri: https://github.com/aquasecurity/trivy-aws/releases/download/v0.11.0/trivy-aws-linux-arm64.tar.gz
     bin: ./trivy-aws-linux-arm64
   - selector:
       os: windows
       arch: amd64
-    uri: https://github.com/aquasecurity/trivy-aws/releases/download/v0.11.0/trivy-aws-windows.tar.gz
+    uri: https://github.com/aquasecurity/trivy-aws/releases/download/v0.11.0/trivy-aws-windows-amd64.tar.gz
     bin: ./trivy-aws-windows-amd64
