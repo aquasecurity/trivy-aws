@@ -38,27 +38,27 @@ func NewCmd() *cobra.Command {
 	sort.Strings(services)
 
 	cmd := &cobra.Command{
-		Use:     "aws-scan [flags]",
+		Use:     "aws [flags]",
 		Aliases: []string{},
 		Args:    cobra.ExactArgs(0),
 		Short:   "[EXPERIMENTAL] Scan AWS account",
-		Long: fmt.Sprintf(`Scan an AWS account for misconfigurations. Trivy uses the same authentication methods as the AWS CLI. See https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html
+		Long: fmt.Sprintf(`Scan an AWS account for misconfigurations. It uses the same authentication methods as the AWS CLI. See https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html
 
 The following services are supported:
 
 - %s
 `, strings.Join(services, "\n- ")),
 		Example: `  # basic scanning
-  $ trivy aws-scan --region us-east-1
+  $ trivy aws --region us-east-1
 
   # limit scan to a single service:
-  $ trivy aws-scan --region us-east-1 --service s3
+  $ trivy aws --region us-east-1 --service s3
 
   # limit scan to multiple services:
-  $ trivy aws-scan --region us-east-1 --service s3 --service ec2
+  $ trivy aws --region us-east-1 --service s3 --service ec2
 
   # force refresh of cache for fresh results
-  $ trivy aws-scan --region us-east-1 --update-cache
+  $ trivy aws --region us-east-1 --update-cache
 `,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if err := awsFlags.Bind(cmd); err != nil {

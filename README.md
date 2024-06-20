@@ -47,23 +47,21 @@ The following services are supported:
 
 ```shell
 Usage:
-  trivy aws-scan [flags]
+  trivy aws [flags]
 
 Examples:
   # basic scanning
-  $ trivy aws-scan --region us-east-1
+  $ trivy aws --region us-east-1
 
   # limit scan to a single service:
-  $ trivy aws-scan --region us-east-1 --service s3
+  $ trivy aws --region us-east-1 --service s3
 
   # limit scan to multiple services:
-  $ trivy aws-scan --region us-east-1 --service s3 --service ec2
+  $ trivy aws --region us-east-1 --service s3 --service ec2
 
   # force refresh of cache for fresh results
-  $ trivy aws-scan --region us-east-1 --update-cache
+  $ trivy aws --region us-east-1 --update-cache
 ```
-
-_trivy-aws_ is the AWS misconfiguration scanning logic for Trivy
 
 Please see [ARCHITECTURE.md](ARCHITECTURE.md) for more information.
 
