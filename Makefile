@@ -11,7 +11,12 @@ build: clean $(OUTPUTS)
 	GOOS=$(word 1,$(subst /, ,$*)); \
 	GOARCH=$(word 2,$(subst /, ,$*)); \
 	CGO_ENABLED=0 GOOS=$$GOOS GOARCH=$$GOARCH go build -ldflags "-s -w" -o trivy-aws-$$GOOS-$$GOARCH ./cmd/trivy-aws/main.go; \
-	tar -cvzf trivy-aws-$$GOOS-$$GOARCH.tar.gz plugin.yaml trivy-aws-$$GOOS-$$GOARCH LICENSE
+	if [ $$GOOS = "windows" ]; then \
+		mv trivy-aws-$$GOOS-$$GOARCH trivy-aws-$$GOOS-$$GOARCH.exe; \
+		tar -cvzf trivy-aws-$$GOOS-$$GOARCH.tar.gz plugin.yaml trivy-aws-$$GOOS-$$GOARCH.exe LICENSE; \
+	else \
+		tar -cvzf trivy-aws-$$GOOS-$$GOARCH.tar.gz plugin.yaml trivy-aws-$$GOOS-$$GOARCH LICENSE; \
+	fi
 
 .PHONY: test-no-localstack
 test-no-localstack:
