@@ -1,17 +1,21 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"golang.org/x/xerrors"
 
 	"github.com/aquasecurity/trivy-aws/pkg/scanner"
 	"github.com/aquasecurity/trivy/pkg/flag"
 	"github.com/aquasecurity/trivy/pkg/log"
 	"github.com/aquasecurity/trivy/pkg/types"
-	"github.com/spf13/cobra"
-	"golang.org/x/xerrors"
 )
 
 func NewCmd() *cobra.Command {
@@ -25,8 +29,9 @@ func NewCmd() *cobra.Command {
 	reportFlagGroup.ExitOnEOL = nil          // disable '--exit-on-eol'
 	reportFlagGroup.ShowSuppressed = nil     // disable '--show-suppressed'
 
+	globalFlags := flag.NewGlobalFlagGroup()
 	awsFlags := &flag.Flags{
-		GlobalFlagGroup:  flag.NewGlobalFlagGroup(),
+		GlobalFlagGroup:  globalFlags,
 		AWSFlagGroup:     flag.NewAWSFlagGroup(),
 		CloudFlagGroup:   flag.NewCloudFlagGroup(),
 		MisconfFlagGroup: flag.NewMisconfFlagGroup(),
@@ -61,6 +66,31 @@ The following services are supported:
   $ trivy aws --region us-east-1 --update-cache
 `,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			// viper.BindPFlag cannot be called in init().
+			// cf. https://github.com/spf13/cobra/issues/875
+			//     https://github.com/spf13/viper/issues/233
+			if err := globalFlags.Bind(cmd); err != nil {
+				return xerrors.Errorf("flag bind error: %w", err)
+			}
+
+			// The config path is needed for config initialization.
+			// It needs to be obtained before ToOptions().
+			configPath := viper.GetString(flag.ConfigFileFlag.ConfigName)
+
+			// Configure environment variables and config file
+			// It cannot be called in init() because it must be called after viper.BindPFlags.
+			if err := initConfig(configPath, cmd.Flags().Changed(flag.ConfigFileFlag.ConfigName)); err != nil {
+				return err
+			}
+
+			globalOptions, err := globalFlags.ToOptions()
+			if err != nil {
+				return err
+			}
+
+			// Initialize logger
+			log.InitLogger(globalOptions.Debug, globalOptions.Quiet)
+
 			if err := awsFlags.Bind(cmd); err != nil {
 				return xerrors.Errorf("flag bind error: %w", err)
 			}
@@ -81,7 +111,25 @@ The following services are supported:
 		SilenceUsage:  true,
 	}
 
+	globalFlags.AddFlags(cmd)
 	awsFlags.AddFlags(cmd)
 
 	return cmd
+}
+
+func initConfig(configFile string, pathChanged bool) error {
+	// Read from config
+	viper.SetConfigFile(configFile)
+	viper.SetConfigType("yaml")
+	if err := viper.ReadInConfig(); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			if !pathChanged {
+				log.Debugf("Default config file %q not found, using built in values", log.String("file_path", configFile))
+				return nil
+			}
+		}
+		return xerrors.Errorf("config file %q loading error: %s", configFile, err)
+	}
+	log.Info("Loaded", log.String("file_path", configFile))
+	return nil
 }
