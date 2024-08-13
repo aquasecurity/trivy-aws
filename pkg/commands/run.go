@@ -12,7 +12,6 @@ import (
 
 	"github.com/aquasecurity/trivy-aws/pkg/errs"
 	"github.com/aquasecurity/trivy-aws/pkg/report"
-	"github.com/aquasecurity/trivy-aws/pkg/scanner"
 	awsScanner "github.com/aquasecurity/trivy-aws/pkg/scanner"
 	"github.com/aquasecurity/trivy/pkg/cloud/aws/config"
 	"github.com/aquasecurity/trivy/pkg/commands/operation"
@@ -151,7 +150,7 @@ func Run(ctx context.Context, opt flag.Options) error {
 		return err
 	}
 
-	results, cached, err := scanner.NewScanner().Scan(ctx, opt)
+	results, cached, err := awsScanner.NewScanner().Scan(ctx, opt)
 	if err != nil {
 		var aerr errs.AdapterError
 		if errors.As(err, &aerr) {
