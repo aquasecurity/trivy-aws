@@ -23,11 +23,21 @@ jobs:
         go-version-file: go.mod
         cache: true
         cache-dependency-path: go.sum
+    
     - uses: actions/setup-go@v5
       if: matrix.os == 'windows-latest'
       with:
         go-version-file: go.mod
         cache: false
+
+    - name: go mod tidy
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        go mod tidy
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "Run 'go mod tidy' and push it"
+          exit 1
+        fi
 
     - name: Run non-localstack tests
       if: matrix.os != 'ubuntu-latest'
