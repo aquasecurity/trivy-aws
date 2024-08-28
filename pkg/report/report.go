@@ -124,7 +124,7 @@ func Write(ctx context.Context, rep *Report, opt flag.Options, fromCache bool) e
 		default:
 			return pkgReport.Write(ctx, base, opt)
 		}
-		
+
 		// render cache info
 		if fromCache {
 			_ = tml.Fprintf(output, "\n<blue>This scan report was loaded from cached results. If you'd like to run a fresh scan, use --update-cache.</blue>\n")
