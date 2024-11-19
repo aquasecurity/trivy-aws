@@ -7,6 +7,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/s3"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	"github.com/aquasecurity/trivy/pkg/log"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	s3api "github.com/aws/aws-sdk-go-v2/service/s3"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
@@ -61,7 +62,7 @@ func (a *adapter) getBuckets() (buckets []s3.Bucket, err error) {
 	}
 
 	a.Tracker().SetTotalResources(len(apiBuckets.Buckets))
-	a.Tracker().SetServiceLabel("Discovering buckets...")
+	a.Tracker().SetServiceLabel("Adapting buckets...")
 	return concurrency.Adapt(apiBuckets.Buckets, a.RootAdapter, a.adaptBucket), nil
 }
 
@@ -75,7 +76,7 @@ func (a *adapter) adaptBucket(bucket s3types.Bucket) (*s3.Bucket, error) {
 		Bucket: bucket.Name,
 	})
 	if err != nil {
-		a.Debug("Error getting bucket location: %s", err)
+		a.Logger().Error("Error getting bucket location", log.Err(err))
 		return nil, nil
 	}
 	region := string(location.LocationConstraint)
@@ -125,7 +126,7 @@ func (a *adapter) getPublicAccessBlock(bucketName *string, metadata trivyTypes.M
 				return nil
 			}
 		}
-		a.Debug("Error getting public access block: %s", err)
+		a.Logger().Error("Error getting public access block", log.Err(err))
 		return nil
 	}
 
@@ -155,7 +156,7 @@ func (a *adapter) getBucketPolicies(bucketName *string, metadata trivyTypes.Meta
 				return nil
 			}
 		}
-		a.Debug("Error getting public access block: %s", err)
+		a.Logger().Error("Error getting public access block", log.Err(err))
 		return nil
 
 	}
@@ -163,7 +164,7 @@ func (a *adapter) getBucketPolicies(bucketName *string, metadata trivyTypes.Meta
 	if bucketPolicy.Policy != nil {
 		policyDocument, err := iamgo.ParseString(*bucketPolicy.Policy)
 		if err != nil {
-			a.Debug("Error parsing bucket policy: %s", err)
+			a.Logger().Error("Error parsing bucket policy", log.Err(err))
 			return bucketPolicies
 		}
 
@@ -198,7 +199,7 @@ func (a *adapter) getBucketEncryption(bucketName *string, metadata trivyTypes.Me
 				return bucketEncryption
 			}
 		}
-		a.Debug("Error getting encryption block: %s", err)
+		a.Logger().Error("Error getting encryption block", log.Err(err))
 		return bucketEncryption
 	}
 
@@ -234,7 +235,7 @@ func (a *adapter) getBucketVersioning(bucketName *string, metadata trivyTypes.Me
 				return bucketVersioning
 			}
 		}
-		a.Debug("Error getting bucket versioning: %s", err)
+		a.Logger().Error("Error getting bucket versioning", log.Err(err))
 		return bucketVersioning
 	}
 
@@ -257,7 +258,7 @@ func (a *adapter) getBucketLogging(bucketName *string, metadata trivyTypes.Metad
 
 	logging, err := a.api.GetBucketLogging(a.Context(), &s3api.GetBucketLoggingInput{Bucket: bucketName})
 	if err != nil {
-		a.Debug("Error getting bucket logging: %s", err)
+		a.Logger().Error("Error getting bucket logging", log.Err(err))
 		return bucketLogging
 	}
 
@@ -272,7 +273,7 @@ func (a *adapter) getBucketLogging(bucketName *string, metadata trivyTypes.Metad
 func (a *adapter) getBucketACL(bucketName *string, metadata trivyTypes.Metadata) trivyTypes.StringValue {
 	acl, err := a.api.GetBucketAcl(a.Context(), &s3api.GetBucketAclInput{Bucket: bucketName})
 	if err != nil {
-		a.Debug("Error getting bucket ACL: %s", err)
+		a.Logger().Error("Error getting bucket ACL", log.Err(err))
 		return trivyTypes.StringDefault("private", metadata)
 	}
 
@@ -355,7 +356,7 @@ func (a *adapter) getWebsite(bucketName *string, metadata trivyTypes.Metadata) *
 		Bucket: bucketName,
 	})
 	if err != nil {
-		a.Debug("Error getting website: %s", err)
+		a.Logger().Error("Error getting website", log.Err(err))
 		return nil
 	}
 

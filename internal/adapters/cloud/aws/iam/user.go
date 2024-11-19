@@ -8,6 +8,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	"github.com/aquasecurity/trivy/pkg/log"
 	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 
@@ -83,14 +84,16 @@ func (a *adapter) getUserPolicies(apiUser iamtypes.User) []iam.Policy {
 	for {
 		policiesOutput, err := a.api.ListAttachedUserPolicies(a.Context(), input)
 		if err != nil {
-			a.Debug("Failed to locate policies attached to user '%s': %s", *apiUser.UserName, err)
+			a.Logger().Error("Failed to locate policies attached to user",
+				log.String("name", *apiUser.UserName), log.Err(err))
 			break
 		}
 
 		for _, apiPolicy := range policiesOutput.AttachedPolicies {
 			policy, err := a.adaptAttachedPolicy(apiPolicy)
 			if err != nil {
-				a.Debug("Failed to adapt policy attached to user '%s': %s", *apiUser.UserName, err)
+				a.Logger().Error("Failed to adapt policy attached to user",
+					log.String("name", *apiUser.UserName), log.Err(err))
 				continue
 			}
 			policies = append(policies, *policy)

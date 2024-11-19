@@ -3,19 +3,19 @@ package commands
 import (
 	"context"
 	"errors"
+	"slices"
 	"sort"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"golang.org/x/exp/slices"
 	"golang.org/x/xerrors"
 
 	"github.com/aquasecurity/trivy-aws/pkg/errs"
+	"github.com/aquasecurity/trivy-aws/pkg/flag"
 	"github.com/aquasecurity/trivy-aws/pkg/report"
 	awsScanner "github.com/aquasecurity/trivy-aws/pkg/scanner"
 	"github.com/aquasecurity/trivy/pkg/cloud/aws/config"
 	"github.com/aquasecurity/trivy/pkg/commands/operation"
-	"github.com/aquasecurity/trivy/pkg/flag"
 	"github.com/aquasecurity/trivy/pkg/log"
 	"github.com/aquasecurity/trivy/pkg/types"
 )
@@ -174,9 +174,9 @@ func Run(ctx context.Context, opt flag.Options) error {
 	}
 
 	r := report.New(ProviderAWS, opt.Account, opt.Region, res, opt.Services)
-	if err := report.Write(ctx, r, opt, cached); err != nil {
+	if err := report.Write(ctx, r, opt.Options, cached); err != nil {
 		return xerrors.Errorf("unable to write results: %w", err)
 	}
 
-	return operation.Exit(opt, r.Failed(), types.Metadata{})
+	return operation.Exit(opt.Options, r.Failed(), types.Metadata{})
 }

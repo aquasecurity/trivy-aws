@@ -4,21 +4,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
-	"io/fs"
 	"os"
 	"runtime"
 	"sync"
 
-	"github.com/aquasecurity/trivy/pkg/iac/debug"
 	"github.com/aquasecurity/trivy/pkg/iac/framework"
 	"github.com/aquasecurity/trivy/pkg/iac/rego"
 	"github.com/aquasecurity/trivy/pkg/iac/rules"
 	"github.com/aquasecurity/trivy/pkg/iac/scan"
 	"github.com/aquasecurity/trivy/pkg/iac/scanners/options"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	"github.com/aquasecurity/trivy/pkg/iac/types"
 	defsecRules "github.com/aquasecurity/trivy/pkg/iac/types/rules"
+	"github.com/aquasecurity/trivy/pkg/log"
 
 	adapter "github.com/aquasecurity/trivy-aws/internal/adapters/cloud"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
@@ -32,23 +30,17 @@ var _ ConfigurableAWSScanner = (*Scanner)(nil)
 
 type Scanner struct {
 	sync.Mutex
-	regoScanner           *rego.Scanner
-	debug                 debug.Logger
-	options               []options.ScannerOption
-	progressTracker       progress.Tracker
-	region                string
-	endpoint              string
-	services              []string
-	frameworks            []framework.Framework
-	spec                  string
-	concurrencyStrategy   concurrency.Strategy
-	policyDirs            []string
-	policyReaders         []io.Reader
-	policyFS              fs.FS
-	dataFs                fs.FS
-	loadEmbeddedPolicies  bool
-	loadEmbeddedLibraries bool
-	regoOnly              bool
+	regoScanner         *rego.Scanner
+	logger              *log.Logger
+	options             []options.ScannerOption
+	progressTracker     progress.Tracker
+	region              string
+	endpoint            string
+	services            []string
+	frameworks          []framework.Framework
+	spec                string
+	concurrencyStrategy concurrency.Strategy
+	regoOnly            bool
 }
 
 func (s *Scanner) SetIncludeDeprecatedChecks(bool) {}
@@ -69,44 +61,9 @@ func (s *Scanner) Name() string {
 	return "AWS API"
 }
 
-func (s *Scanner) SetDebugWriter(writer io.Writer) {
-	s.debug = debug.New(writer, "aws-api", "scanner")
-}
-
 func (s *Scanner) SetProgressTracker(t progress.Tracker) {
 	s.progressTracker = t
 }
-
-func (s *Scanner) SetPolicyReaders(readers []io.Reader) {
-	s.policyReaders = readers
-}
-
-func (s *Scanner) SetPolicyDirs(dirs ...string) {
-	s.policyDirs = dirs
-}
-
-func (s *Scanner) SetPolicyFilesystem(fs fs.FS) {
-	s.policyFS = fs
-}
-
-func (s *Scanner) SetDataFilesystem(fs fs.FS) {
-	s.dataFs = fs
-}
-
-func (s *Scanner) SetUseEmbeddedPolicies(b bool) {
-	s.loadEmbeddedPolicies = b
-}
-
-func (s *Scanner) SetUseEmbeddedLibraries(b bool) {
-	s.loadEmbeddedLibraries = b
-}
-
-func (s *Scanner) SetTraceWriter(io.Writer)        {}
-func (s *Scanner) SetPerResultTracingEnabled(bool) {}
-func (s *Scanner) SetDataDirs(...string)           {}
-func (s *Scanner) SetPolicyNamespaces(...string)   {}
-func (s *Scanner) SetSkipRequiredCheck(bool)       {}
-func (s *Scanner) SetRegoErrorLimit(int)           {}
 
 func AllSupportedServices() []string {
 	return aws.AllServices()
@@ -134,7 +91,9 @@ func New(opts ...options.ScannerOption) *Scanner {
 		options:             opts,
 		progressTracker:     progress.NoProgress,
 		concurrencyStrategy: concurrency.DefaultStrategy,
+		logger:              log.WithPrefix("aws-api-scanner"),
 	}
+
 	for _, opt := range opts {
 		opt(s)
 	}
@@ -147,13 +106,12 @@ func (s *Scanner) CreateState(ctx context.Context) (*state.State, error) {
 		Region:              s.region,
 		Endpoint:            s.endpoint,
 		Services:            s.services,
-		DebugWriter:         s.debug,
 		ConcurrencyStrategy: s.concurrencyStrategy,
 	})
 	if err != nil {
 		var adaptionError errs.AdapterError
 		if errors.As(err, &adaptionError) {
-			s.debug.Log("There were %d errors during adaption process: %s", len(adaptionError.Errors()), adaptionError)
+			s.logger.Error("Errors occurred during the adaptation. See logs above")
 		} else {
 			return nil, err
 		}
@@ -189,7 +147,8 @@ func (s *Scanner) Scan(ctx context.Context, cloudState *state.State) (results sc
 			}
 			ruleResults := rule.Evaluate(cloudState)
 			if len(ruleResults) > 0 {
-				s.debug.Log("Found %d results for %s", len(ruleResults), rule.GetRule().AVDID)
+				s.logger.Debug("Found results",
+					log.Int("count", len(ruleResults)), log.String("check", rule.GetRule().AVDID))
 				results = append(results, ruleResults...)
 			}
 		}
@@ -200,6 +159,7 @@ func (s *Scanner) Scan(ctx context.Context, cloudState *state.State) (results sc
 	if err != nil {
 		return nil, err
 	}
+
 	regoResults, err := regoScanner.ScanInput(ctx, rego.Input{
 		Contents: cloudState.ToRego(),
 	})
@@ -219,26 +179,22 @@ func (s *Scanner) getRules() []defsecRules.RegisteredRule {
 func (s *Scanner) initRegoScanner() (*rego.Scanner, error) {
 	s.Lock()
 	defer s.Unlock()
+
 	if s.regoScanner != nil {
 		return s.regoScanner, nil
 	}
 
-	srcFS := s.policyFS
-	if srcFS == nil {
-		if runtime.GOOS == "windows" {
-			homeDrive := os.Getenv("HOMEDRIVE")
-			if homeDrive == "" {
-				homeDrive = "C:"
-			}
-			srcFS = os.DirFS(homeDrive + "\\")
-		} else {
-			srcFS = os.DirFS("/")
+	fsys := os.DirFS("/")
+	if runtime.GOOS == "windows" {
+		homeDrive := os.Getenv("HOMEDRIVE")
+		if homeDrive == "" {
+			homeDrive = "C:"
 		}
+		fsys = os.DirFS(homeDrive + "\\")
 	}
 
-	regoScanner := rego.NewScanner(trivyTypes.SourceCloud, s.options...)
-	regoScanner.SetParentDebugLogger(s.debug)
-	if err := regoScanner.LoadPolicies(s.loadEmbeddedLibraries, s.loadEmbeddedPolicies, srcFS, s.policyDirs, s.policyReaders); err != nil {
+	regoScanner := rego.NewScanner(types.SourceCloud, s.options...)
+	if err := regoScanner.LoadPolicies(fsys); err != nil {
 		return nil, err
 	}
 	s.regoScanner = regoScanner

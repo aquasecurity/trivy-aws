@@ -12,15 +12,16 @@ import (
 	"github.com/spf13/viper"
 	"golang.org/x/xerrors"
 
+	"github.com/aquasecurity/trivy-aws/pkg/flag"
 	"github.com/aquasecurity/trivy-aws/pkg/scanner"
-	"github.com/aquasecurity/trivy/pkg/flag"
+	trivyflag "github.com/aquasecurity/trivy/pkg/flag"
 	"github.com/aquasecurity/trivy/pkg/log"
 	"github.com/aquasecurity/trivy/pkg/types"
 )
 
 func NewCmd() *cobra.Command {
-	reportFlagGroup := flag.NewReportFlagGroup()
-	compliance := flag.ComplianceFlag
+	reportFlagGroup := trivyflag.NewReportFlagGroup()
+	compliance := trivyflag.ComplianceFlag
 	compliance.Values = []string{
 		types.ComplianceAWSCIS12,
 		types.ComplianceAWSCIS14,
@@ -29,14 +30,19 @@ func NewCmd() *cobra.Command {
 	reportFlagGroup.ExitOnEOL = nil          // disable '--exit-on-eol'
 	reportFlagGroup.ShowSuppressed = nil     // disable '--show-suppressed'
 
-	globalFlags := flag.NewGlobalFlagGroup()
+	globalFlags := trivyflag.NewGlobalFlagGroup()
 	awsFlags := &flag.Flags{
-		GlobalFlagGroup:  globalFlags,
-		AWSFlagGroup:     flag.NewAWSFlagGroup(),
-		CloudFlagGroup:   flag.NewCloudFlagGroup(),
-		MisconfFlagGroup: flag.NewMisconfFlagGroup(),
-		RegoFlagGroup:    flag.NewRegoFlagGroup(),
-		ReportFlagGroup:  reportFlagGroup,
+		BaseFlags: trivyflag.Flags{
+			GlobalFlagGroup:  globalFlags,
+			AWSFlagGroup:     trivyflag.NewAWSFlagGroup(),
+			MisconfFlagGroup: trivyflag.NewMisconfFlagGroup(),
+			RegoFlagGroup:    trivyflag.NewRegoFlagGroup(),
+			ReportFlagGroup:  reportFlagGroup,
+			DBFlagGroup: &trivyflag.DBFlagGroup{
+				NoProgress: trivyflag.NoProgressFlag.Clone(),
+			},
+		},
+		CloudFlagGroup: flag.NewCloudFlagGroup(),
 	}
 
 	services := scanner.AllSupportedServices()
@@ -75,11 +81,11 @@ The following services are supported:
 
 			// The config path is needed for config initialization.
 			// It needs to be obtained before ToOptions().
-			configPath := viper.GetString(flag.ConfigFileFlag.ConfigName)
+			configPath := viper.GetString(trivyflag.ConfigFileFlag.ConfigName)
 
 			// Configure environment variables and config file
 			// It cannot be called in init() because it must be called after viper.BindPFlags.
-			if err := initConfig(configPath, cmd.Flags().Changed(flag.ConfigFileFlag.ConfigName)); err != nil {
+			if err := initConfig(configPath, cmd.Flags().Changed(trivyflag.ConfigFileFlag.ConfigName)); err != nil {
 				return err
 			}
 
