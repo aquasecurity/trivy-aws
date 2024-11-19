@@ -117,10 +117,12 @@ func Write(ctx context.Context, rep *Report, opt flag.Options, fromCache bool) e
 			if err := writeResultsForARN(rep, filtered, output, opt.Services[0], opt.ARN, opt.Severities); err != nil {
 				return err
 			}
-		default:
+		case opt.ReportFormat == "summary":
 			if err := writeServiceTable(rep, filtered, output); err != nil {
 				return err
 			}
+		default:
+			return pkgReport.Write(ctx, base, opt)
 		}
 
 		// render cache info
