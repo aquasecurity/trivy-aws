@@ -52,13 +52,13 @@ require (
 	github.com/liamg/iamgo v0.0.9
 	github.com/liamg/memoryfs v1.6.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/spf13/cobra v1.8.0
-	github.com/spf13/viper v1.18.2
+	github.com/spf13/cobra v1.8.1
+	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go v0.34.0
 	github.com/testcontainers/testcontainers-go/modules/localstack v0.34.0
 	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa
-	golang.org/x/term v0.21.0
+	golang.org/x/term v0.26.0
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028
 )
 
@@ -261,7 +261,7 @@ require (
 	github.com/owenrumney/go-sarif/v2 v2.3.1 // indirect
 	github.com/owenrumney/squealer v1.2.2 // indirect
 	github.com/package-url/packageurl-go v0.1.3 // indirect
-	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
+	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
@@ -326,7 +326,7 @@ require (
 	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/oauth2 v0.20.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
+	golang.org/x/sys v0.27.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
