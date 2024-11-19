@@ -6,6 +6,9 @@ on:
   schedule:
   - cron:  0 23 * * *
 
+env:
+  GO_VERSION: '1.22'
+
 jobs:
   build:
     name: building defsec
@@ -20,14 +23,12 @@ jobs:
     - uses: actions/setup-go@v5
       if: matrix.os != 'windows-latest'
       with:
-        go-version-file: go.mod
-        cache: true
-        cache-dependency-path: go.sum
-    
+        go-version: ${{ env.GO_VERSION }}
+
     - uses: actions/setup-go@v5
       if: matrix.os == 'windows-latest'
       with:
-        go-version-file: go.mod
+        go-version: ${{ env.GO_VERSION }}
         cache: false
 
     - name: go mod tidy

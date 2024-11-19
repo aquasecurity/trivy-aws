@@ -5,7 +5,25 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "github.com/aquasecurity/trivy" ## `trivy` are updated manually
+    groups:
+      aws:
+        patterns:
+          - "github.com/aws/*"
+      testcontainers:
+        patterns:
+          - "github.com/testcontainers/*"
+      common:
+        exclude-patterns:
+          - "github.com/aquasecurity/trivy"
+        patterns:
+          - "*"
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: "monthly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
