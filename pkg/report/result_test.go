@@ -45,10 +45,10 @@ Results for 'arn:aws:s3:us-east-1:1234567890:bucket1' (AWS Account 1234567890)
 
 arn:aws:s3:us-east-1:1234567890:bucket1 (cloud)
 
-Tests: 1 (SUCCESSES: 0, FAILURES: 1, EXCEPTIONS: 0)
+Tests: 1 (SUCCESSES: 0, FAILURES: 1)
 Failures: 1 (LOW: 0, MEDIUM: 0, HIGH: 1, CRITICAL: 0)
 
-HIGH: something failed
+AVD-AWS-9999 (HIGH): something failed
 ════════════════════════════════════════
 Bad stuff is... bad
 

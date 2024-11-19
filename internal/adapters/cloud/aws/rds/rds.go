@@ -4,6 +4,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/rds"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	"github.com/aquasecurity/trivy/pkg/log"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	rdsApi "github.com/aws/aws-sdk-go-v2/service/rds"
 	rdsTypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
@@ -48,7 +49,7 @@ func (a *adapter) Adapt(root *aws.RootAdapter, state *state.State) error {
 
 	state.AWS.RDS.Classic, err = a.getClassic()
 	if err != nil {
-		a.Debug("Failed to retrieve classic resource: %s", err)
+		a.Logger().Error("Failed to retrieve classic resource", log.Err(err))
 		return nil
 	}
 

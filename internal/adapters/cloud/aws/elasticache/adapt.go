@@ -5,6 +5,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/elasticache"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	"github.com/aquasecurity/trivy/pkg/log"
 	api "github.com/aws/aws-sdk-go-v2/service/elasticache"
 	"github.com/aws/aws-sdk-go-v2/service/elasticache/types"
 
@@ -124,7 +125,7 @@ func (a *adapter) getReplicationGroups() ([]elasticache.ReplicationGroup, error)
 	for _, apiGroup := range apiGroups {
 		group, err := a.adaptReplicationGroup(apiGroup)
 		if err != nil {
-			a.Debug("Failed to adapt replication group '%s': %s", *apiGroup.ARN, err)
+			a.Logger().Error("Failed to adapt replication group", log.String("ARN", *apiGroup.ARN), log.Err(err))
 			continue
 		}
 		groups = append(groups, *group)
@@ -178,7 +179,7 @@ func (a *adapter) getSecurityGroups() ([]elasticache.SecurityGroup, error) {
 	for _, apiGroup := range apiGroups {
 		group, err := a.adaptSecurityGroup(apiGroup)
 		if err != nil {
-			a.Debug("Failed to adapt security group '%s': %s", *apiGroup.ARN, err)
+			a.Logger().Error("Failed to adapt security group", log.String("ARN", *apiGroup.ARN), log.Err(err))
 			continue
 		}
 		groups = append(groups, *group)

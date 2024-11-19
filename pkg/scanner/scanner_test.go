@@ -8,6 +8,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/azure"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/azure/authorization"
+	"github.com/aquasecurity/trivy/pkg/iac/rego"
 
 	"github.com/aquasecurity/trivy-aws/internal/testutil"
 	"github.com/aquasecurity/trivy/pkg/iac/framework"
@@ -533,12 +534,12 @@ deny[res] {
 		t.Run(tc.name, func(t *testing.T) {
 			var scannerOpts []options.ScannerOption
 			if tc.dataFS != nil {
-				scannerOpts = append(scannerOpts, options.ScannerWithPolicyDirs("config-data"))
+				scannerOpts = append(scannerOpts, rego.WithPolicyDirs("config-data"))
 			}
-			scannerOpts = append(scannerOpts, options.ScannerWithEmbeddedPolicies(false))
-			scannerOpts = append(scannerOpts, options.ScannerWithPolicyFilesystem(tc.srcFS))
+			scannerOpts = append(scannerOpts, rego.WithEmbeddedPolicies(false))
+			scannerOpts = append(scannerOpts, rego.WithPolicyFilesystem(tc.srcFS))
 			scannerOpts = append(scannerOpts, options.ScannerWithRegoOnly(true))
-			scannerOpts = append(scannerOpts, options.ScannerWithPolicyDirs("policies/"))
+			scannerOpts = append(scannerOpts, rego.WithPolicyDirs("policies/"))
 			scanner := New(scannerOpts...)
 
 			results, err := scanner.Scan(context.TODO(), &tc.state)

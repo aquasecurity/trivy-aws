@@ -6,6 +6,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	"github.com/aquasecurity/trivy/pkg/iac/types"
+	"github.com/aquasecurity/trivy/pkg/log"
 	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 
@@ -55,14 +56,16 @@ func (a *adapter) adaptRole(apiRole iamtypes.Role) (*iam.Role, error) {
 	for {
 		policiesOutput, err := a.api.ListAttachedRolePolicies(a.Context(), input)
 		if err != nil {
-			a.Debug("Failed to locate policies attached to role '%s': %s", *apiRole.RoleName, err)
+			a.Logger().Error("Failed to locate policies attached to role",
+				log.String("name", *apiRole.RoleName), log.Err(err))
 			break
 		}
 
 		for _, apiPolicy := range policiesOutput.AttachedPolicies {
 			policy, err := a.adaptAttachedPolicy(apiPolicy)
 			if err != nil {
-				a.Debug("Failed to adapt policy attached to role '%s': %s", *apiRole.RoleName, err)
+				a.Logger().Error("Failed to adapt policy attached to role",
+					log.String("name", *apiRole.RoleName), log.Err(err))
 				continue
 			}
 			policies = append(policies, *policy)

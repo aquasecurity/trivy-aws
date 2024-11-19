@@ -3,21 +3,20 @@ package aws
 import (
 	"context"
 	"fmt"
+	"slices"
 
-	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
-	"github.com/aquasecurity/trivy-aws/pkg/errs"
-	"github.com/aquasecurity/trivy/pkg/iac/types"
-
-	"github.com/aquasecurity/trivy/pkg/iac/debug"
-
-	"github.com/aws/aws-sdk-go-v2/service/sts"
-
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/options"
-	"github.com/aquasecurity/trivy-aws/pkg/progress"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
+
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/options"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/errs"
+	"github.com/aquasecurity/trivy-aws/pkg/progress"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	"github.com/aquasecurity/trivy/pkg/iac/types"
+	"github.com/aquasecurity/trivy/pkg/log"
 )
 
 var registeredAdapters []ServiceAdapter
@@ -44,25 +43,22 @@ type RootAdapter struct {
 	accountID           string
 	currentService      string
 	region              string
-	debugWriter         debug.Logger
+	logger              *log.Logger
 	concurrencyStrategy concurrency.Strategy
 }
 
-func NewRootAdapter(ctx context.Context, cfg aws.Config, tracker progress.ServiceTracker) *RootAdapter {
+func NewRootAdapter(ctx context.Context, cfg aws.Config, tracker progress.ServiceTracker, logger *log.Logger) *RootAdapter {
 	return &RootAdapter{
 		ctx:        ctx,
 		tracker:    tracker,
 		sessionCfg: cfg,
 		region:     cfg.Region,
+		logger:     logger,
 	}
 }
 
 func (a *RootAdapter) Region() string {
 	return a.region
-}
-
-func (a *RootAdapter) Debug(format string, args ...interface{}) {
-	a.debugWriter.Log(format, args...)
 }
 
 func (a *RootAdapter) ConcurrencyStrategy() concurrency.Strategy {
@@ -79,6 +75,10 @@ func (a *RootAdapter) Context() context.Context {
 
 func (a *RootAdapter) Tracker() progress.ServiceTracker {
 	return a.tracker
+}
+
+func (a *RootAdapter) Logger() *log.Logger {
+	return a.logger
 }
 
 func (a *RootAdapter) CreateMetadata(resource string) types.Metadata {
@@ -136,7 +136,7 @@ func Adapt(ctx context.Context, state *state.State, opt options.Options) error {
 	c := &RootAdapter{
 		ctx:                 ctx,
 		tracker:             opt.ProgressTracker,
-		debugWriter:         opt.DebugWriter.Extend("adapt", "aws"),
+		logger:              log.WithPrefix("adapt-aws"),
 		concurrencyStrategy: opt.ConcurrencyStrategy,
 	}
 
@@ -148,15 +148,15 @@ func Adapt(ctx context.Context, state *state.State, opt options.Options) error {
 	c.sessionCfg = cfg
 
 	if opt.Region != "" {
-		c.Debug("Using region '%s'", opt.Region)
+		c.logger.Info("Using region", log.String("region", opt.Region))
 		c.sessionCfg.Region = opt.Region
 	}
 	if opt.Endpoint != "" {
-		c.Debug("Using endpoint '%s'", opt.Endpoint)
+		c.logger.Info("Using endpoint", log.String("endpoint", opt.Endpoint))
 		c.sessionCfg.EndpointResolverWithOptions = createResolver(opt.Endpoint)
 	}
 
-	c.Debug("Discovering caller identity...")
+	c.logger.Debug("Discovering caller identity...")
 	stsClient := sts.NewFromConfig(c.sessionCfg)
 	result, err := stsClient.GetCallerIdentity(ctx, &sts.GetCallerIdentityInput{})
 	if err != nil {
@@ -166,13 +166,13 @@ func Adapt(ctx context.Context, state *state.State, opt options.Options) error {
 		return fmt.Errorf("missing account id for aws account")
 	}
 	c.accountID = *result.Account
-	c.Debug("AWS account ID: %s", c.accountID)
+	c.logger.Info("AWS account ID", log.String("ID", c.accountID))
 
 	if len(opt.Services) == 0 {
-		c.Debug("Preparing to run for all %d registered services...", len(registeredAdapters))
+		c.logger.Info("Preparing to run for all registered services...", log.Int("count", len(registeredAdapters)))
 		opt.ProgressTracker.SetTotalServices(len(registeredAdapters))
 	} else {
-		c.Debug("Preparing to run for %d filtered services...", len(opt.Services))
+		c.logger.Info("Preparing to run for filtered services...", log.Int("count", len(opt.Services)))
 		opt.ProgressTracker.SetTotalServices(len(opt.Services))
 	}
 
@@ -181,16 +181,16 @@ func Adapt(ctx context.Context, state *state.State, opt options.Options) error {
 	var adapterErrors []error
 
 	for _, adapter := range registeredAdapters {
-		if len(opt.Services) != 0 && !contains(opt.Services, adapter.Name()) {
+		if len(opt.Services) != 0 && !slices.Contains(opt.Services, adapter.Name()) {
 			continue
 		}
 		c.currentService = adapter.Name()
-		c.Debug("Running adapter for %s...", adapter.Name())
+		c.logger.Debug("Running adapter", log.String("service", adapter.Name()))
 		opt.ProgressTracker.StartService(adapter.Name())
 
 		if err := adapter.Adapt(c, state); err != nil {
-			c.Debug("Error occurred while running adapter for %s: %s", adapter.Name(), err)
-			adapterErrors = append(adapterErrors, fmt.Errorf("failed to run adapter for %s: %w", adapter.Name(), err))
+			c.logger.Error("Failed to adapt", log.String("service", adapter.Name()), log.Err(err))
+			adapterErrors = append(adapterErrors, fmt.Errorf("failed to adapt service %s: %w", adapter.Name(), err))
 		}
 		opt.ProgressTracker.FinishService()
 	}
@@ -200,13 +200,4 @@ func Adapt(ctx context.Context, state *state.State, opt options.Options) error {
 	}
 
 	return nil
-}
-
-func contains(services []string, service string) bool {
-	for _, s := range services {
-		if s == service {
-			return true
-		}
-	}
-	return false
 }

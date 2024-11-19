@@ -83,6 +83,9 @@ func Write(ctx context.Context, rep *Report, opt flag.Options, fromCache bool) e
 		return err
 	}
 
+	// combine results without a target for consistency of the result
+	filtered = combineResults(filtered)
+
 	sort.Slice(filtered, func(i, j int) bool {
 		return filtered[i].Target < filtered[j].Target
 	})
@@ -148,6 +151,35 @@ func filterResults(ctx context.Context, rep *Report, opt flag.Options, ignoreCon
 		}
 	}
 	return filtered, nil
+}
+
+func combineResults(results []types.Result) []types.Result {
+	var noTarget types.Result
+	var withTarget []types.Result
+
+	for _, r := range results {
+		if r.Target == "" {
+			if noTarget.MisconfSummary == nil {
+				noTarget = r
+			} else {
+				noTarget.MisconfSummary.Failures += r.MisconfSummary.Failures
+				noTarget.MisconfSummary.Successes += r.MisconfSummary.Successes
+				noTarget.Misconfigurations = append(noTarget.Misconfigurations, r.Misconfigurations...)
+			}
+		} else {
+			withTarget = append(withTarget, r)
+		}
+	}
+
+	if noTarget.MisconfSummary != nil {
+		misconfs := noTarget.Misconfigurations
+		sort.Slice(noTarget.Misconfigurations, func(i, j int) bool {
+			return misconfs[i].AVDID < misconfs[j].AVDID
+		})
+		withTarget = append(withTarget, noTarget)
+	}
+
+	return withTarget
 }
 
 func writeCompliance(ctx context.Context, rep *Report, opt flag.Options, output io.Writer) error {

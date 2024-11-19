@@ -6,6 +6,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	"github.com/aquasecurity/trivy/pkg/iac/types"
+	"github.com/aquasecurity/trivy/pkg/log"
 	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 
@@ -57,14 +58,16 @@ func (a *adapter) adaptGroup(apiGroup iamtypes.Group, state *state.State) (*iam.
 		for {
 			policiesOutput, err := a.api.ListAttachedGroupPolicies(a.Context(), input)
 			if err != nil {
-				a.Debug("Failed to locate policies attached to group '%s': %s", *apiGroup.GroupName, err)
+				a.Logger().Error("Failed to locate policies attached to group",
+					log.String("name", *apiGroup.GroupName), log.Err(err))
 				break
 			}
 
 			for _, apiPolicy := range policiesOutput.AttachedPolicies {
 				policy, err := a.adaptAttachedPolicy(apiPolicy)
 				if err != nil {
-					a.Debug("Failed to adapt policy attached to group '%s': %s", *apiGroup.GroupName, err)
+					a.Logger().Error("Failed to adapt policy attached to group",
+						log.String("name", *apiGroup.GroupName), log.Err(err))
 					continue
 				}
 				policies = append(policies, *policy)

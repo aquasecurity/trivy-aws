@@ -177,8 +177,7 @@ Scan Overview for AWS Account
       "Type": "cloud",
       "MisconfSummary": {
         "Successes": 0,
-        "Failures": 1,
-        "Exceptions": 0
+        "Failures": 1
       },
       "Misconfigurations": [
         {
@@ -213,8 +212,7 @@ Scan Overview for AWS Account
       "Type": "cloud",
       "MisconfSummary": {
         "Successes": 0,
-        "Failures": 1,
-        "Exceptions": 0
+        "Failures": 1
       },
       "Misconfigurations": [
         {
@@ -249,8 +247,7 @@ Scan Overview for AWS Account
       "Type": "cloud",
       "MisconfSummary": {
         "Successes": 0,
-        "Failures": 2,
-        "Exceptions": 0
+        "Failures": 2
       },
       "Misconfigurations": [
         {
@@ -309,8 +306,7 @@ Scan Overview for AWS Account
       "Type": "cloud",
       "MisconfSummary": {
         "Successes": 1,
-        "Failures": 0,
-        "Exceptions": 0
+        "Failures": 0
       }
     }
   ]

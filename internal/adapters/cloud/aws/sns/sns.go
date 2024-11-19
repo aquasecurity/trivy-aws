@@ -5,6 +5,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/sns"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	"github.com/aquasecurity/trivy/pkg/iac/types"
+	"github.com/aquasecurity/trivy/pkg/log"
 	snsapi "github.com/aws/aws-sdk-go-v2/service/sns"
 	snsTypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
 
@@ -75,7 +76,8 @@ func (a *adapter) adaptTopic(topic snsTypes.Topic) (*sns.Topic, error) {
 		TopicArn: topic.TopicArn,
 	})
 	if err != nil {
-		a.Debug("Failed to get topic attributes for '%s': %s", *topic.TopicArn, err)
+		a.Logger().Error("Failed to get topic attributes",
+			log.String("ARN", *topic.TopicArn), log.Err(err))
 		return nil, err
 	}
 
