@@ -4,21 +4,21 @@ import (
 	"context"
 	"io/fs"
 	"testing"
+	"testing/fstest"
 
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
-	"github.com/aquasecurity/trivy/pkg/iac/providers/azure"
-	"github.com/aquasecurity/trivy/pkg/iac/providers/azure/authorization"
-
-	"github.com/aquasecurity/trivy-aws/internal/testutil"
-	"github.com/aquasecurity/trivy/pkg/iac/framework"
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws"
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/rds"
-	"github.com/aquasecurity/trivy/pkg/iac/scanners/options"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
-	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
-	defsecRules "github.com/aquasecurity/trivy/pkg/iac/types/rules"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/aquasecurity/trivy/pkg/iac/framework"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/rds"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/azure"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/azure/authorization"
+	"github.com/aquasecurity/trivy/pkg/iac/scan"
+	"github.com/aquasecurity/trivy/pkg/iac/scanners/options"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	iacTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 )
 
 type testStruct struct {
@@ -61,17 +61,17 @@ func TestScanner_GetRegisteredRules(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			for _, r := range tc.scanner.getRules() {
-				assertRules(t, r, tc)
+				assertRules(t, r.Rule, tc)
 			}
 		})
 	}
 }
 
-func assertRules(t *testing.T, r defsecRules.RegisteredRule, tc testStruct) {
+func assertRules(t *testing.T, r scan.Rule, tc testStruct) {
 	t.Helper()
 
-	if _, ok := r.Rule.Frameworks[tc.fwApplied]; !ok {
-		assert.FailNowf(t, "unexpected rule found", "rule: %s in test case: %s", r.Rule.AVDID, tc.name)
+	if _, ok := r.Frameworks[tc.fwApplied]; !ok {
+		assert.FailNowf(t, "unexpected rule found", "rule: %s in test case: %s", r.AVDID, tc.name)
 	}
 }
 
@@ -88,7 +88,7 @@ func Test_AWSInputSelectors(t *testing.T) {
 	}{
 		{
 			name: "selector is not defined",
-			srcFS: testutil.CreateFS(t, map[string]string{
+			srcFS: createFS(map[string]string{
 				"policies/rds_policy.rego": `# METADATA
 # title: "RDS Publicly Accessible"
 # custom:
@@ -113,8 +113,8 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: trivyTypes.Metadata{},
-							PublicAccess: trivyTypes.Bool(true, trivyTypes.NewTestMetadata()),
+						{Metadata: iacTypes.Metadata{},
+							PublicAccess: iacTypes.Bool(true, iacTypes.NewTestMetadata()),
 						},
 					},
 				},
@@ -127,7 +127,7 @@ deny[res] {
 		},
 		{
 			name: "selector is empty",
-			srcFS: testutil.CreateFS(t, map[string]string{
+			srcFS: createFS(map[string]string{
 				"policies/rds_policy.rego": `# METADATA
 # title: "RDS Publicly Accessible"
 # custom:
@@ -155,8 +155,8 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: trivyTypes.Metadata{},
-							PublicAccess: trivyTypes.Bool(true, trivyTypes.NewTestMetadata()),
+						{Metadata: iacTypes.Metadata{},
+							PublicAccess: iacTypes.Bool(true, iacTypes.NewTestMetadata()),
 						},
 					},
 				},
@@ -168,7 +168,7 @@ deny[res] {
 		},
 		{
 			name: "selector without subtype",
-			srcFS: testutil.CreateFS(t, map[string]string{
+			srcFS: createFS(map[string]string{
 				"policies/rds_policy.rego": `# METADATA
 # title: "RDS Publicly Accessible"
 # custom:
@@ -197,8 +197,8 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: trivyTypes.Metadata{},
-							PublicAccess: trivyTypes.Bool(true, trivyTypes.NewTestMetadata()),
+						{Metadata: iacTypes.Metadata{},
+							PublicAccess: iacTypes.Bool(true, iacTypes.NewTestMetadata()),
 						},
 					},
 				},
@@ -211,7 +211,7 @@ deny[res] {
 		},
 		{
 			name: "conflicting selectors",
-			srcFS: testutil.CreateFS(t, map[string]string{
+			srcFS: createFS(map[string]string{
 				"policies/rds_policy.rego": `# METADATA
 # title: "RDS Publicly Accessible"
 # custom:
@@ -234,8 +234,8 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: trivyTypes.Metadata{},
-							PublicAccess: trivyTypes.Bool(true, trivyTypes.NewTestMetadata()),
+						{Metadata: iacTypes.Metadata{},
+							PublicAccess: iacTypes.Bool(true, iacTypes.NewTestMetadata()),
 						},
 					},
 				},
@@ -247,7 +247,7 @@ deny[res] {
 		},
 		{
 			name: "selector is defined with empty subtype",
-			srcFS: testutil.CreateFS(t, map[string]string{
+			srcFS: createFS(map[string]string{
 				"policies/rds_policy.rego": `# METADATA
 # title: "RDS Publicly Accessible"
 # custom:
@@ -279,8 +279,8 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: trivyTypes.Metadata{},
-							PublicAccess: trivyTypes.Bool(true, trivyTypes.NewTestMetadata()),
+						{Metadata: iacTypes.Metadata{},
+							PublicAccess: iacTypes.Bool(true, iacTypes.NewTestMetadata()),
 						},
 					},
 				},
@@ -293,7 +293,7 @@ deny[res] {
 		},
 		{
 			name: "single cloud, single selector",
-			srcFS: testutil.CreateFS(t, map[string]string{
+			srcFS: createFS(map[string]string{
 				"policies/rds_policy.rego": `# METADATA
 # title: "RDS Publicly Accessible"
 # description: "Ensures RDS instances are not launched into the public cloud."
@@ -359,8 +359,8 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: trivyTypes.Metadata{},
-							PublicAccess: trivyTypes.Bool(true, trivyTypes.NewTestMetadata()),
+						{Metadata: iacTypes.Metadata{},
+							PublicAccess: iacTypes.Bool(true, iacTypes.NewTestMetadata()),
 						},
 					},
 				},
@@ -373,7 +373,7 @@ deny[res] {
 		},
 		{
 			name: "multi cloud, single selector, same named service",
-			srcFS: testutil.CreateFS(t, map[string]string{
+			srcFS: createFS(map[string]string{
 				"policies/azure_iam_policy.rego": `# METADATA
 # title: "Azure IAM Policy"
 # custom:
@@ -409,23 +409,23 @@ deny[res] {
 				AWS: aws.AWS{
 					IAM: iam.IAM{
 						PasswordPolicy: iam.PasswordPolicy{
-							MinimumLength: trivyTypes.Int(1, trivyTypes.NewTestMetadata()),
+							MinimumLength: iacTypes.Int(1, iacTypes.NewTestMetadata()),
 						}},
 				},
 				Azure: azure.Azure{
 					Authorization: authorization.Authorization{
 						RoleDefinitions: []authorization.RoleDefinition{{
-							Metadata: trivyTypes.NewTestMetadata(),
+							Metadata: iacTypes.NewTestMetadata(),
 							Permissions: []authorization.Permission{
 								{
-									Metadata: trivyTypes.NewTestMetadata(),
-									Actions: []trivyTypes.StringValue{
-										trivyTypes.String("*", trivyTypes.NewTestMetadata()),
+									Metadata: iacTypes.NewTestMetadata(),
+									Actions: []iacTypes.StringValue{
+										iacTypes.String("*", iacTypes.NewTestMetadata()),
 									},
 								},
 							},
-							AssignableScopes: []trivyTypes.StringValue{
-								trivyTypes.StringUnresolvable(trivyTypes.NewTestMetadata()),
+							AssignableScopes: []iacTypes.StringValue{
+								iacTypes.StringUnresolvable(iacTypes.NewTestMetadata()),
 							}},
 						}},
 				},
@@ -438,7 +438,7 @@ deny[res] {
 		},
 		{
 			name: "single cloud, single selector with config data",
-			srcFS: testutil.CreateFS(t, map[string]string{
+			srcFS: createFS(map[string]string{
 				"policies/rds_policy.rego": `# METADATA
 # title: "RDS Publicly Accessible"
 # description: "Ensures RDS instances are not launched into the public cloud."
@@ -499,7 +499,7 @@ deny[res] {
 }
 `,
 			}),
-			dataFS: testutil.CreateFS(t, map[string]string{
+			dataFS: createFS(map[string]string{
 				"config-data/data.json": `{
     "settings": {
 		"DS0999": {
@@ -515,8 +515,8 @@ deny[res] {
 			state: state.State{AWS: aws.AWS{
 				RDS: rds.RDS{
 					Instances: []rds.Instance{
-						{Metadata: trivyTypes.Metadata{},
-							PublicAccess: trivyTypes.Bool(false, trivyTypes.NewTestMetadata()),
+						{Metadata: iacTypes.Metadata{},
+							PublicAccess: iacTypes.Bool(false, iacTypes.NewTestMetadata()),
 						},
 					},
 				},
@@ -538,7 +538,7 @@ deny[res] {
 			scannerOpts = append(scannerOpts, options.ScannerWithEmbeddedPolicies(false))
 			scannerOpts = append(scannerOpts, options.ScannerWithPolicyFilesystem(tc.srcFS))
 			scannerOpts = append(scannerOpts, options.ScannerWithRegoOnly(true))
-			scannerOpts = append(scannerOpts, options.ScannerWithPolicyDirs("policies/"))
+			scannerOpts = append(scannerOpts, options.ScannerWithPolicyDirs("policies"))
 			scanner := New(scannerOpts...)
 
 			results, err := scanner.Scan(context.TODO(), &tc.state)
@@ -549,4 +549,12 @@ deny[res] {
 			}
 		})
 	}
+}
+
+func createFS(files map[string]string) fs.FS {
+	fsys := make(fstest.MapFS)
+	for path, content := range files {
+		fsys[path] = &fstest.MapFile{Data: []byte(content)}
+	}
+	return fsys
 }
