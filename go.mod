@@ -15,40 +15,40 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.28.5
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.46
 	github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.36.1
-	github.com/aws/aws-sdk-go-v2/service/apigateway v1.27.6
+	github.com/aws/aws-sdk-go-v2/service/apigateway v1.28.0
 	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.24.6
 	github.com/aws/aws-sdk-go-v2/service/athena v1.48.4
-	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.41.1
-	github.com/aws/aws-sdk-go-v2/service/cloudtrail v1.45.1
+	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.43.0
+	github.com/aws/aws-sdk-go-v2/service/cloudtrail v1.46.1
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.43.1
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.43.3
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.44.0
 	github.com/aws/aws-sdk-go-v2/service/codebuild v1.49.1
 	github.com/aws/aws-sdk-go-v2/service/docdb v1.39.5
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.37.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.190.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.193.0
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.36.6
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.50.0
-	github.com/aws/aws-sdk-go-v2/service/efs v1.33.6
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.52.0
+	github.com/aws/aws-sdk-go-v2/service/efs v1.34.0
 	github.com/aws/aws-sdk-go-v2/service/eks v1.52.1
-	github.com/aws/aws-sdk-go-v2/service/elasticache v1.43.3
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.41.2
+	github.com/aws/aws-sdk-go-v2/service/elasticache v1.44.0
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.43.0
 	github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.32.6
-	github.com/aws/aws-sdk-go-v2/service/emr v1.46.4
+	github.com/aws/aws-sdk-go-v2/service/emr v1.47.0
 	github.com/aws/aws-sdk-go-v2/service/iam v1.38.1
 	github.com/aws/aws-sdk-go-v2/service/kafka v1.38.6
 	github.com/aws/aws-sdk-go-v2/service/kinesis v1.32.6
 	github.com/aws/aws-sdk-go-v2/service/kms v1.37.6
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.66.1
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.69.0
 	github.com/aws/aws-sdk-go-v2/service/mq v1.27.7
 	github.com/aws/aws-sdk-go-v2/service/neptune v1.35.5
-	github.com/aws/aws-sdk-go-v2/service/rds v1.90.0
+	github.com/aws/aws-sdk-go-v2/service/rds v1.91.0
 	github.com/aws/aws-sdk-go-v2/service/redshift v1.52.1
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.67.1
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.68.0
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.34.6
-	github.com/aws/aws-sdk-go-v2/service/sns v1.33.5
+	github.com/aws/aws-sdk-go-v2/service/sns v1.33.6
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.37.1
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.1
-	github.com/aws/aws-sdk-go-v2/service/workspaces v1.48.6
+	github.com/aws/aws-sdk-go-v2/service/workspaces v1.50.1
 	github.com/liamg/iamgo v0.0.9
 	github.com/liamg/memoryfs v1.6.0
 	github.com/sirupsen/logrus v1.9.3
