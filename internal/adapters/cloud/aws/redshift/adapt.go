@@ -6,6 +6,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/redshift"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	"github.com/aquasecurity/trivy/pkg/log"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	api "github.com/aws/aws-sdk-go-v2/service/redshift"
 	redshiftTypes "github.com/aws/aws-sdk-go-v2/service/redshift/types"
@@ -56,7 +57,7 @@ func (a *adapter) Adapt(root *aws.RootAdapter, state *state.State) error {
 	// this can error is classic resources are used where disabled
 	state.AWS.Redshift.SecurityGroups, err = a.getSecurityGroups()
 	if err != nil {
-		a.Debug("Failed to adapt security groups: %s", err)
+		a.Logger().Error("Failed to adapt security groups", log.Err(err))
 		return nil
 	}
 

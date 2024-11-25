@@ -5,6 +5,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	"github.com/aquasecurity/trivy/pkg/iac/types"
+	"github.com/aquasecurity/trivy/pkg/log"
 	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
 )
 
@@ -64,7 +65,7 @@ func (a *adapter) adaptPasswordPolicy(state *state.State) error {
 
 	output, err := a.api.GetAccountPasswordPolicy(a.Context(), &iamapi.GetAccountPasswordPolicyInput{})
 	if err != nil {
-		a.Debug("Failed to adapt account password policy: %s", err)
+		a.Logger().Error("Failed to adapt account password policy", log.Err(err))
 		return nil
 	}
 	a.Tracker().SetTotalResources(1)

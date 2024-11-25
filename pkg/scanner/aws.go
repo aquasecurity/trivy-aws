@@ -4,13 +4,15 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
+	"os"
 
 	"golang.org/x/xerrors"
 
 	"github.com/aquasecurity/trivy-aws/pkg/cache"
+	"github.com/aquasecurity/trivy-aws/pkg/flag"
 	"github.com/aquasecurity/trivy/pkg/commands/operation"
-	"github.com/aquasecurity/trivy/pkg/flag"
 	"github.com/aquasecurity/trivy/pkg/iac/framework"
+	"github.com/aquasecurity/trivy/pkg/iac/rego"
 	"github.com/aquasecurity/trivy/pkg/iac/scan"
 	"github.com/aquasecurity/trivy/pkg/iac/scanners/options"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
@@ -30,11 +32,13 @@ func (s *AWSScanner) Scan(ctx context.Context, option flag.Options) (scan.Result
 	awsCache := cache.New(option.CacheDir, option.MaxCacheAge, option.Account, option.Region)
 	included, missing := awsCache.ListServices(option.Services)
 
-	prefixedLogger := log.NewWriteLogger(log.WithPrefix("aws"))
+	scannerOpts := []options.ScannerOption{
+		options.ScannerWithRegoOnly(true),
+	}
 
-	var scannerOpts []options.ScannerOption
-	if !option.NoProgress {
-		tracker := newProgressTracker(prefixedLogger)
+	noProgress := option.Quiet || option.NoProgress
+	if !noProgress {
+		tracker := newProgressTracker(os.Stdout)
 		defer tracker.Finish()
 		scannerOpts = append(scannerOpts, ScannerWithProgressTracker(tracker))
 	}
@@ -43,12 +47,8 @@ func (s *AWSScanner) Scan(ctx context.Context, option flag.Options) (scan.Result
 		scannerOpts = append(scannerOpts, ScannerWithAWSServices(missing...))
 	}
 
-	if option.Debug {
-		scannerOpts = append(scannerOpts, options.ScannerWithDebug(prefixedLogger))
-	}
-
 	if option.Trace {
-		scannerOpts = append(scannerOpts, options.ScannerWithTrace(prefixedLogger))
+		scannerOpts = append(scannerOpts, rego.WithPerResultTracing(true))
 	}
 
 	if option.Region != "" {
@@ -65,10 +65,14 @@ func (s *AWSScanner) Scan(ctx context.Context, option flag.Options) (scan.Result
 		)
 	}
 
-	var policyPaths []string
-	var downloadedPolicyPaths []string
-	var err error
-	downloadedPolicyPaths, err = operation.InitBuiltinPolicies(context.Background(), option.CacheDir, option.Quiet, option.SkipCheckUpdate, option.MisconfOptions.ChecksBundleRepository, option.RegistryOpts())
+	var (
+		disableEmbedded       bool
+		policyPaths           []string
+		downloadedPolicyPaths []string
+		err                   error
+	)
+
+	downloadedPolicyPaths, err = operation.InitBuiltinChecks(context.Background(), option.CacheDir, option.Quiet, option.SkipCheckUpdate, option.MisconfOptions.ChecksBundleRepository, option.RegistryOpts())
 	if err != nil {
 		if !option.SkipCheckUpdate {
 			log.Errorf("Falling back to embedded policies: %s", err)
@@ -76,10 +80,13 @@ func (s *AWSScanner) Scan(ctx context.Context, option flag.Options) (scan.Result
 	} else {
 		log.Debug("Policies successfully loaded from disk")
 		policyPaths = append(policyPaths, downloadedPolicyPaths...)
-		scannerOpts = append(scannerOpts,
-			options.ScannerWithEmbeddedPolicies(false),
-			options.ScannerWithEmbeddedLibraries(false))
+		disableEmbedded = true
 	}
+
+	scannerOpts = append(scannerOpts,
+		rego.WithEmbeddedPolicies(!disableEmbedded),
+		rego.WithEmbeddedLibraries(!disableEmbedded),
+	)
 
 	var policyFS fs.FS
 	policyFS, policyPaths, err = misconf.CreatePolicyFS(append(policyPaths, option.RegoOptions.CheckPaths...))
@@ -88,8 +95,8 @@ func (s *AWSScanner) Scan(ctx context.Context, option flag.Options) (scan.Result
 	}
 
 	scannerOpts = append(scannerOpts,
-		options.ScannerWithPolicyFilesystem(policyFS),
-		options.ScannerWithPolicyDirs(policyPaths...),
+		rego.WithPolicyFilesystem(policyFS),
+		rego.WithPolicyDirs(policyPaths...),
 	)
 
 	dataFS, dataPaths, err := misconf.CreateDataFS(option.RegoOptions.DataPaths)
@@ -97,18 +104,17 @@ func (s *AWSScanner) Scan(ctx context.Context, option flag.Options) (scan.Result
 		log.Errorf("Could not load config data: %s", err)
 	}
 	scannerOpts = append(scannerOpts,
-		options.ScannerWithDataDirs(dataPaths...),
-		options.ScannerWithDataFilesystem(dataFS),
+		rego.WithDataDirs(dataPaths...),
+		rego.WithDataFilesystem(dataFS),
 	)
 
 	scannerOpts = addPolicyNamespaces(option.RegoOptions.CheckNamespaces, scannerOpts)
 
-	if option.Compliance.Spec.ID != "" {
-		scannerOpts = append(scannerOpts, options.ScannerWithSpec(option.Compliance.Spec.ID))
-	} else {
+	if option.Compliance.Spec.ID == "" {
 		scannerOpts = append(scannerOpts, options.ScannerWithFrameworks(
 			framework.Default,
-			framework.CIS_AWS_1_2))
+			framework.CIS_AWS_1_2),
+		)
 	}
 
 	scanner := New(scannerOpts...)
@@ -164,7 +170,7 @@ func addPolicyNamespaces(namespaces []string, scannerOpts []options.ScannerOptio
 	if len(namespaces) > 0 {
 		scannerOpts = append(
 			scannerOpts,
-			options.ScannerWithPolicyNamespaces(namespaces...),
+			rego.WithPolicyNamespaces(namespaces...),
 		)
 	}
 	return scannerOpts

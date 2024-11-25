@@ -5,6 +5,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/emr"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	"github.com/aquasecurity/trivy/pkg/log"
 	api "github.com/aws/aws-sdk-go-v2/service/emr"
 	"github.com/aws/aws-sdk-go-v2/service/emr/types"
 
@@ -131,7 +132,8 @@ func (a *adapter) getSecurityConfigurations() ([]emr.SecurityConfiguration, erro
 	for _, apiConfig := range apiConfigs {
 		config, err := a.adaptConfig(apiConfig)
 		if err != nil {
-			a.Debug("Failed to adapt security configuration '%s': %s", *apiConfig.Name, err)
+			a.Logger().Error("Failed to adapt security configuration",
+				log.String("name", *apiConfig.Name), log.Err(err))
 			continue
 		}
 		configs = append(configs, *config)

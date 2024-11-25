@@ -1,22 +1,21 @@
 package test
 
 import (
-	"bytes"
 	"context"
+	"io"
+	"log/slog"
 	"os"
-	"sync"
 	"testing"
-
-	localstack "github.com/aquasecurity/go-mock-aws"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
+	localstack "github.com/aquasecurity/go-mock-aws"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/progress"
+	"github.com/aquasecurity/trivy/pkg/log"
 )
 
 func getOrCreateLocalStack(ctx context.Context) (*localstack.Stack, error) {
@@ -30,10 +29,7 @@ func getOrCreateLocalStack(ctx context.Context) (*localstack.Stack, error) {
 		return nil, err
 	}
 
-	buf := &concurrentWriter{buf: &bytes.Buffer{}}
-	logger := log.New()
-	logger.SetLevel(log.DebugLevel)
-	logger.SetOutput(buf)
+	log.New(log.NewHandler(os.Stdout, &log.Options{Level: slog.LevelDebug}))
 
 	err = stack.Start(false, initScripts, localstack.WithContext(ctx))
 	if err != nil {
@@ -51,7 +47,7 @@ func CreateLocalstackAdapter(t *testing.T) (*aws.RootAdapter, *localstack.Stack,
 	cfg, err := createTestConfig(ctx, l)
 	require.NoError(t, err)
 
-	ra := aws.NewRootAdapter(ctx, cfg, progress.NoProgress)
+	ra := aws.NewRootAdapter(ctx, cfg, progress.NoProgress, log.New(log.NewHandler(io.Discard, nil)))
 	require.NotNil(t, ra)
 	return ra, l, err
 }
@@ -69,21 +65,4 @@ func createTestConfig(ctx context.Context, l *localstack.Stack) (awssdk.Config, 
 		})),
 		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("dummy", "dummy", "dummy")),
 	)
-}
-
-type concurrentWriter struct {
-	buf *bytes.Buffer
-	mu  sync.RWMutex
-}
-
-func (c *concurrentWriter) Write(p []byte) (n int, err error) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	return c.buf.Write(p)
-}
-
-func (c *concurrentWriter) Bytes() []byte {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	return c.buf.Bytes()
 }
