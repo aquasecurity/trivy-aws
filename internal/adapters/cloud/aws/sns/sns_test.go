@@ -2,17 +2,17 @@ package sns
 
 import (
 	"fmt"
-
 	"testing"
 
-	aws2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/sns"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	snsapi "github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	awsAdapter "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/sns"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
 )
 
 type topicDetails struct {
@@ -74,7 +74,7 @@ func Test_SNSTopicEncryption(t *testing.T) {
 	}
 }
 
-func bootstrapSNSTopic(t *testing.T, ra *aws2.RootAdapter, spec topicDetails) {
+func bootstrapSNSTopic(t *testing.T, ra *awsAdapter.RootAdapter, spec topicDetails) {
 
 	api := snsapi.NewFromConfig(ra.SessionConfig())
 
@@ -91,7 +91,7 @@ func bootstrapSNSTopic(t *testing.T, ra *aws2.RootAdapter, spec topicDetails) {
 
 }
 
-func removeTopic(t *testing.T, ra *aws2.RootAdapter, topicARN string) {
+func removeTopic(t *testing.T, ra *awsAdapter.RootAdapter, topicARN string) {
 
 	api := snsapi.NewFromConfig(ra.SessionConfig())
 

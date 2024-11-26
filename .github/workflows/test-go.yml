@@ -1,4 +1,4 @@
-name: test go
+name: Test
 
 on:
   pull_request:
@@ -10,8 +10,7 @@ env:
   GO_VERSION: '1.22'
 
 jobs:
-  build:
-    name: building defsec
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

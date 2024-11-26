@@ -3,8 +3,6 @@ package ec2
 import (
 	"testing"
 
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ec2"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	vpcApi "github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -15,6 +13,8 @@ import (
 
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ec2"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
 )
 
 type rule struct {

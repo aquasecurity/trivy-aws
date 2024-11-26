@@ -1,12 +1,13 @@
 package iam
 
 import (
+	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
+
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	"github.com/aquasecurity/trivy/pkg/iac/types"
 	"github.com/aquasecurity/trivy/pkg/log"
-	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
 )
 
 type adapter struct {

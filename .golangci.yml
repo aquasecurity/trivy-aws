@@ -16,6 +16,7 @@ linters:
     - goimports
     - gocritic
     - gosec
+    - gci
 
 linters-settings:
   cyclop:
@@ -30,6 +31,13 @@ linters-settings:
   gosec:
     excludes:
       - G115 # Potential integer overflow when converting between integer types
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(github.com/aquasecurity/)
+      - blank
+      - dot
 
 issues:
   exclude-rules:

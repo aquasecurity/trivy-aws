@@ -3,14 +3,13 @@ package iam
 import (
 	"fmt"
 
-	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
-
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
 	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 )
 
 func (a *adapter) adaptServerCertificates(state *state.State) error {

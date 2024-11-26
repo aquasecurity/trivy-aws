@@ -4,8 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/s3"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	s3api "github.com/aws/aws-sdk-go-v2/service/s3"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
@@ -14,6 +12,8 @@ import (
 
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/s3"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
 )
 
 type publicAccessBlock struct {
@@ -25,7 +25,7 @@ type publicAccessBlock struct {
 
 type bucketDetails struct {
 	bucketName          string
-	acl                 string
+	acl                 s3types.BucketCannedACL
 	encrypted           bool
 	loggingEnabled      bool
 	loggingTargetBucket string
@@ -43,7 +43,7 @@ func Test_S3BucketACLs(t *testing.T) {
 			name: "simple bucket with public-read acl",
 			details: bucketDetails{
 				bucketName: "test-bucket",
-				acl:        "public-read",
+				acl:        s3types.BucketCannedACLPublicRead,
 				encrypted:  false,
 			},
 		},
@@ -51,7 +51,7 @@ func Test_S3BucketACLs(t *testing.T) {
 			name: "simple bucket with authenticated-read acl",
 			details: bucketDetails{
 				bucketName: "wide-open-bucket",
-				acl:        "authenticated-read",
+				acl:        s3types.BucketCannedACLAuthenticatedRead,
 				encrypted:  false,
 			},
 		},
@@ -59,7 +59,7 @@ func Test_S3BucketACLs(t *testing.T) {
 			name: "simple bucket with public-read-write acl",
 			details: bucketDetails{
 				bucketName: "public-read-write-bucket",
-				acl:        "public-read-write",
+				acl:        s3types.BucketCannedACLPublicReadWrite,
 				encrypted:  false,
 			},
 		},
@@ -67,7 +67,7 @@ func Test_S3BucketACLs(t *testing.T) {
 			name: "simple bucket with private acl and encryption",
 			details: bucketDetails{
 				bucketName: "private-bucket",
-				acl:        "private",
+				acl:        s3types.BucketCannedACLPrivate,
 				encrypted:  true,
 			},
 		},
@@ -96,7 +96,7 @@ func Test_S3BucketACLs(t *testing.T) {
 			}
 
 			assert.Equal(t, tt.details.bucketName, got.Name.Value())
-			assert.Equal(t, tt.details.acl, got.ACL.Value())
+			assert.Equal(t, string(tt.details.acl), got.ACL.Value())
 			if tt.details.encrypted {
 				// Amazon S3 now applies server-side encryption with Amazon S3 managed keys (SSE-S3)
 				assert.Equal(t, string(s3types.ServerSideEncryptionAes256), got.Encryption.Algorithm.Value())
@@ -296,8 +296,7 @@ func bootstrapBucket(t *testing.T, ra *aws.RootAdapter, spec bucketDetails) {
 
 	_, err := api.CreateBucket(ra.Context(), &s3api.CreateBucketInput{
 		Bucket: awssdk.String(spec.bucketName),
-
-		ACL: aclToCannedACL(spec.acl),
+		ACL:    spec.acl,
 	})
 	require.NoError(t, err)
 
@@ -384,19 +383,6 @@ func createPublicAccessBlock(t *testing.T, api *s3api.Client, ctx context.Contex
 		},
 	})
 	require.NoError(t, err)
-}
-
-func aclToCannedACL(acl string) s3types.BucketCannedACL {
-	switch acl {
-	case "authenticated-read":
-		return s3types.BucketCannedACLAuthenticatedRead
-	case "public-read":
-		return s3types.BucketCannedACLPublicRead
-	case "public-read-write":
-		return s3types.BucketCannedACLPublicReadWrite
-	default:
-		return s3types.BucketCannedACLPrivate
-	}
 }
 
 func removeBucket(t *testing.T, ra *aws.RootAdapter, spec bucketDetails) {

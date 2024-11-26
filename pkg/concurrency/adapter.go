@@ -3,10 +3,9 @@ package concurrency
 import (
 	"sync"
 
+	"github.com/aquasecurity/trivy-aws/pkg/progress"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	"github.com/aquasecurity/trivy/pkg/log"
-
-	"github.com/aquasecurity/trivy-aws/pkg/progress"
 )
 
 type Context interface {

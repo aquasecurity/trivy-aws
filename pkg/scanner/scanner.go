@@ -8,22 +8,21 @@ import (
 	"runtime"
 	"sync"
 
+	adapter "github.com/aquasecurity/trivy-aws/internal/adapters/cloud"
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/options"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy-aws/pkg/errs"
+	"github.com/aquasecurity/trivy-aws/pkg/progress"
 	"github.com/aquasecurity/trivy/pkg/iac/framework"
 	"github.com/aquasecurity/trivy/pkg/iac/rego"
 	"github.com/aquasecurity/trivy/pkg/iac/rules"
 	"github.com/aquasecurity/trivy/pkg/iac/scan"
-	"github.com/aquasecurity/trivy/pkg/iac/scanners/options"
+	iacOptions "github.com/aquasecurity/trivy/pkg/iac/scanners/options"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	"github.com/aquasecurity/trivy/pkg/iac/types"
 	defsecRules "github.com/aquasecurity/trivy/pkg/iac/types/rules"
 	"github.com/aquasecurity/trivy/pkg/log"
-
-	adapter "github.com/aquasecurity/trivy-aws/internal/adapters/cloud"
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
-	options2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/options"
-	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
-	"github.com/aquasecurity/trivy-aws/pkg/errs"
-	"github.com/aquasecurity/trivy-aws/pkg/progress"
 )
 
 var _ ConfigurableAWSScanner = (*Scanner)(nil)
@@ -32,7 +31,7 @@ type Scanner struct {
 	sync.Mutex
 	regoScanner         *rego.Scanner
 	logger              *log.Logger
-	options             []options.ScannerOption
+	options             []iacOptions.ScannerOption
 	progressTracker     progress.Tracker
 	region              string
 	endpoint            string
@@ -85,7 +84,7 @@ func (s *Scanner) SetConcurrencyStrategy(strategy concurrency.Strategy) {
 	s.concurrencyStrategy = strategy
 }
 
-func New(opts ...options.ScannerOption) *Scanner {
+func New(opts ...iacOptions.ScannerOption) *Scanner {
 
 	s := &Scanner{
 		options:             opts,
@@ -101,7 +100,7 @@ func New(opts ...options.ScannerOption) *Scanner {
 }
 
 func (s *Scanner) CreateState(ctx context.Context) (*state.State, error) {
-	cloudState, err := adapter.Adapt(ctx, options2.Options{
+	cloudState, err := adapter.Adapt(ctx, options.Options{
 		ProgressTracker:     s.progressTracker,
 		Region:              s.region,
 		Endpoint:            s.endpoint,

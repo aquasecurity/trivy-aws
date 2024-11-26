@@ -1,15 +1,15 @@
 package sns
 
 import (
+	snsapi "github.com/aws/aws-sdk-go-v2/service/sns"
+	snsTypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
+
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/sns"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	"github.com/aquasecurity/trivy/pkg/iac/types"
 	"github.com/aquasecurity/trivy/pkg/log"
-	snsapi "github.com/aws/aws-sdk-go-v2/service/sns"
-	snsTypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
-
-	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 )
 
 type adapter struct {
