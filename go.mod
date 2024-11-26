@@ -50,7 +50,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.1
 	github.com/aws/aws-sdk-go-v2/service/workspaces v1.50.1
 	github.com/liamg/iamgo v0.0.9
-	github.com/liamg/memoryfs v1.6.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
@@ -235,6 +234,7 @@ require (
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/letsencrypt/boulder v0.0.0-20231026200631-000cd05d5491 // indirect
 	github.com/liamg/jfather v0.0.7 // indirect
+	github.com/liamg/memoryfs v1.6.0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
 	github.com/lufia/plan9stats v0.0.0-20240226150601-1dcf7310316a // indirect
