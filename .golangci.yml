@@ -27,6 +27,9 @@ linters-settings:
     checks:
       - all
       - '-SA1019' # TODO
+  gosec:
+    excludes:
+      - G115 # Potential integer overflow when converting between integer types
 
 issues:
   exclude-rules:
