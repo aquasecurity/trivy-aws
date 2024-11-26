@@ -1,8 +1,6 @@
 package workspaces
 
 import (
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/workspaces"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	api "github.com/aws/aws-sdk-go-v2/service/workspaces"
 	workspaceTypes "github.com/aws/aws-sdk-go-v2/service/workspaces/types"
@@ -10,6 +8,8 @@ import (
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy-aws/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/workspaces"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
 )
 
 type adapter struct {

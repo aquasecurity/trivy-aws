@@ -1,24 +1,24 @@
 package dynamodb
 
 import (
-	aws2 "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/dynamodb"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
-	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	dynamodbApi "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	dynamodbTypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 
+	awsAdapter "github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/dynamodb"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 )
 
 type adapter struct {
-	*aws2.RootAdapter
+	*awsAdapter.RootAdapter
 	client *dynamodbApi.Client
 }
 
 func init() {
-	aws2.RegisterServiceAdapter(&adapter{})
+	awsAdapter.RegisterServiceAdapter(&adapter{})
 }
 
 func (a *adapter) Name() string {
@@ -29,7 +29,7 @@ func (a *adapter) Provider() string {
 	return "aws"
 }
 
-func (a *adapter) Adapt(root *aws2.RootAdapter, state *state.State) error {
+func (a *adapter) Adapt(root *awsAdapter.RootAdapter, state *state.State) error {
 	a.RootAdapter = root
 	a.client = dynamodbApi.NewFromConfig(root.SessionConfig())
 	var err error

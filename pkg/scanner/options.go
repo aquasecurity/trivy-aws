@@ -1,10 +1,9 @@
 package scanner
 
 import (
-	"github.com/aquasecurity/trivy/pkg/iac/scanners/options"
-
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy-aws/pkg/progress"
+	"github.com/aquasecurity/trivy/pkg/iac/scanners/options"
 )
 
 type ConfigurableAWSScanner interface {

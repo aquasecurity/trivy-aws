@@ -5,21 +5,21 @@ import (
 	"io/fs"
 	"testing"
 
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
-	"github.com/aquasecurity/trivy/pkg/iac/providers/azure"
-	"github.com/aquasecurity/trivy/pkg/iac/providers/azure/authorization"
-	"github.com/aquasecurity/trivy/pkg/iac/rego"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/aquasecurity/trivy-aws/internal/testutil"
 	"github.com/aquasecurity/trivy/pkg/iac/framework"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/rds"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/azure"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/azure/authorization"
+	"github.com/aquasecurity/trivy/pkg/iac/rego"
 	"github.com/aquasecurity/trivy/pkg/iac/scanners/options"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	defsecRules "github.com/aquasecurity/trivy/pkg/iac/types/rules"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 type testStruct struct {

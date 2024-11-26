@@ -1,10 +1,6 @@
 package sqs
 
 import (
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/sqs"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
-	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	sqsApi "github.com/aws/aws-sdk-go-v2/service/sqs"
 	sqsTypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
@@ -12,6 +8,10 @@ import (
 
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/sqs"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 )
 
 type adapter struct {

@@ -1,9 +1,10 @@
 package ecs
 
 import (
+	ecsapi "github.com/aws/aws-sdk-go-v2/service/ecs"
+
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	ecsapi "github.com/aws/aws-sdk-go-v2/service/ecs"
 )
 
 type adapter struct {

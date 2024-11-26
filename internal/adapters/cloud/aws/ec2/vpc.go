@@ -1,13 +1,13 @@
 package ec2
 
 import (
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ec2"
-	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	ec2api "github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ec2"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 )
 
 func (a *adapter) getSecurityGroups() (securityGroups []ec2.SecurityGroup, err error) {

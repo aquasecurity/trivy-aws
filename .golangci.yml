@@ -16,6 +16,7 @@ linters:
     - goimports
     - gocritic
     - gosec
+    - gci
 
 linters-settings:
   cyclop:
@@ -27,6 +28,13 @@ linters-settings:
     checks:
       - all
       - '-SA1019' # TODO
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(github.com/aquasecurity/)
+      - blank
+      - dot
 
 issues:
   exclude-rules:

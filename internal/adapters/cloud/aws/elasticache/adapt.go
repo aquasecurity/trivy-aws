@@ -1,15 +1,15 @@
 package elasticache
 
 import (
+	api "github.com/aws/aws-sdk-go-v2/service/elasticache"
+	"github.com/aws/aws-sdk-go-v2/service/elasticache/types"
+
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/elasticache"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	"github.com/aquasecurity/trivy/pkg/log"
-	api "github.com/aws/aws-sdk-go-v2/service/elasticache"
-	"github.com/aws/aws-sdk-go-v2/service/elasticache/types"
-
-	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 )
 
 type adapter struct {

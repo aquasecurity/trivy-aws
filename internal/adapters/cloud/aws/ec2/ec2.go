@@ -2,12 +2,7 @@ package ec2
 
 import (
 	"fmt"
-
 	"strings"
-
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ec2"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
-	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	ec2api "github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -16,6 +11,9 @@ import (
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy-aws/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ec2"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 )
 
 type adapter struct {

@@ -1,13 +1,13 @@
 package kinesis
 
 import (
+	api "github.com/aws/aws-sdk-go-v2/service/kinesis"
+
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/kinesis"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
-	api "github.com/aws/aws-sdk-go-v2/service/kinesis"
-
-	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 )
 
 type adapter struct {

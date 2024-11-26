@@ -1,14 +1,14 @@
 package kms
 
 import (
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/kms"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
-	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/aws/aws-sdk-go-v2/service/kms/types"
 
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/kms"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 )
 
 type adapter struct {

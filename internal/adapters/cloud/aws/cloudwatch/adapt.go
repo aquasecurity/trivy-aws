@@ -1,16 +1,16 @@
 package cloudwatch
 
 import (
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/cloudwatch"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
-	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	cwApi "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	cwTypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	api "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/cloudwatch"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 )
 
 type adapter struct {

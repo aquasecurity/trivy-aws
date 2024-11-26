@@ -3,8 +3,9 @@ package flag
 import (
 	"time"
 
-	trivyflag "github.com/aquasecurity/trivy/pkg/flag"
 	"golang.org/x/xerrors"
+
+	trivyflag "github.com/aquasecurity/trivy/pkg/flag"
 )
 
 var (
