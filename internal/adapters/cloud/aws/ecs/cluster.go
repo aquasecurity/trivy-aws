@@ -3,12 +3,12 @@ package ecs
 import (
 	"fmt"
 
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ecs"
-	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 	ecsapi "github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ecs"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 )
 
 func (a *adapter) getClusters() ([]ecs.Cluster, error) {

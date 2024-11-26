@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"testing"
 
-	localstack "github.com/aquasecurity/go-mock-aws"
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/sqs"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	sqsapi "github.com/aws/aws-sdk-go-v2/service/sqs"
 	sqsTypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	localstack "github.com/aquasecurity/go-mock-aws"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/sqs"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
 )
 
 type queueDetails struct {

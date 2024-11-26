@@ -3,10 +3,6 @@ package redshift
 import (
 	"strings"
 
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/redshift"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
-	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
-	"github.com/aquasecurity/trivy/pkg/log"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	api "github.com/aws/aws-sdk-go-v2/service/redshift"
 	redshiftTypes "github.com/aws/aws-sdk-go-v2/service/redshift/types"
@@ -14,6 +10,10 @@ import (
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy-aws/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/redshift"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/iac/types"
+	"github.com/aquasecurity/trivy/pkg/log"
 )
 
 type adapter struct {

@@ -1,10 +1,11 @@
 package api_gateway
 
 import (
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
 	apiv1 "github.com/aws/aws-sdk-go-v2/service/apigateway"
 	apiv2 "github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
+
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
 )
 
 type adapter struct {

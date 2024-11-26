@@ -1,14 +1,14 @@
 package mq
 
 import (
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/mq"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
 	api "github.com/aws/aws-sdk-go-v2/service/mq"
 	mqTypes "github.com/aws/aws-sdk-go-v2/service/mq/types"
 
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy-aws/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/mq"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
 )
 
 type adapter struct {

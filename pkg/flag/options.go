@@ -1,9 +1,10 @@
 package flag
 
 import (
-	trivyFlag "github.com/aquasecurity/trivy/pkg/flag"
 	"github.com/spf13/cobra"
 	"golang.org/x/xerrors"
+
+	trivyFlag "github.com/aquasecurity/trivy/pkg/flag"
 )
 
 type Flags struct {

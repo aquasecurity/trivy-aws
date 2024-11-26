@@ -4,8 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/s3"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	s3api "github.com/aws/aws-sdk-go-v2/service/s3"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
@@ -14,6 +12,8 @@ import (
 
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/s3"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
 )
 
 type publicAccessBlock struct {

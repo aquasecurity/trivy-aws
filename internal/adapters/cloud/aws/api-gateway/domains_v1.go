@@ -3,12 +3,12 @@ package api_gateway
 import (
 	"fmt"
 
-	v1 "github.com/aquasecurity/trivy/pkg/iac/providers/aws/apigateway/v1"
-	"github.com/aquasecurity/trivy/pkg/iac/types"
 	api "github.com/aws/aws-sdk-go-v2/service/apigateway"
 	agTypes "github.com/aws/aws-sdk-go-v2/service/apigateway/types"
 
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	v1 "github.com/aquasecurity/trivy/pkg/iac/providers/aws/apigateway/v1"
+	"github.com/aquasecurity/trivy/pkg/iac/types"
 )
 
 func (a *adapter) getDomainNamesv1() ([]v1.DomainName, error) {

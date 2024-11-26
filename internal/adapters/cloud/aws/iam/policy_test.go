@@ -3,13 +3,14 @@ package iam
 import (
 	"testing"
 
+	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws/test"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/iam"
 	"github.com/aquasecurity/trivy/pkg/iac/state"
-	iamapi "github.com/aws/aws-sdk-go-v2/service/iam"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 type policyDetails struct {

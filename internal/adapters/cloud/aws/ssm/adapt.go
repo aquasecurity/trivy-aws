@@ -1,8 +1,6 @@
 package ssm
 
 import (
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ssm"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	api "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	secretsmanagerTypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
@@ -10,6 +8,8 @@ import (
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy-aws/pkg/types"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ssm"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
 )
 
 type adapter struct {

@@ -3,15 +3,15 @@ package api_gateway
 import (
 	"fmt"
 
-	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
-	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/accessanalyzer"
-	"github.com/aquasecurity/trivy/pkg/iac/state"
-	"github.com/aquasecurity/trivy/pkg/iac/types"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	api "github.com/aws/aws-sdk-go-v2/service/accessanalyzer"
 	aatypes "github.com/aws/aws-sdk-go-v2/service/accessanalyzer/types"
 
+	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
+	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/accessanalyzer"
+	"github.com/aquasecurity/trivy/pkg/iac/state"
+	"github.com/aquasecurity/trivy/pkg/iac/types"
 )
 
 type adapter struct {
