@@ -1,0 +1,7 @@
+
+Summary Report for compliance: my-custom-spec
+┌─────┬──────────┬───────────────────────┬────────┬────────┐
+│ ID  │ Severity │     Control Name      │ Status │ Issues │
+├─────┼──────────┼───────────────────────┼────────┼────────┤
+│ 1.1 │   HIGH   │ Unencrypted S3 bucket │  FAIL  │   1    │
+└─────┴──────────┴───────────────────────┴────────┴────────┘

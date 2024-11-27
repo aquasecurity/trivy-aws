@@ -1,1643 +1,210 @@
-package commands
+package commands_test
 
 import (
-	"bytes"
 	"context"
+	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/aquasecurity/trivy-aws/pkg/flag"
-	dbTypes "github.com/aquasecurity/trivy-db/pkg/types"
+	"github.com/aquasecurity/trivy-aws/pkg/commands"
 	"github.com/aquasecurity/trivy/pkg/clock"
-	"github.com/aquasecurity/trivy/pkg/compliance/spec"
-	trivyflag "github.com/aquasecurity/trivy/pkg/flag"
-	iacTypes "github.com/aquasecurity/trivy/pkg/iac/types"
 )
 
-const expectedS3ScanResult = `{
-  "CreatedAt": "2021-08-25T12:20:30.000000005Z",
-  "ArtifactName": "12345678",
-  "ArtifactType": "aws_account",
-  "Metadata": {
-    "ImageConfig": {
-      "architecture": "",
-      "created": "0001-01-01T00:00:00Z",
-      "os": "",
-      "rootfs": {
-        "type": "",
-        "diff_ids": null
-      },
-      "config": {}
-    }
-  },
-  "Results": [
-    {
-      "Target": "",
-      "Class": "config",
-      "Type": "cloud",
-      "MisconfSummary": {
-        "Successes": 2,
-        "Failures": 0
-      },
-      "Misconfigurations": [
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0092",
-          "AVDID": "AVD-AWS-0092",
-          "Title": "S3 Buckets not publicly accessible through ACL.",
-          "Description": "Buckets should not have ACLs that allow public access",
-          "Namespace": "builtin.aws.s3.aws0092",
-          "Query": "deny",
-          "Resolution": "Don't use canned ACLs or switch to private acl",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0092",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0092"
-          ],
-          "Status": "PASS",
-          "Layer": {},
-          "CauseMetadata": {
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0320",
-          "AVDID": "AVD-AWS-0320",
-          "Title": "S3 DNS Compliant Bucket Names",
-          "Description": "Ensures that S3 buckets have DNS complaint bucket names.",
-          "Namespace": "builtin.aws.s3.aws0320",
-          "Query": "deny",
-          "Resolution": "Recreate S3 bucket to use - instead of . in S3 bucket names",
-          "Severity": "MEDIUM",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0320",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0320"
-          ],
-          "Status": "PASS",
-          "Layer": {},
-          "CauseMetadata": {
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        }
-      ]
-    },
-    {
-      "Target": "arn:aws:s3:::examplebucket",
-      "Class": "config",
-      "Type": "cloud",
-      "MisconfSummary": {
-        "Successes": 0,
-        "Failures": 9
-      },
-      "Misconfigurations": [
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0086",
-          "AVDID": "AVD-AWS-0086",
-          "Title": "S3 Access block should block public ACL",
-          "Description": "S3 buckets should block public ACLs on buckets and any objects they contain. By blocking, PUTs with fail if the object has any public ACL a.",
-          "Message": "No public access block so not blocking public acls",
-          "Namespace": "builtin.aws.s3.aws0086",
-          "Query": "deny",
-          "Resolution": "Enable blocking any PUT calls with a public ACL specified",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0086",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0086"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0087",
-          "AVDID": "AVD-AWS-0087",
-          "Title": "S3 Access block should block public policy",
-          "Description": "S3 bucket policy should have block public policy to prevent users from putting a policy that enable public access.",
-          "Message": "No public access block so not blocking public policies",
-          "Namespace": "builtin.aws.s3.aws0087",
-          "Query": "deny",
-          "Resolution": "Prevent policies that allow public access being PUT",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0087",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0087"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0088",
-          "AVDID": "AVD-AWS-0088",
-          "Title": "Unencrypted S3 bucket.",
-          "Description": "S3 Buckets should be encrypted to protect the data that is stored within them if access is compromised.",
-          "Message": "Bucket does not have encryption enabled",
-          "Namespace": "builtin.aws.s3.aws0088",
-          "Query": "deny",
-          "Resolution": "Configure bucket encryption",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0088",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0088"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0089",
-          "AVDID": "AVD-AWS-0089",
-          "Title": "S3 Bucket Logging",
-          "Description": "Ensures S3 bucket logging is enabled for S3 buckets",
-          "Message": "Bucket has logging disabled",
-          "Namespace": "builtin.aws.s3.aws0089",
-          "Query": "deny",
-          "Resolution": "Add a logging block to the resource to enable access logging",
-          "Severity": "LOW",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0089",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0089"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0090",
-          "AVDID": "AVD-AWS-0090",
-          "Title": "S3 Data should be versioned",
-          "Description": "Versioning in Amazon S3 is a means of keeping multiple variants of an object in the same bucket.\n\nYou can use the S3 Versioning feature to preserve, retrieve, and restore every version of every object stored in your buckets.\n\nWith versioning you can recover more easily from both unintended user actions and application failures.",
-          "Message": "Bucket does not have versioning enabled",
-          "Namespace": "builtin.aws.s3.aws0090",
-          "Query": "deny",
-          "Resolution": "Enable versioning to protect against accidental/malicious removal or modification",
-          "Severity": "MEDIUM",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0090",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0090"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0091",
-          "AVDID": "AVD-AWS-0091",
-          "Title": "S3 Access Block should Ignore Public Acl",
-          "Description": "S3 buckets should ignore public ACLs on buckets and any objects they contain. By ignoring rather than blocking, PUT calls with public ACLs will still be applied but the ACL will be ignored.",
-          "Message": "No public access block so not blocking public acls",
-          "Namespace": "builtin.aws.s3.aws0091",
-          "Query": "deny",
-          "Resolution": "Enable ignoring the application of public ACLs in PUT calls",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0091",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0091"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0093",
-          "AVDID": "AVD-AWS-0093",
-          "Title": "S3 Access block should restrict public bucket to limit access",
-          "Description": "S3 buckets should restrict public policies for the bucket. By enabling, the restrict_public_buckets, only the bucket owner and AWS Services can access if it has a public policy.",
-          "Message": "No public access block so not restricting public buckets",
-          "Namespace": "builtin.aws.s3.aws0093",
-          "Query": "deny",
-          "Resolution": "Limit the access to public buckets to only the owner or AWS Services (eg; CloudFront)",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0093",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0093"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0094",
-          "AVDID": "AVD-AWS-0094",
-          "Title": "S3 buckets should each define an aws_s3_bucket_public_access_block",
-          "Description": "The \"block public access\" settings in S3 override individual policies that apply to a given bucket, meaning that all public access can be controlled in one central types for that bucket. It is therefore good practice to define these settings for each bucket in order to clearly define the public access that can be allowed for it.",
-          "Message": "Bucket does not have a corresponding public access block.",
-          "Namespace": "builtin.aws.s3.aws0094",
-          "Query": "deny",
-          "Resolution": "Define a aws_s3_bucket_public_access_block for the given bucket to control public access policies",
-          "Severity": "LOW",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0094",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0094"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0132",
-          "AVDID": "AVD-AWS-0132",
-          "Title": "S3 encryption should use Customer Managed Keys",
-          "Description": "Encryption using AWS keys provides protection for your S3 buckets. To increase control of the encryption and manage factors like rotation use customer managed keys.",
-          "Message": "Bucket does not encrypt data with a customer managed key.",
-          "Namespace": "builtin.aws.s3.aws0132",
-          "Query": "deny",
-          "Resolution": "Enable encryption using customer managed keys",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0132",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0132"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        }
-      ]
-    }
-  ]
-}
-`
-
-const expectedS3ScanResultWithIgnores = `{
-  "CreatedAt": "2021-08-25T12:20:30.000000005Z",
-  "ArtifactName": "12345678",
-  "ArtifactType": "aws_account",
-  "Metadata": {
-    "ImageConfig": {
-      "architecture": "",
-      "created": "0001-01-01T00:00:00Z",
-      "os": "",
-      "rootfs": {
-        "type": "",
-        "diff_ids": null
-      },
-      "config": {}
-    }
-  },
-  "Results": [
-    {
-      "Target": "",
-      "Class": "config",
-      "Type": "cloud",
-      "MisconfSummary": {
-        "Successes": 1,
-        "Failures": 0
-      },
-      "Misconfigurations": [
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0320",
-          "AVDID": "AVD-AWS-0320",
-          "Title": "S3 DNS Compliant Bucket Names",
-          "Description": "Ensures that S3 buckets have DNS complaint bucket names.",
-          "Namespace": "builtin.aws.s3.aws0320",
-          "Query": "deny",
-          "Resolution": "Recreate S3 bucket to use - instead of . in S3 bucket names",
-          "Severity": "MEDIUM",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0320",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0320"
-          ],
-          "Status": "PASS",
-          "Layer": {},
-          "CauseMetadata": {
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        }
-      ]
-    },
-    {
-      "Target": "arn:aws:s3:::examplebucket",
-      "Class": "config",
-      "Type": "cloud",
-      "MisconfSummary": {
-        "Successes": 0,
-        "Failures": 2
-      },
-      "Misconfigurations": [
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0089",
-          "AVDID": "AVD-AWS-0089",
-          "Title": "S3 Bucket Logging",
-          "Description": "Ensures S3 bucket logging is enabled for S3 buckets",
-          "Message": "Bucket has logging disabled",
-          "Namespace": "builtin.aws.s3.aws0089",
-          "Query": "deny",
-          "Resolution": "Add a logging block to the resource to enable access logging",
-          "Severity": "LOW",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0089",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0089"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0094",
-          "AVDID": "AVD-AWS-0094",
-          "Title": "S3 buckets should each define an aws_s3_bucket_public_access_block",
-          "Description": "The \"block public access\" settings in S3 override individual policies that apply to a given bucket, meaning that all public access can be controlled in one central types for that bucket. It is therefore good practice to define these settings for each bucket in order to clearly define the public access that can be allowed for it.",
-          "Message": "Bucket does not have a corresponding public access block.",
-          "Namespace": "builtin.aws.s3.aws0094",
-          "Query": "deny",
-          "Resolution": "Define a aws_s3_bucket_public_access_block for the given bucket to control public access policies",
-          "Severity": "LOW",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0094",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0094"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        }
-      ]
-    }
-  ]
-}
-`
-
-const expectedCustomScanResult = `{
-  "CreatedAt": "2021-08-25T12:20:30.000000005Z",
-  "ArtifactName": "12345678",
-  "ArtifactType": "aws_account",
-  "Metadata": {
-    "ImageConfig": {
-      "architecture": "",
-      "created": "0001-01-01T00:00:00Z",
-      "os": "",
-      "rootfs": {
-        "type": "",
-        "diff_ids": null
-      },
-      "config": {}
-    }
-  },
-  "Results": [
-    {
-      "Target": "",
-      "Class": "config",
-      "Type": "cloud",
-      "MisconfSummary": {
-        "Successes": 2,
-        "Failures": 1
-      },
-      "Misconfigurations": [
-        {
-          "Type": "AWS",
-          "Title": "Bad input data",
-          "Description": "Just failing rule with input data",
-          "Message": "Rego check resulted in DENY",
-          "Namespace": "user.whatever",
-          "Query": "deny",
-          "Severity": "LOW",
-          "References": [
-            ""
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Provider": "cloud",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0092",
-          "AVDID": "AVD-AWS-0092",
-          "Title": "S3 Buckets not publicly accessible through ACL.",
-          "Description": "Buckets should not have ACLs that allow public access",
-          "Namespace": "builtin.aws.s3.aws0092",
-          "Query": "deny",
-          "Resolution": "Don't use canned ACLs or switch to private acl",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0092",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0092"
-          ],
-          "Status": "PASS",
-          "Layer": {},
-          "CauseMetadata": {
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0320",
-          "AVDID": "AVD-AWS-0320",
-          "Title": "S3 DNS Compliant Bucket Names",
-          "Description": "Ensures that S3 buckets have DNS complaint bucket names.",
-          "Namespace": "builtin.aws.s3.aws0320",
-          "Query": "deny",
-          "Resolution": "Recreate S3 bucket to use - instead of . in S3 bucket names",
-          "Severity": "MEDIUM",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0320",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0320"
-          ],
-          "Status": "PASS",
-          "Layer": {},
-          "CauseMetadata": {
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        }
-      ]
-    },
-    {
-      "Target": "arn:aws:s3:::examplebucket",
-      "Class": "config",
-      "Type": "cloud",
-      "MisconfSummary": {
-        "Successes": 0,
-        "Failures": 9
-      },
-      "Misconfigurations": [
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0086",
-          "AVDID": "AVD-AWS-0086",
-          "Title": "S3 Access block should block public ACL",
-          "Description": "S3 buckets should block public ACLs on buckets and any objects they contain. By blocking, PUTs with fail if the object has any public ACL a.",
-          "Message": "No public access block so not blocking public acls",
-          "Namespace": "builtin.aws.s3.aws0086",
-          "Query": "deny",
-          "Resolution": "Enable blocking any PUT calls with a public ACL specified",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0086",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0086"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0087",
-          "AVDID": "AVD-AWS-0087",
-          "Title": "S3 Access block should block public policy",
-          "Description": "S3 bucket policy should have block public policy to prevent users from putting a policy that enable public access.",
-          "Message": "No public access block so not blocking public policies",
-          "Namespace": "builtin.aws.s3.aws0087",
-          "Query": "deny",
-          "Resolution": "Prevent policies that allow public access being PUT",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0087",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0087"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0088",
-          "AVDID": "AVD-AWS-0088",
-          "Title": "Unencrypted S3 bucket.",
-          "Description": "S3 Buckets should be encrypted to protect the data that is stored within them if access is compromised.",
-          "Message": "Bucket does not have encryption enabled",
-          "Namespace": "builtin.aws.s3.aws0088",
-          "Query": "deny",
-          "Resolution": "Configure bucket encryption",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0088",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0088"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0089",
-          "AVDID": "AVD-AWS-0089",
-          "Title": "S3 Bucket Logging",
-          "Description": "Ensures S3 bucket logging is enabled for S3 buckets",
-          "Message": "Bucket has logging disabled",
-          "Namespace": "builtin.aws.s3.aws0089",
-          "Query": "deny",
-          "Resolution": "Add a logging block to the resource to enable access logging",
-          "Severity": "LOW",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0089",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0089"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0090",
-          "AVDID": "AVD-AWS-0090",
-          "Title": "S3 Data should be versioned",
-          "Description": "Versioning in Amazon S3 is a means of keeping multiple variants of an object in the same bucket.\n\nYou can use the S3 Versioning feature to preserve, retrieve, and restore every version of every object stored in your buckets.\n\nWith versioning you can recover more easily from both unintended user actions and application failures.",
-          "Message": "Bucket does not have versioning enabled",
-          "Namespace": "builtin.aws.s3.aws0090",
-          "Query": "deny",
-          "Resolution": "Enable versioning to protect against accidental/malicious removal or modification",
-          "Severity": "MEDIUM",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0090",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0090"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0091",
-          "AVDID": "AVD-AWS-0091",
-          "Title": "S3 Access Block should Ignore Public Acl",
-          "Description": "S3 buckets should ignore public ACLs on buckets and any objects they contain. By ignoring rather than blocking, PUT calls with public ACLs will still be applied but the ACL will be ignored.",
-          "Message": "No public access block so not blocking public acls",
-          "Namespace": "builtin.aws.s3.aws0091",
-          "Query": "deny",
-          "Resolution": "Enable ignoring the application of public ACLs in PUT calls",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0091",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0091"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0093",
-          "AVDID": "AVD-AWS-0093",
-          "Title": "S3 Access block should restrict public bucket to limit access",
-          "Description": "S3 buckets should restrict public policies for the bucket. By enabling, the restrict_public_buckets, only the bucket owner and AWS Services can access if it has a public policy.",
-          "Message": "No public access block so not restricting public buckets",
-          "Namespace": "builtin.aws.s3.aws0093",
-          "Query": "deny",
-          "Resolution": "Limit the access to public buckets to only the owner or AWS Services (eg; CloudFront)",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0093",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0093"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0094",
-          "AVDID": "AVD-AWS-0094",
-          "Title": "S3 buckets should each define an aws_s3_bucket_public_access_block",
-          "Description": "The \"block public access\" settings in S3 override individual policies that apply to a given bucket, meaning that all public access can be controlled in one central types for that bucket. It is therefore good practice to define these settings for each bucket in order to clearly define the public access that can be allowed for it.",
-          "Message": "Bucket does not have a corresponding public access block.",
-          "Namespace": "builtin.aws.s3.aws0094",
-          "Query": "deny",
-          "Resolution": "Define a aws_s3_bucket_public_access_block for the given bucket to control public access policies",
-          "Severity": "LOW",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0094",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0094"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0132",
-          "AVDID": "AVD-AWS-0132",
-          "Title": "S3 encryption should use Customer Managed Keys",
-          "Description": "Encryption using AWS keys provides protection for your S3 buckets. To increase control of the encryption and manage factors like rotation use customer managed keys.",
-          "Message": "Bucket does not encrypt data with a customer managed key.",
-          "Namespace": "builtin.aws.s3.aws0132",
-          "Query": "deny",
-          "Resolution": "Enable encryption using customer managed keys",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0132",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0132"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        }
-      ]
-    }
-  ]
-}
-`
-
-const expectedS3AndCloudTrailResult = `{
-  "CreatedAt": "2021-08-25T12:20:30.000000005Z",
-  "ArtifactName": "123456789",
-  "ArtifactType": "aws_account",
-  "Metadata": {
-    "ImageConfig": {
-      "architecture": "",
-      "created": "0001-01-01T00:00:00Z",
-      "os": "",
-      "rootfs": {
-        "type": "",
-        "diff_ids": null
-      },
-      "config": {}
-    }
-  },
-  "Results": [
-    {
-      "Target": "",
-      "Class": "config",
-      "Type": "cloud",
-      "MisconfSummary": {
-        "Successes": 5,
-        "Failures": 0
-      },
-      "Misconfigurations": [
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0014",
-          "AVDID": "AVD-AWS-0014",
-          "Title": "Cloudtrail should be enabled in all regions regardless of where your AWS resources are generally homed",
-          "Description": "Activity could be happening in your account in a different region. When creating Cloudtrail in the AWS Management Console the trail is configured by default to be multi-region, this isn't the case with the Terraform resource. Cloudtrail should cover the full AWS account to ensure you can track changes in regions you are not actively operting in.",
-          "Namespace": "builtin.aws.cloudtrail.aws0014",
-          "Query": "deny",
-          "Resolution": "Enable Cloudtrail in all regions",
-          "Severity": "MEDIUM",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0014",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0014"
-          ],
-          "Status": "PASS",
-          "Layer": {},
-          "CauseMetadata": {
-            "Provider": "aws",
-            "Service": "cloudtrail",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0092",
-          "AVDID": "AVD-AWS-0092",
-          "Title": "S3 Buckets not publicly accessible through ACL.",
-          "Description": "Buckets should not have ACLs that allow public access",
-          "Namespace": "builtin.aws.s3.aws0092",
-          "Query": "deny",
-          "Resolution": "Don't use canned ACLs or switch to private acl",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0092",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0092"
-          ],
-          "Status": "PASS",
-          "Layer": {},
-          "CauseMetadata": {
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0161",
-          "AVDID": "AVD-AWS-0161",
-          "Title": "The S3 Bucket backing Cloudtrail should be private",
-          "Description": "CloudTrail logs will be publicly exposed, potentially containing sensitive information. CloudTrail logs a record of every API call made in your account. These log files are stored in an S3 bucket. CIS recommends that the S3 bucket policy, or access control list (ACL), applied to the S3 bucket that CloudTrail logs to prevents public access to the CloudTrail logs. Allowing public access to CloudTrail log content might aid an adversary in identifying weaknesses in the affected account's use or configuration.",
-          "Namespace": "builtin.aws.cloudtrail.aws0161",
-          "Query": "deny",
-          "Resolution": "Restrict public access to the S3 bucket",
-          "Severity": "CRITICAL",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0161",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0161"
-          ],
-          "Status": "PASS",
-          "Layer": {},
-          "CauseMetadata": {
-            "Provider": "aws",
-            "Service": "cloudtrail",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0163",
-          "AVDID": "AVD-AWS-0163",
-          "Title": "You should enable bucket access logging on the CloudTrail S3 bucket.",
-          "Description": "Amazon S3 bucket access logging generates a log that contains access records for each request made to your S3 bucket. An access log record contains details about the request, such as the request type, the resources specified in the request worked, and the time and date the request was processed.\nCIS recommends that you enable bucket access logging on the CloudTrail S3 bucket.\nBy enabling S3 bucket logging on target S3 buckets, you can capture all events that might affect objects in a target bucket. Configuring logs to be placed in a separate bucket enables access to log information, which can be useful in security and incident response workflows.",
-          "Namespace": "builtin.aws.cloudtrail.aws0163",
-          "Query": "deny",
-          "Resolution": "Enable access logging on the bucket",
-          "Severity": "LOW",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0163",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0163"
-          ],
-          "Status": "PASS",
-          "Layer": {},
-          "CauseMetadata": {
-            "Provider": "aws",
-            "Service": "cloudtrail",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0320",
-          "AVDID": "AVD-AWS-0320",
-          "Title": "S3 DNS Compliant Bucket Names",
-          "Description": "Ensures that S3 buckets have DNS complaint bucket names.",
-          "Namespace": "builtin.aws.s3.aws0320",
-          "Query": "deny",
-          "Resolution": "Recreate S3 bucket to use - instead of . in S3 bucket names",
-          "Severity": "MEDIUM",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0320",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0320"
-          ],
-          "Status": "PASS",
-          "Layer": {},
-          "CauseMetadata": {
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        }
-      ]
-    },
-    {
-      "Target": "arn:aws:cloudtrail:us-east-1:12345678:trail/management-events",
-      "Class": "config",
-      "Type": "cloud",
-      "MisconfSummary": {
-        "Successes": 0,
-        "Failures": 3
-      },
-      "Misconfigurations": [
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0015",
-          "AVDID": "AVD-AWS-0015",
-          "Title": "CloudTrail should use Customer managed keys to encrypt the logs",
-          "Description": "Using AWS managed keys does not allow for fine grained control.  Using Customer managed keys provides comprehensive control over cryptographic keys, enabling management of policies, permissions, and rotation, thus enhancing security and compliance measures for sensitive data and systems.",
-          "Message": "CloudTrail does not use a customer managed key to encrypt the logs.",
-          "Namespace": "builtin.aws.cloudtrail.aws0015",
-          "Query": "deny",
-          "Resolution": "Use Customer managed key",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0015",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0015"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:cloudtrail:us-east-1:12345678:trail/management-events",
-            "Provider": "aws",
-            "Service": "cloudtrail",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0016",
-          "AVDID": "AVD-AWS-0016",
-          "Title": "Cloudtrail log validation should be enabled to prevent tampering of log data",
-          "Description": "Illicit activity could be removed from the logs. Log validation should be activated on Cloudtrail logs to prevent the tampering of the underlying data in the S3 bucket. It is feasible that a rogue actor compromising an AWS account might want to modify the log data to remove trace of their actions.",
-          "Message": "Trail does not have log validation enabled.",
-          "Namespace": "builtin.aws.cloudtrail.aws0016",
-          "Query": "deny",
-          "Resolution": "Turn on log validation for Cloudtrail",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0016",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0016"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:cloudtrail:us-east-1:12345678:trail/management-events",
-            "Provider": "aws",
-            "Service": "cloudtrail",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0162",
-          "AVDID": "AVD-AWS-0162",
-          "Title": "CloudTrail logs should be stored in S3 and also sent to CloudWatch Logs",
-          "Description": "Realtime log analysis is not available without enabling CloudWatch logging.\n\nCloudTrail is a web service that records AWS API calls made in a given account. The recorded information includes the identity of the API caller, the time of the API call, the source IP address of the API caller, the request parameters, and the response elements returned by the AWS service.\n\nCloudTrail uses Amazon S3 for log file storage and delivery, so log files are stored durably. In addition to capturing CloudTrail logs in a specified Amazon S3 bucket for long-term analysis, you can perform real-time analysis by configuring CloudTrail to send logs to CloudWatch Logs.\n\nFor a trail that is enabled in all Regions in an account, CloudTrail sends log files from all those Regions to a CloudWatch Logs log group.",
-          "Message": "Trail does not have CloudWatch logging configured",
-          "Namespace": "builtin.aws.cloudtrail.aws0162",
-          "Query": "deny",
-          "Resolution": "Enable logging to CloudWatch",
-          "Severity": "LOW",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0162",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0162"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:cloudtrail:us-east-1:12345678:trail/management-events",
-            "Provider": "aws",
-            "Service": "cloudtrail",
-            "Code": {
-              "Lines": null
-            }
-          }
-        }
-      ]
-    },
-    {
-      "Target": "arn:aws:s3:::examplebucket",
-      "Class": "config",
-      "Type": "cloud",
-      "MisconfSummary": {
-        "Successes": 0,
-        "Failures": 9
-      },
-      "Misconfigurations": [
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0086",
-          "AVDID": "AVD-AWS-0086",
-          "Title": "S3 Access block should block public ACL",
-          "Description": "S3 buckets should block public ACLs on buckets and any objects they contain. By blocking, PUTs with fail if the object has any public ACL a.",
-          "Message": "No public access block so not blocking public acls",
-          "Namespace": "builtin.aws.s3.aws0086",
-          "Query": "deny",
-          "Resolution": "Enable blocking any PUT calls with a public ACL specified",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0086",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0086"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0087",
-          "AVDID": "AVD-AWS-0087",
-          "Title": "S3 Access block should block public policy",
-          "Description": "S3 bucket policy should have block public policy to prevent users from putting a policy that enable public access.",
-          "Message": "No public access block so not blocking public policies",
-          "Namespace": "builtin.aws.s3.aws0087",
-          "Query": "deny",
-          "Resolution": "Prevent policies that allow public access being PUT",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0087",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0087"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0088",
-          "AVDID": "AVD-AWS-0088",
-          "Title": "Unencrypted S3 bucket.",
-          "Description": "S3 Buckets should be encrypted to protect the data that is stored within them if access is compromised.",
-          "Message": "Bucket does not have encryption enabled",
-          "Namespace": "builtin.aws.s3.aws0088",
-          "Query": "deny",
-          "Resolution": "Configure bucket encryption",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0088",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0088"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0089",
-          "AVDID": "AVD-AWS-0089",
-          "Title": "S3 Bucket Logging",
-          "Description": "Ensures S3 bucket logging is enabled for S3 buckets",
-          "Message": "Bucket has logging disabled",
-          "Namespace": "builtin.aws.s3.aws0089",
-          "Query": "deny",
-          "Resolution": "Add a logging block to the resource to enable access logging",
-          "Severity": "LOW",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0089",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0089"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0090",
-          "AVDID": "AVD-AWS-0090",
-          "Title": "S3 Data should be versioned",
-          "Description": "Versioning in Amazon S3 is a means of keeping multiple variants of an object in the same bucket.\n\nYou can use the S3 Versioning feature to preserve, retrieve, and restore every version of every object stored in your buckets.\n\nWith versioning you can recover more easily from both unintended user actions and application failures.",
-          "Message": "Bucket does not have versioning enabled",
-          "Namespace": "builtin.aws.s3.aws0090",
-          "Query": "deny",
-          "Resolution": "Enable versioning to protect against accidental/malicious removal or modification",
-          "Severity": "MEDIUM",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0090",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0090"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0091",
-          "AVDID": "AVD-AWS-0091",
-          "Title": "S3 Access Block should Ignore Public Acl",
-          "Description": "S3 buckets should ignore public ACLs on buckets and any objects they contain. By ignoring rather than blocking, PUT calls with public ACLs will still be applied but the ACL will be ignored.",
-          "Message": "No public access block so not blocking public acls",
-          "Namespace": "builtin.aws.s3.aws0091",
-          "Query": "deny",
-          "Resolution": "Enable ignoring the application of public ACLs in PUT calls",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0091",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0091"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0093",
-          "AVDID": "AVD-AWS-0093",
-          "Title": "S3 Access block should restrict public bucket to limit access",
-          "Description": "S3 buckets should restrict public policies for the bucket. By enabling, the restrict_public_buckets, only the bucket owner and AWS Services can access if it has a public policy.",
-          "Message": "No public access block so not restricting public buckets",
-          "Namespace": "builtin.aws.s3.aws0093",
-          "Query": "deny",
-          "Resolution": "Limit the access to public buckets to only the owner or AWS Services (eg; CloudFront)",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0093",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0093"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0094",
-          "AVDID": "AVD-AWS-0094",
-          "Title": "S3 buckets should each define an aws_s3_bucket_public_access_block",
-          "Description": "The \"block public access\" settings in S3 override individual policies that apply to a given bucket, meaning that all public access can be controlled in one central types for that bucket. It is therefore good practice to define these settings for each bucket in order to clearly define the public access that can be allowed for it.",
-          "Message": "Bucket does not have a corresponding public access block.",
-          "Namespace": "builtin.aws.s3.aws0094",
-          "Query": "deny",
-          "Resolution": "Define a aws_s3_bucket_public_access_block for the given bucket to control public access policies",
-          "Severity": "LOW",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0094",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0094"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        },
-        {
-          "Type": "AWS",
-          "ID": "AVD-AWS-0132",
-          "AVDID": "AVD-AWS-0132",
-          "Title": "S3 encryption should use Customer Managed Keys",
-          "Description": "Encryption using AWS keys provides protection for your S3 buckets. To increase control of the encryption and manage factors like rotation use customer managed keys.",
-          "Message": "Bucket does not encrypt data with a customer managed key.",
-          "Namespace": "builtin.aws.s3.aws0132",
-          "Query": "deny",
-          "Resolution": "Enable encryption using customer managed keys",
-          "Severity": "HIGH",
-          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-aws-0132",
-          "References": [
-            "https://avd.aquasec.com/misconfig/avd-aws-0132"
-          ],
-          "Status": "FAIL",
-          "Layer": {},
-          "CauseMetadata": {
-            "Resource": "arn:aws:s3:::examplebucket",
-            "Provider": "aws",
-            "Service": "s3",
-            "Code": {
-              "Lines": null
-            }
-          }
-        }
-      ]
-    }
-  ]
-}
-`
+const (
+	account = "12345678"
+	region  = "us-east-1"
+)
 
 func Test_Run(t *testing.T) {
-	regoDir := t.TempDir()
 
 	tests := []struct {
-		name         string
-		options      flag.Options
-		want         string
-		expectErr    bool
-		cacheContent string
-		regoPolicy   string
-		allServices  []string
-		inputData    string
-		ignoreFile   string
+		name              string
+		args              []string
+		cacheFile         string
+		supportedServices []string
+		golden            string
+		wantErr           string
 	}{
 		{
 			name: "succeed with cached infra",
-			options: flag.Options{
-				Options: trivyflag.Options{
-					RegoOptions: trivyflag.RegoOptions{SkipCheckUpdate: true},
-					AWSOptions: trivyflag.AWSOptions{
-						Region:   "us-east-1",
-						Services: []string{"s3"},
-						Account:  "12345678",
-					},
-					MisconfOptions: trivyflag.MisconfOptions{IncludeNonFailures: true},
-				},
-				CloudOptions: flag.CloudOptions{
-					MaxCacheAge: time.Hour * 24 * 365 * 100,
-				},
+			args: []string{
+				"--service", "s3",
+				"--include-non-failures",
+				"--format", "json",
 			},
-			cacheContent: "testdata/s3onlycache.json",
-			allServices:  []string{"s3"},
-			want:         expectedS3ScanResult,
+			supportedServices: []string{"s3"},
+			cacheFile:         "s3onlycache.json",
+			golden:            "s3-scan.json.golden",
 		},
 		{
 			name: "custom rego rule with passed results",
-			options: flag.Options{
-				Options: trivyflag.Options{
-					AWSOptions: trivyflag.AWSOptions{
-						Region:   "us-east-1",
-						Services: []string{"s3"},
-						Account:  "12345678",
-					},
-					RegoOptions: trivyflag.RegoOptions{
-						Trace: true,
-						CheckPaths: []string{
-							filepath.Join(regoDir, "policies"),
-						},
-						CheckNamespaces: []string{
-							"user",
-						},
-						DataPaths: []string{
-							filepath.Join(regoDir, "data"),
-						},
-						SkipCheckUpdate: true,
-					},
-					MisconfOptions: trivyflag.MisconfOptions{
-						IncludeNonFailures: true,
-					},
-				},
-				CloudOptions: flag.CloudOptions{
-					MaxCacheAge: time.Hour * 24 * 365 * 100,
-				},
+			args: []string{
+				"--service", "s3",
+				"--include-non-failures",
+				"--config-check", filepath.Join("testdata", "check.rego"),
+				"--check-namespaces", "user",
+				"--config-data", filepath.Join("testdata", "data"),
+				"--format", "json",
 			},
-			regoPolicy: `# METADATA
-# title: Bad input data
-# description: Just failing rule with input data
-# scope: package
-# schemas:
-# - input: schema["input"]
-# custom:
-#   severity: LOW
-#   service: s3
-#   input:
-#     selector:
-#     - type: cloud
-package user.whatever
-import data.settings.DS123.foo
-
-deny {
-	foo == true
-}
-`,
-			inputData: `{
-	"settings": {
-		"DS123": {
-			"foo": true
-		}
-	}
-}`,
-			cacheContent: filepath.Join("testdata", "s3onlycache.json"),
-			allServices:  []string{"s3"},
-			want:         expectedCustomScanResult,
+			supportedServices: []string{"s3"},
+			cacheFile:         "s3onlycache.json",
+			golden:            "custom-scan.json.golden",
 		},
 		{
 			name: "compliance report summary",
-			options: flag.Options{
-				Options: trivyflag.Options{
-					AWSOptions: trivyflag.AWSOptions{
-						Region:   "us-east-1",
-						Services: []string{"s3"},
-						Account:  "12345678",
-					},
-					ReportOptions: trivyflag.ReportOptions{
-						Compliance: spec.ComplianceSpec{
-							Spec: iacTypes.Spec{
-								ID:          "@testdata/example-spec.yaml",
-								Title:       "my-custom-spec",
-								Description: "My fancy spec",
-								Version:     "1.2",
-								Controls: []iacTypes.Control{
-									{
-										ID:          "1.1",
-										Name:        "Unencrypted S3 bucket",
-										Description: "S3 Buckets should be encrypted to protect the data that is stored within them if access is compromised.",
-										Checks: []iacTypes.SpecCheck{
-											{ID: "AVD-AWS-0088"},
-										},
-										Severity: "HIGH",
-									},
-								},
-							},
-						},
-						Format:       "table",
-						ReportFormat: "summary",
-					},
-					RegoOptions: trivyflag.RegoOptions{
-						SkipCheckUpdate: true,
-					},
-				},
-				CloudOptions: flag.CloudOptions{
-					MaxCacheAge: time.Hour * 24 * 365 * 100,
-				},
+			args: []string{
+				"--service", "s3",
+				"--format", "table",
+				"--report", "summary",
+				"--compliance", filepath.Join("@testdata", "example-spec.yaml"),
 			},
-			cacheContent: "testdata/s3onlycache.json",
-			allServices:  []string{"s3"},
-			want: `
-Summary Report for compliance: my-custom-spec
-┌─────┬──────────┬───────────────────────┬────────┬────────┐
-│ ID  │ Severity │     Control Name      │ Status │ Issues │
-├─────┼──────────┼───────────────────────┼────────┼────────┤
-│ 1.1 │   HIGH   │ Unencrypted S3 bucket │  FAIL  │   1    │
-└─────┴──────────┴───────────────────────┴────────┴────────┘
-`,
+			supportedServices: []string{"s3"},
+			cacheFile:         "s3onlycache.json",
+			golden:            "compliance-report-summary.golden",
 		},
 		{
 			name: "scan an unsupported service",
-			options: flag.Options{
-				Options: trivyflag.Options{
-					RegoOptions: trivyflag.RegoOptions{SkipCheckUpdate: true},
-					AWSOptions: trivyflag.AWSOptions{
-						Region:   "us-east-1",
-						Account:  "123456789",
-						Services: []string{"theultimateservice"},
-					},
-					MisconfOptions: trivyflag.MisconfOptions{IncludeNonFailures: true},
-				},
-				CloudOptions: flag.CloudOptions{
-					MaxCacheAge: time.Hour * 24 * 365 * 100,
-				},
+			args: []string{
+				"--service", "theultimateservice",
+				"--format", "json",
 			},
-			cacheContent: "testdata/s3onlycache.json",
-			expectErr:    true,
+			wantErr: `service 'theultimateservice' is not currently supported`,
 		},
 		{
-			name: "scan every service",
-			options: flag.Options{
-				Options: trivyflag.Options{
-					RegoOptions: trivyflag.RegoOptions{SkipCheckUpdate: true},
-					AWSOptions: trivyflag.AWSOptions{
-						Region:  "us-east-1",
-						Account: "123456789",
-					},
-					MisconfOptions: trivyflag.MisconfOptions{IncludeNonFailures: true},
-				},
-				CloudOptions: flag.CloudOptions{
-					MaxCacheAge: time.Hour * 24 * 365 * 100,
-				},
+			name: "scan all supported services",
+			args: []string{
+				"--include-non-failures",
+				"--format", "json",
 			},
-			cacheContent: "testdata/s3andcloudtrailcache.json",
-			allServices: []string{
-				"s3",
-				"cloudtrail",
-			},
-			want: expectedS3AndCloudTrailResult,
+			supportedServices: []string{"s3", "cloudtrail"},
+			cacheFile:         "s3andcloudtrailcache.json",
+			golden:            "s3-cloud-trail-scan.json.golden",
 		},
 		{
 			name: "skip certain services and include specific services",
-			options: flag.Options{
-				Options: trivyflag.Options{
-					RegoOptions: trivyflag.RegoOptions{SkipCheckUpdate: true},
-					AWSOptions: trivyflag.AWSOptions{
-						Region:       "us-east-1",
-						Services:     []string{"s3"},
-						SkipServices: []string{"cloudtrail"},
-						Account:      "123456789",
-					},
-					MisconfOptions: trivyflag.MisconfOptions{IncludeNonFailures: true},
-				},
-				CloudOptions: flag.CloudOptions{
-					MaxCacheAge: time.Hour * 24 * 365 * 100,
-				},
+			args: []string{
+				"--service", "s3",
+				"--skip-service", "cloudtrail",
+				"--include-non-failures",
+				"--format", "json",
 			},
-			cacheContent: "testdata/s3andcloudtrailcache.json",
-			allServices: []string{
-				"s3",
-				"cloudtrail",
-			},
+			supportedServices: []string{"s3", "cloudtrail"},
+			cacheFile:         "s3andcloudtrailcache.json",
 			// we skip cloudtrail but still expect results from it as it is cached
-			want: expectedS3AndCloudTrailResult,
+			golden: "s3-cloud-trail-scan.json.golden",
 		},
 		{
 			name: "only skip certain services but scan the rest",
-			options: flag.Options{
-				Options: trivyflag.Options{
-					RegoOptions: trivyflag.RegoOptions{SkipCheckUpdate: true},
-					AWSOptions: trivyflag.AWSOptions{
-						Region: "us-east-1",
-						SkipServices: []string{
-							"cloudtrail",
-							"iam",
-						},
-						Account: "12345678",
-					},
-					MisconfOptions: trivyflag.MisconfOptions{IncludeNonFailures: true},
-				},
-				CloudOptions: flag.CloudOptions{
-					MaxCacheAge: time.Hour * 24 * 365 * 100,
-				},
+			args: []string{
+				"--skip-service", "cloudtrail,iam",
+				"--include-non-failures",
+				"--format", "json",
 			},
-			allServices: []string{
-				"s3",
-				"cloudtrail",
-				"iam",
-			},
-			cacheContent: "testdata/s3onlycache.json",
-			want:         expectedS3ScanResult,
+			supportedServices: []string{"s3", "cloudtrail", "iam"},
+			cacheFile:         "s3onlycache.json",
+			golden:            "s3-scan.json.golden",
 		},
 		{
 			name: "fail - service specified to both include and exclude",
-			options: flag.Options{
-				Options: trivyflag.Options{
-					RegoOptions: trivyflag.RegoOptions{SkipCheckUpdate: true},
-					AWSOptions: trivyflag.AWSOptions{
-						Region:       "us-east-1",
-						Services:     []string{"s3"},
-						SkipServices: []string{"s3"},
-						Account:      "123456789",
-					},
-					MisconfOptions: trivyflag.MisconfOptions{IncludeNonFailures: true},
-				},
-				CloudOptions: flag.CloudOptions{
-					MaxCacheAge: time.Hour * 24 * 365 * 100,
-				},
+			args: []string{
+				"--service", "s3",
+				"--skip-service", "s3",
+				"--include-non-failures",
+				"--format", "json",
 			},
-			cacheContent: "testdata/s3andcloudtrailcache.json",
-			expectErr:    true,
+			cacheFile: "s3andcloudtrailcache.json",
+			wantErr:   "service: s3 specified to both skip and include",
 		},
 		{
 			name: "ignore findings with .trivyignore",
-			options: flag.Options{
-				Options: trivyflag.Options{
-					RegoOptions: trivyflag.RegoOptions{SkipCheckUpdate: true},
-					AWSOptions: trivyflag.AWSOptions{
-						Region:   "us-east-1",
-						Services: []string{"s3"},
-						Account:  "12345678",
-					},
-					MisconfOptions: trivyflag.MisconfOptions{IncludeNonFailures: true},
-				},
-				CloudOptions: flag.CloudOptions{
-					MaxCacheAge: time.Hour * 24 * 365 * 100,
-				},
+			args: []string{
+				"--include-non-failures",
+				"--format", "json",
+				"--ignorefile", filepath.Join("testdata", ".trivyignore"),
 			},
-			cacheContent: "testdata/s3onlycache.json",
-			allServices:  []string{"s3"},
-			ignoreFile:   "testdata/.trivyignore",
-			want:         expectedS3ScanResultWithIgnores,
+			supportedServices: []string{"s3"},
+			cacheFile:         "s3onlycache.json",
+			golden:            "s3-scan-with-ignores.json.golden",
 		},
 	}
 
-	ctx := clock.With(context.Background(), time.Date(2021, 8, 25, 12, 20, 30, 5, time.UTC))
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			if test.allServices != nil {
-				oldAllSupportedServicesFunc := allSupportedServicesFunc
-				allSupportedServicesFunc = func() []string {
-					return test.allServices
+	cacheDir := t.TempDir()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.supportedServices != nil {
+				oldAllSupportedServicesFunc := commands.AllSupportedServicesFunc
+				commands.AllSupportedServicesFunc = func() []string {
+					return tt.supportedServices
 				}
 				defer func() {
-					allSupportedServicesFunc = oldAllSupportedServicesFunc
+					commands.AllSupportedServicesFunc = oldAllSupportedServicesFunc
 				}()
 			}
 
-			output := bytes.NewBuffer(nil)
-			test.options.SetOutputWriter(output)
-			test.options.Debug = true
-			test.options.SkipCheckUpdate = true
-			test.options.GlobalOptions.Timeout = time.Minute
-			if test.options.Format == "" {
-				test.options.Format = "json"
-			}
-			test.options.Severities = []dbTypes.Severity{
-				dbTypes.SeverityUnknown,
-				dbTypes.SeverityLow,
-				dbTypes.SeverityMedium,
-				dbTypes.SeverityHigh,
-				dbTypes.SeverityCritical,
+			outputFile := filepath.Join(t.TempDir(), "output")
+
+			args := []string{
+				"--region", region,
+				"--account", account,
+				"--skip-check-update",
+				"--quiet",
+				"--timeout", time.Minute.String(),
+				"--cache-dir", cacheDir,
+				"--max-cache-age", "876000h",
+				"--output", outputFile,
 			}
 
-			if test.regoPolicy != "" {
-				require.NoError(t, os.MkdirAll(filepath.Join(regoDir, "policies"), 0755))
-				require.NoError(t, os.WriteFile(filepath.Join(regoDir, "policies", "user.rego"), []byte(test.regoPolicy), 0600))
-			}
+			args = append(args, tt.args...)
 
-			if test.inputData != "" {
-				require.NoError(t, os.MkdirAll(filepath.Join(regoDir, "data"), 0755))
-				require.NoError(t, os.WriteFile(filepath.Join(regoDir, "data", "data.json"), []byte(test.inputData), 0600))
-			}
-
-			if test.cacheContent != "" {
-				cacheRoot := t.TempDir()
-				test.options.CacheDir = cacheRoot
-				cacheFile := filepath.Join(cacheRoot, "cloud", "aws", test.options.Account, test.options.Region, "data.json")
+			if tt.cacheFile != "" {
+				cacheFile := filepath.Join(cacheDir, "cloud", "aws", account, region, "data.json")
 				require.NoError(t, os.MkdirAll(filepath.Dir(cacheFile), 0700))
 
-				cacheData, err := os.ReadFile(test.cacheContent)
-				require.NoError(t, err, test.name)
-
+				cacheData, err := os.ReadFile(filepath.Join("testdata", tt.cacheFile))
+				require.NoError(t, err)
 				require.NoError(t, os.WriteFile(cacheFile, cacheData, 0600))
 			}
 
-			if test.ignoreFile != "" {
-				test.options.ReportOptions.IgnoreFile = test.ignoreFile
-			}
+			err := run(args)
 
-			err := Run(ctx, test.options)
-			if test.expectErr {
-				assert.Error(t, err)
+			if tt.wantErr != "" {
+				assert.ErrorContains(t, err, tt.wantErr)
 				return
 			}
 			assert.NoError(t, err)
-			assert.Equal(t, test.want, output.String())
+
+			want, err := os.ReadFile(filepath.Join("testdata", tt.golden))
+			require.NoError(t, err)
+
+			out, err := os.ReadFile(outputFile)
+			require.NoError(t, err)
+
+			assert.Equal(t, normalizeNewlines(string(want)), normalizeNewlines(string(out)))
 		})
 	}
+}
+
+func run(args []string) error {
+	defer viper.Reset()
+
+	ctx := clock.With(context.Background(), time.Date(2021, 8, 25, 12, 20, 30, 5, time.UTC))
+
+	app := commands.NewCmd()
+	app.SetOut(io.Discard)
+	app.SetArgs(args)
+
+	// Run trivy-aws
+	return app.ExecuteContext(ctx)
+}
+
+func normalizeNewlines(input string) string {
+	return strings.ReplaceAll(input, "\r\n", "\n")
 }
