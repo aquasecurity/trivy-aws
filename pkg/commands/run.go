@@ -24,7 +24,7 @@ const (
 	ProviderAWS = "AWS"
 )
 
-var allSupportedServicesFunc = awsScanner.AllSupportedServices
+var AllSupportedServicesFunc = awsScanner.AllSupportedServices
 
 func getAccountIDAndRegion(ctx context.Context, region, endpoint string) (string, string, error) {
 	log.DebugContext(ctx, "Looking for AWS credentials provider...")
@@ -102,10 +102,10 @@ func filterServices(ctx context.Context, opt *flag.Options) error {
 	switch {
 	case len(opt.Services) == 0 && len(opt.SkipServices) == 0:
 		log.DebugContext(ctx, "No service(s) specified, scanning all services...")
-		opt.Services = allSupportedServicesFunc()
+		opt.Services = AllSupportedServicesFunc()
 	case len(opt.SkipServices) > 0:
 		log.DebugContext(ctx, "Excluding services", log.Any("services", opt.SkipServices))
-		for _, s := range allSupportedServicesFunc() {
+		for _, s := range AllSupportedServicesFunc() {
 			if slices.Contains(opt.SkipServices, s) {
 				continue
 			}
@@ -118,7 +118,7 @@ func filterServices(ctx context.Context, opt *flag.Options) error {
 			log.String("services", strings.Join(opt.Services, ", ")))
 		for _, service := range opt.Services {
 			var found bool
-			supported := allSupportedServicesFunc()
+			supported := AllSupportedServicesFunc()
 			for _, allowed := range supported {
 				if allowed == service {
 					found = true

@@ -23,6 +23,12 @@ func (f *Flags) Bind(cmd *cobra.Command) error {
 		return xerrors.Errorf("%w", err)
 	}
 
+	for _, ff := range f.CloudFlagGroup.Flags() {
+		if err := ff.Bind(cmd); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

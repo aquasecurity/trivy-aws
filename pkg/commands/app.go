@@ -16,16 +16,18 @@ import (
 	"github.com/aquasecurity/trivy-aws/pkg/scanner"
 	trivyflag "github.com/aquasecurity/trivy/pkg/flag"
 	"github.com/aquasecurity/trivy/pkg/log"
-	"github.com/aquasecurity/trivy/pkg/types"
+	trivyTypes "github.com/aquasecurity/trivy/pkg/types"
 )
 
 func NewCmd() *cobra.Command {
+
+	trivyTypes.SupportedCompliances = []trivyTypes.Compliance{
+		trivyTypes.ComplianceAWSCIS12,
+		trivyTypes.ComplianceAWSCIS14,
+	}
+
 	reportFlagGroup := trivyflag.NewReportFlagGroup()
 	compliance := trivyflag.ComplianceFlag
-	compliance.Values = []string{
-		types.ComplianceAWSCIS12,
-		types.ComplianceAWSCIS14,
-	}
 	reportFlagGroup.Compliance = &compliance // override usage as the accepted values differ for each subcommand.
 	reportFlagGroup.ExitOnEOL = nil          // disable '--exit-on-eol'
 	reportFlagGroup.ShowSuppressed = nil     // disable '--show-suppressed'

@@ -1,6 +1,6 @@
 {
   "CreatedAt": "2021-08-25T12:20:30.000000005Z",
-  "ArtifactName": "123456789",
+  "ArtifactName": "12345678",
   "ArtifactType": "aws_account",
   "Metadata": {
     "ImageConfig": {
