@@ -26,10 +26,10 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/docdb v1.40.0
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.38.1
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.198.1
-	github.com/aws/aws-sdk-go-v2/service/ecr v1.36.8
+	github.com/aws/aws-sdk-go-v2/service/ecr v1.38.0
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.53.1
 	github.com/aws/aws-sdk-go-v2/service/efs v1.34.2
-	github.com/aws/aws-sdk-go-v2/service/eks v1.55.0
+	github.com/aws/aws-sdk-go-v2/service/eks v1.56.0
 	github.com/aws/aws-sdk-go-v2/service/elasticache v1.44.2
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.43.2
 	github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.32.8
@@ -41,7 +41,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.69.2
 	github.com/aws/aws-sdk-go-v2/service/mq v1.27.9
 	github.com/aws/aws-sdk-go-v2/service/neptune v1.35.7
-	github.com/aws/aws-sdk-go-v2/service/rds v1.93.1
+	github.com/aws/aws-sdk-go-v2/service/rds v1.93.2
 	github.com/aws/aws-sdk-go-v2/service/redshift v1.53.1
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.71.1
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.34.8
