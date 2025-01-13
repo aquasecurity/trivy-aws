@@ -53,8 +53,8 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
-	github.com/testcontainers/testcontainers-go v0.34.0
-	github.com/testcontainers/testcontainers-go/modules/localstack v0.34.0
+	github.com/testcontainers/testcontainers-go v0.35.0
+	github.com/testcontainers/testcontainers-go/modules/localstack v0.35.0
 	golang.org/x/term v0.28.0
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028
 )
