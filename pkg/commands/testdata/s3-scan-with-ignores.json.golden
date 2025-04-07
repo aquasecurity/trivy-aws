@@ -45,7 +45,8 @@
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         }
       ]
@@ -82,7 +83,8 @@
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -108,7 +110,8 @@
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         }
       ]

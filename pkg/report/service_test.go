@@ -201,7 +201,8 @@ Scan Overview for AWS Account
             "Service": "ec2",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         }
       ]
@@ -236,7 +237,8 @@ Scan Overview for AWS Account
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         }
       ]
@@ -271,7 +273,8 @@ Scan Overview for AWS Account
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -295,7 +298,8 @@ Scan Overview for AWS Account
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         }
       ]

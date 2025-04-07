@@ -26,7 +26,7 @@ test-no-localstack:
 
 .PHONY: quality
 quality:
-	which golangci-lint || go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.61.0
+	which golangci-lint || go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.2
 	golangci-lint run --timeout 3m --verbose
 
 .PHONY: update-aws-deps

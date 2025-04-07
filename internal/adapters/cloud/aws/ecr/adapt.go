@@ -3,8 +3,8 @@ package ecr
 import (
 	ecrapi "github.com/aws/aws-sdk-go-v2/service/ecr"
 	"github.com/aws/aws-sdk-go-v2/service/ecr/types"
-	"github.com/liamg/iamgo"
 
+	"github.com/aquasecurity/iamgo"
 	"github.com/aquasecurity/trivy-aws/internal/adapters/cloud/aws"
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
 	"github.com/aquasecurity/trivy/pkg/iac/providers/aws/ecr"

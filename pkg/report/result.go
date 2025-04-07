@@ -1,12 +1,12 @@
 package report
 
 import (
-	"fmt"
+	"bytes"
 	"io"
 
 	"github.com/aquasecurity/tml"
 	dbTypes "github.com/aquasecurity/trivy-db/pkg/types"
-	renderer "github.com/aquasecurity/trivy/pkg/report/table"
+	"github.com/aquasecurity/trivy/pkg/report/table"
 	"github.com/aquasecurity/trivy/pkg/types"
 )
 
@@ -15,6 +15,7 @@ func writeResultsForARN(report *Report, results types.Results, output io.Writer,
 	// render scan title
 	_ = tml.Fprintf(output, "\n<bold>Results for '%s' (%s Account %s)</bold>\n\n", arn, report.Provider, report.AccountID)
 
+	var buf bytes.Buffer
 	for _, result := range results {
 		var filtered []types.DetectedMisconfiguration
 		for _, misconfiguration := range result.Misconfigurations {
@@ -26,10 +27,14 @@ func writeResultsForARN(report *Report, results types.Results, output io.Writer,
 			}
 			filtered = append(filtered, misconfiguration)
 		}
+
 		if len(filtered) > 0 {
-			_, _ = fmt.Fprint(output, renderer.NewMisconfigRenderer(result, severities, false, false, true).Render())
+			renderer := table.NewMisconfigRenderer(&buf, severities, false, false, true, nil)
+			renderer.Render(result)
 		}
 	}
+
+	_, _ = buf.WriteTo(output)
 
 	return nil
 }
