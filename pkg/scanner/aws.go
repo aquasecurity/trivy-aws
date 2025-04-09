@@ -18,6 +18,7 @@ import (
 	"github.com/aquasecurity/trivy/pkg/iac/state"
 	"github.com/aquasecurity/trivy/pkg/log"
 	"github.com/aquasecurity/trivy/pkg/misconf"
+	"github.com/aquasecurity/trivy/pkg/policy"
 )
 
 type AWSScanner struct {
@@ -32,9 +33,7 @@ func (s *AWSScanner) Scan(ctx context.Context, option flag.Options) (scan.Result
 	awsCache := cache.New(option.CacheDir, option.MaxCacheAge, option.Account, option.Region)
 	included, missing := awsCache.ListServices(option.Services)
 
-	scannerOpts := []options.ScannerOption{
-		options.ScannerWithRegoOnly(true),
-	}
+	var scannerOpts []options.ScannerOption
 
 	noProgress := option.Quiet || option.NoProgress
 	if !noProgress {
@@ -66,20 +65,20 @@ func (s *AWSScanner) Scan(ctx context.Context, option flag.Options) (scan.Result
 	}
 
 	var (
-		disableEmbedded       bool
-		policyPaths           []string
-		downloadedPolicyPaths []string
-		err                   error
+		disableEmbedded bool
+		policyPaths     []string
+		err             error
 	)
 
-	downloadedPolicyPaths, err = operation.InitBuiltinChecks(context.Background(), option.CacheDir, option.Quiet, option.SkipCheckUpdate, option.MisconfOptions.ChecksBundleRepository, option.RegistryOpts())
+	c, _ := policy.NewClient(option.CacheDir, option.Quiet, option.MisconfOptions.ChecksBundleRepository)
+	downloadedPolicyPaths, err := operation.InitBuiltinChecks(context.Background(), c, option.SkipCheckUpdate, option.RegistryOpts())
 	if err != nil {
 		if !option.SkipCheckUpdate {
 			log.Errorf("Falling back to embedded policies: %s", err)
 		}
 	} else {
 		log.Debug("Policies successfully loaded from disk")
-		policyPaths = append(policyPaths, downloadedPolicyPaths...)
+		policyPaths = append(policyPaths, downloadedPolicyPaths)
 		disableEmbedded = true
 	}
 
@@ -111,7 +110,7 @@ func (s *AWSScanner) Scan(ctx context.Context, option flag.Options) (scan.Result
 	scannerOpts = addPolicyNamespaces(option.RegoOptions.CheckNamespaces, scannerOpts)
 
 	if option.Compliance.Spec.ID == "" {
-		scannerOpts = append(scannerOpts, options.ScannerWithFrameworks(
+		scannerOpts = append(scannerOpts, rego.WithFrameworks(
 			framework.Default,
 			framework.CIS_AWS_1_2),
 		)

@@ -1,6 +1,8 @@
 package ecs
 
 import (
+	"strconv"
+
 	ecsapi "github.com/aws/aws-sdk-go-v2/service/ecs"
 
 	"github.com/aquasecurity/trivy-aws/pkg/concurrency"
@@ -61,8 +63,8 @@ func (a *adapter) adaptTaskDefinition(arn string) (*ecs.TaskDefinition, error) {
 
 		var name string
 		var image string
-		var cpu int
-		var memory int
+		var cpu string
+		var memory string
 		var essential bool
 		var envVars []ecs.EnvVar
 
@@ -72,9 +74,9 @@ func (a *adapter) adaptTaskDefinition(arn string) (*ecs.TaskDefinition, error) {
 		if apiContainer.Image != nil {
 			image = *apiContainer.Image
 		}
-		cpu = int(apiContainer.Cpu)
+		cpu = strconv.Itoa(int(apiContainer.Cpu))
 		if apiContainer.Memory != nil {
-			memory = int(*apiContainer.Memory)
+			memory = strconv.Itoa(int(*apiContainer.Memory))
 		}
 		if apiContainer.Essential != nil {
 			essential = *apiContainer.Essential
@@ -82,8 +84,8 @@ func (a *adapter) adaptTaskDefinition(arn string) (*ecs.TaskDefinition, error) {
 
 		for _, env := range apiContainer.Environment {
 			envVars = append(envVars, ecs.EnvVar{
-				Name:  *env.Name,
-				Value: *env.Value,
+				Name:  trivyTypes.String(*env.Name, metadata),
+				Value: trivyTypes.String(*env.Value, metadata),
 			})
 		}
 
@@ -91,8 +93,8 @@ func (a *adapter) adaptTaskDefinition(arn string) (*ecs.TaskDefinition, error) {
 			Metadata:     metadata,
 			Name:         trivyTypes.String(name, metadata),
 			Image:        trivyTypes.String(image, metadata),
-			CPU:          trivyTypes.Int(cpu, metadata),
-			Memory:       trivyTypes.Int(memory, metadata),
+			CPU:          trivyTypes.String(cpu, metadata),
+			Memory:       trivyTypes.String(memory, metadata),
 			Essential:    trivyTypes.Bool(essential, metadata),
 			PortMappings: portMappings,
 			Environment:  envVars,

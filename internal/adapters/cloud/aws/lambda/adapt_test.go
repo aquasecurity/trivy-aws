@@ -1,7 +1,9 @@
 package lambda
 
 import (
+	"cmp"
 	"fmt"
+	"slices"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -76,6 +78,8 @@ func Test_Lambda(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tt.details.tracing = cmp.Or(tt.details.tracing, lambda.TracingModePassThrough)
+
 			funcARN := bootstrapFunction(t, ra, tt.details)
 			defer removeFunction(t, ra, funcARN)
 
@@ -87,21 +91,14 @@ func Test_Lambda(t *testing.T) {
 			require.Len(t, testState.AWS.Lambda.Functions, 1)
 			got := testState.AWS.Lambda.Functions[0]
 
-			if tt.details.tracing == "" {
-				tt.details.tracing = lambda.TracingModePassThrough
-			}
 			assert.Equal(t, tt.details.tracing, got.Tracing.Mode.Value())
-
 			assert.Equal(t, len(tt.details.permissions), len(got.Permissions))
 
 			for _, expectedPermission := range tt.details.permissions {
-				var found bool
-				for _, actualPermission := range got.Permissions {
-					if actualPermission.Principal.Value() == expectedPermission.principal && actualPermission.SourceARN.Value() == expectedPermission.source {
-						found = true
-						break
-					}
-				}
+				found := slices.ContainsFunc(got.Permissions, func(perm lambda.Permission) bool {
+					return perm.Principal.Value() == expectedPermission.principal &&
+						perm.SourceARN.Value() == expectedPermission.source
+				})
 				assert.True(t, found)
 			}
 		})
@@ -127,14 +124,13 @@ func bootstrapFunction(t *testing.T, ra *aws.RootAdapter, spec functionDetails) 
 	require.NoError(t, err)
 
 	for i, permission := range spec.permissions {
-		perm := permission
 		statementID := fmt.Sprintf("%d", i)
 		_, err = api.AddPermission(ra.Context(), &lambdaapi.AddPermissionInput{
-			Action:       &perm.action,
+			Action:       &permission.action,
 			FunctionName: &spec.name,
-			Principal:    &perm.principal,
+			Principal:    &permission.principal,
 			StatementId:  &statementID,
-			SourceArn:    &perm.source,
+			SourceArn:    &permission.source,
 		})
 		require.NoError(t, err)
 	}

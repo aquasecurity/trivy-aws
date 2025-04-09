@@ -12,7 +12,7 @@ linters:
     - durationcheck
     - errname
     - errorlint
-    - exportloopref
+    - copyloopvar
     - goimports
     - gocritic
     - gosec

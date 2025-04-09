@@ -45,7 +45,8 @@
             "Service": "cloudtrail",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -69,7 +70,8 @@
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -93,7 +95,8 @@
             "Service": "cloudtrail",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -117,7 +120,8 @@
             "Service": "cloudtrail",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -141,7 +145,8 @@
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         }
       ]
@@ -178,7 +183,8 @@
             "Service": "cloudtrail",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -204,7 +210,8 @@
             "Service": "cloudtrail",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -230,7 +237,8 @@
             "Service": "cloudtrail",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         }
       ]
@@ -267,7 +275,8 @@
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -293,7 +302,8 @@
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -319,7 +329,8 @@
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -345,7 +356,8 @@
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -371,14 +383,15 @@
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
           "Type": "AWS",
           "ID": "AVD-AWS-0091",
           "AVDID": "AVD-AWS-0091",
-          "Title": "S3 Access Block should Ignore Public Acl",
+          "Title": "S3 Access Block should Ignore Public ACL",
           "Description": "S3 buckets should ignore public ACLs on buckets and any objects they contain. By ignoring rather than blocking, PUT calls with public ACLs will still be applied but the ACL will be ignored.",
           "Message": "No public access block so not blocking public acls",
           "Namespace": "builtin.aws.s3.aws0091",
@@ -397,7 +410,8 @@
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -423,7 +437,8 @@
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -449,7 +464,8 @@
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         },
         {
@@ -475,7 +491,8 @@
             "Service": "s3",
             "Code": {
               "Lines": null
-            }
+            },
+            "RenderedCause": {}
           }
         }
       ]

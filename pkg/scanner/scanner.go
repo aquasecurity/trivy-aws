@@ -132,34 +132,13 @@ func (s *Scanner) Scan(ctx context.Context, cloudState *state.State) (results sc
 		return nil, fmt.Errorf("cloud state is nil")
 	}
 
-	// evaluate go rules
-	if !s.regoOnly {
-		for _, rule := range s.getRules() {
-			select {
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			default:
-			}
-
-			if rule.GetRule().RegoPackage != "" {
-				continue
-			}
-			ruleResults := rule.Evaluate(cloudState)
-			if len(ruleResults) > 0 {
-				s.logger.Debug("Found results",
-					log.Int("count", len(ruleResults)), log.String("check", rule.GetRule().AVDID))
-				results = append(results, ruleResults...)
-			}
-		}
-	}
-
 	// evaluate rego rules
 	regoScanner, err := s.initRegoScanner()
 	if err != nil {
 		return nil, err
 	}
 
-	regoResults, err := regoScanner.ScanInput(ctx, rego.Input{
+	regoResults, err := regoScanner.ScanInput(ctx, types.SourceCloud, rego.Input{
 		Contents: cloudState.ToRego(),
 	})
 	if err != nil {
@@ -192,7 +171,7 @@ func (s *Scanner) initRegoScanner() (*rego.Scanner, error) {
 		fsys = os.DirFS(homeDrive + "\\")
 	}
 
-	regoScanner := rego.NewScanner(types.SourceCloud, s.options...)
+	regoScanner := rego.NewScanner(s.options...)
 	if err := regoScanner.LoadPolicies(fsys); err != nil {
 		return nil, err
 	}

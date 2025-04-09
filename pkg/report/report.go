@@ -12,7 +12,7 @@ import (
 	"github.com/aquasecurity/tml"
 	"github.com/aquasecurity/trivy/pkg/clock"
 	cr "github.com/aquasecurity/trivy/pkg/compliance/report"
-	"github.com/aquasecurity/trivy/pkg/fanal/artifact"
+	ftypes "github.com/aquasecurity/trivy/pkg/fanal/types"
 	"github.com/aquasecurity/trivy/pkg/flag"
 	"github.com/aquasecurity/trivy/pkg/iac/scan"
 	pkgReport "github.com/aquasecurity/trivy/pkg/report"
@@ -93,7 +93,7 @@ func Write(ctx context.Context, rep *Report, opt flag.Options, fromCache bool) e
 	base := types.Report{
 		CreatedAt:    clock.Now(ctx),
 		ArtifactName: rep.AccountID,
-		ArtifactType: artifact.TypeAWSAccount,
+		ArtifactType: ftypes.TypeAWSAccount,
 		Results:      filtered,
 	}
 

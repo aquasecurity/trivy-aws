@@ -92,8 +92,6 @@ func Test_AWSInputSelectors(t *testing.T) {
 			srcFS: createFS(map[string]string{
 				"policies/rds_policy.rego": `# METADATA
 # title: "RDS Publicly Accessible"
-# custom:
-#   input:
 package builtin.aws.rds.aws0999
 
 deny[res] {
@@ -102,8 +100,6 @@ deny[res] {
 `,
 				"policies/cloudtrail_policy.rego": `# METADATA
 # title: "CloudTrail Bucket Delete Policy"
-# custom:
-#   input:
 package builtin.aws.cloudtrail.aws0888
 
 deny[res] {
@@ -131,10 +127,6 @@ deny[res] {
 			srcFS: createFS(map[string]string{
 				"policies/rds_policy.rego": `# METADATA
 # title: "RDS Publicly Accessible"
-# custom:
-#   input:
-#     selector:
-        
 package builtin.aws.rds.aws0999
 
 deny[res] {
@@ -143,9 +135,6 @@ deny[res] {
 `,
 				"policies/cloudtrail_policy.rego": `# METADATA
 # title: "CloudTrail Bucket Delete Policy"
-# custom:
-#   input:
-#     selector:
 package builtin.aws.cloudtrail.aws0888
 
 deny[res] {
@@ -255,8 +244,6 @@ deny[res] {
 #   input:
 #     selector:
 #     - type: cloud
-#       subtypes:
-
 package builtin.aws.rds.aws0999
 
 deny[res] {
@@ -269,7 +256,6 @@ deny[res] {
 #   input:
 #     selector:
 #     - type: cloud
-#       subtypes:
 package builtin.aws.cloudtrail.aws0888
 
 deny[res] {
@@ -530,7 +516,6 @@ deny[res] {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			var scannerOpts []options.ScannerOption
 			if tc.dataFS != nil {
@@ -538,7 +523,6 @@ deny[res] {
 			}
 			scannerOpts = append(scannerOpts, rego.WithEmbeddedPolicies(false))
 			scannerOpts = append(scannerOpts, rego.WithPolicyFilesystem(tc.srcFS))
-			scannerOpts = append(scannerOpts, options.ScannerWithRegoOnly(true))
 			scannerOpts = append(scannerOpts, rego.WithPolicyDirs("policies"))
 			scanner := New(scannerOpts...)
 
