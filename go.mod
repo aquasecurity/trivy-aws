@@ -13,48 +13,48 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.36.3
 	github.com/aws/aws-sdk-go-v2/config v1.29.13
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.66
-	github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.38.1
-	github.com/aws/aws-sdk-go-v2/service/apigateway v1.29.1
-	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.26.1
-	github.com/aws/aws-sdk-go-v2/service/athena v1.50.1
-	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.45.2
-	github.com/aws/aws-sdk-go-v2/service/cloudtrail v1.48.2
-	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.44.1
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.46.1
-	github.com/aws/aws-sdk-go-v2/service/codebuild v1.55.1
-	github.com/aws/aws-sdk-go-v2/service/docdb v1.41.1
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.41.1
+	github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.38.3
+	github.com/aws/aws-sdk-go-v2/service/apigateway v1.30.1
+	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.27.1
+	github.com/aws/aws-sdk-go-v2/service/athena v1.50.2
+	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.45.3
+	github.com/aws/aws-sdk-go-v2/service/cloudtrail v1.48.3
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.44.2
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.47.2
+	github.com/aws/aws-sdk-go-v2/service/codebuild v1.59.0
+	github.com/aws/aws-sdk-go-v2/service/docdb v1.41.2
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.42.1
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.211.2
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.43.2
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.54.1
-	github.com/aws/aws-sdk-go-v2/service/efs v1.35.1
-	github.com/aws/aws-sdk-go-v2/service/eks v1.60.1
-	github.com/aws/aws-sdk-go-v2/service/elasticache v1.45.1
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.45.0
-	github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.33.1
-	github.com/aws/aws-sdk-go-v2/service/emr v1.48.1
-	github.com/aws/aws-sdk-go-v2/service/iam v1.40.1
-	github.com/aws/aws-sdk-go-v2/service/kafka v1.39.1
-	github.com/aws/aws-sdk-go-v2/service/kinesis v1.33.1
-	github.com/aws/aws-sdk-go-v2/service/kms v1.38.1
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.70.1
-	github.com/aws/aws-sdk-go-v2/service/mq v1.28.1
-	github.com/aws/aws-sdk-go-v2/service/neptune v1.36.1
-	github.com/aws/aws-sdk-go-v2/service/rds v1.94.1
-	github.com/aws/aws-sdk-go-v2/service/redshift v1.54.1
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.54.5
+	github.com/aws/aws-sdk-go-v2/service/efs v1.35.2
+	github.com/aws/aws-sdk-go-v2/service/eks v1.63.1
+	github.com/aws/aws-sdk-go-v2/service/elasticache v1.45.2
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.45.1
+	github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.33.2
+	github.com/aws/aws-sdk-go-v2/service/emr v1.48.2
+	github.com/aws/aws-sdk-go-v2/service/iam v1.41.1
+	github.com/aws/aws-sdk-go-v2/service/kafka v1.39.2
+	github.com/aws/aws-sdk-go-v2/service/kinesis v1.33.2
+	github.com/aws/aws-sdk-go-v2/service/kms v1.38.2
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.71.1
+	github.com/aws/aws-sdk-go-v2/service/mq v1.28.3
+	github.com/aws/aws-sdk-go-v2/service/neptune v1.36.2
+	github.com/aws/aws-sdk-go-v2/service/rds v1.94.3
+	github.com/aws/aws-sdk-go-v2/service/redshift v1.54.2
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.1
-	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.35.2
-	github.com/aws/aws-sdk-go-v2/service/sns v1.34.1
-	github.com/aws/aws-sdk-go-v2/service/sqs v1.38.1
+	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.35.3
+	github.com/aws/aws-sdk-go-v2/service/sns v1.34.3
+	github.com/aws/aws-sdk-go-v2/service/sqs v1.38.4
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.18
-	github.com/aws/aws-sdk-go-v2/service/workspaces v1.55.0
+	github.com/aws/aws-sdk-go-v2/service/workspaces v1.55.2
 	github.com/liamg/iamgo v0.0.9
 	github.com/spf13/cobra v1.9.1
-	github.com/spf13/viper v1.20.0
+	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
 	github.com/testcontainers/testcontainers-go v0.36.0
 	github.com/testcontainers/testcontainers-go/modules/localstack v0.36.0
-	golang.org/x/term v0.30.0
+	golang.org/x/term v0.31.0
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9
 )
 
@@ -382,7 +382,7 @@ require (
 	golang.org/x/net v0.37.0 // indirect
 	golang.org/x/oauth2 v0.26.0 // indirect
 	golang.org/x/sync v0.12.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/time v0.10.0 // indirect
 	golang.org/x/tools v0.29.0 // indirect
