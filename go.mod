@@ -6,7 +6,7 @@ require (
 	github.com/aquasecurity/go-mock-aws v0.0.0-20240523055201-a4152219967f
 	github.com/aquasecurity/iamgo v0.0.10
 	github.com/aquasecurity/loading v0.0.5
-	github.com/aquasecurity/table v1.8.0
+	github.com/aquasecurity/table v1.10.0
 	github.com/aquasecurity/tml v0.6.1
 	github.com/aquasecurity/trivy v0.61.1-0.20250407075540-f1329c7ea1aa
 	github.com/aquasecurity/trivy-db v0.0.0-20250227071930-8bd8a9b89e2d
