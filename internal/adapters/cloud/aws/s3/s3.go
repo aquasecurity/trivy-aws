@@ -211,9 +211,9 @@ func (a *adapter) getBucketEncryption(bucketName *string, metadata trivyTypes.Me
 		if algorithm != "" {
 			bucketEncryption.Enabled = trivyTypes.Bool(true, metadata)
 		}
-		kmsKeyId := defaultEncryption.ApplyServerSideEncryptionByDefault.KMSMasterKeyID
-		if kmsKeyId != nil {
-			bucketEncryption.KMSKeyId = trivyTypes.StringDefault(*kmsKeyId, metadata)
+		kmsKeyID := defaultEncryption.ApplyServerSideEncryptionByDefault.KMSMasterKeyID
+		if kmsKeyID != nil {
+			bucketEncryption.KMSKeyId = trivyTypes.StringDefault(*kmsKeyID, metadata)
 		}
 	}
 

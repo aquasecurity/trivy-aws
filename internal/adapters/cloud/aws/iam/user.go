@@ -130,9 +130,9 @@ func (a *adapter) getUserKeys(apiUser iamtypes.User) ([]iam.AccessKey, error) {
 				}
 			}
 
-			accessKeyId := trivyTypes.StringDefault("", metadata)
+			accessKeyID := trivyTypes.StringDefault("", metadata)
 			if apiAccessKey.AccessKeyId != nil {
-				accessKeyId = trivyTypes.String(*apiAccessKey.AccessKeyId, metadata)
+				accessKeyID = trivyTypes.String(*apiAccessKey.AccessKeyId, metadata)
 			}
 
 			creationDate := trivyTypes.TimeDefault(time.Now(), metadata)
@@ -142,7 +142,7 @@ func (a *adapter) getUserKeys(apiUser iamtypes.User) ([]iam.AccessKey, error) {
 
 			keys = append(keys, iam.AccessKey{
 				Metadata:     metadata,
-				AccessKeyId:  accessKeyId,
+				AccessKeyId:  accessKeyID,
 				Active:       trivyTypes.Bool(apiAccessKey.Status == iamtypes.StatusTypeActive, metadata),
 				CreationDate: creationDate,
 				LastAccess:   lastUsed,

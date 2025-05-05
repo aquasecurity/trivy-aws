@@ -66,9 +66,9 @@ func Test_SQSQueueEncrypted(t *testing.T) {
 
 			assert.Len(t, testState.AWS.SQS.Queues, 1)
 			var got sqs.Queue
-			queueUrl := tt.details.QueueURL(ra.SessionConfig().Region)
+			queueURL := tt.details.QueueURL(ra.SessionConfig().Region)
 			for _, q := range testState.AWS.SQS.Queues {
-				if q.QueueURL.EqualTo(queueUrl) {
+				if q.QueueURL.EqualTo(queueURL) {
 					got = q
 					break
 				}

@@ -77,9 +77,9 @@ func (a *adapter) adaptStream(streamName string) (*kinesis.Stream, error) {
 
 	metadata := a.CreateMetadataFromARN(*output.StreamDescription.StreamARN)
 
-	var kmsKeyId string
+	var kmsKeyID string
 	if output.StreamDescription.KeyId != nil {
-		kmsKeyId = *output.StreamDescription.KeyId
+		kmsKeyID = *output.StreamDescription.KeyId
 	}
 
 	return &kinesis.Stream{
@@ -87,7 +87,7 @@ func (a *adapter) adaptStream(streamName string) (*kinesis.Stream, error) {
 		Encryption: kinesis.Encryption{
 			Metadata: metadata,
 			Type:     trivyTypes.String(string(output.StreamDescription.EncryptionType), metadata),
-			KMSKeyID: trivyTypes.String(kmsKeyId, metadata),
+			KMSKeyID: trivyTypes.String(kmsKeyID, metadata),
 		},
 	}, nil
 

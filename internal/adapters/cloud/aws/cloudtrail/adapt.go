@@ -76,9 +76,9 @@ func (a *adapter) adaptTrail(info types.TrailInfo) (*cloudtrail.Trail, error) {
 		return nil, err
 	}
 
-	var kmsKeyId string
+	var kmsKeyID string
 	if response.Trail.KmsKeyId != nil {
-		kmsKeyId = *response.Trail.KmsKeyId
+		kmsKeyID = *response.Trail.KmsKeyId
 	}
 
 	status, err := a.client.GetTrailStatus(a.Context(), &api.GetTrailStatusInput{
@@ -147,7 +147,7 @@ func (a *adapter) adaptTrail(info types.TrailInfo) (*cloudtrail.Trail, error) {
 		EnableLogFileValidation:   trivyTypes.Bool(response.Trail.LogFileValidationEnabled != nil && *response.Trail.LogFileValidationEnabled, metadata),
 		IsMultiRegion:             trivyTypes.Bool(response.Trail.IsMultiRegionTrail != nil && *response.Trail.IsMultiRegionTrail, metadata),
 		CloudWatchLogsLogGroupArn: cloudWatchLogsArn,
-		KMSKeyID:                  trivyTypes.String(kmsKeyId, metadata),
+		KMSKeyID:                  trivyTypes.String(kmsKeyID, metadata),
 		IsLogging:                 isLogging,
 		BucketName:                trivyTypes.String(bucketName, metadata),
 		EventSelectors:            eventSelectors,

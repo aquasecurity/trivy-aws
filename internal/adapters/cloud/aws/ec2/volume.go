@@ -40,9 +40,9 @@ func (a *adapter) adaptVolume(volume types.Volume) (*ec2.Volume, error) {
 	metadata := a.CreateMetadata(fmt.Sprintf("volume/%s", *volume.VolumeId))
 
 	encrypted := volume.Encrypted != nil && *volume.Encrypted
-	var kmsKeyId string
+	var kmsKeyID string
 	if volume.KmsKeyId != nil {
-		kmsKeyId = *volume.KmsKeyId
+		kmsKeyID = *volume.KmsKeyId
 	}
 
 	return &ec2.Volume{
@@ -50,7 +50,7 @@ func (a *adapter) adaptVolume(volume types.Volume) (*ec2.Volume, error) {
 		Encryption: ec2.Encryption{
 			Metadata: metadata,
 			Enabled:  trivyTypes.Bool(encrypted, metadata),
-			KMSKeyID: trivyTypes.String(kmsKeyId, metadata),
+			KMSKeyID: trivyTypes.String(kmsKeyID, metadata),
 		},
 	}, nil
 }
