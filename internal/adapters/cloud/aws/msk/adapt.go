@@ -70,7 +70,7 @@ func (a *adapter) adaptCluster(apiCluster types.ClusterInfo) (*msk.Cluster, erro
 
 	metadata := a.CreateMetadataFromARN(*apiCluster.ClusterArn)
 
-	var encInTransitClientBroker, encAtRestKMSKeyId string
+	var encInTransitClientBroker, encAtRestKMSKeyID string
 	var encAtRestEnabled bool
 	if apiCluster.EncryptionInfo != nil {
 		if apiCluster.EncryptionInfo.EncryptionInTransit != nil {
@@ -78,7 +78,7 @@ func (a *adapter) adaptCluster(apiCluster types.ClusterInfo) (*msk.Cluster, erro
 		}
 
 		if apiCluster.EncryptionInfo.EncryptionAtRest != nil {
-			encAtRestKMSKeyId = *apiCluster.EncryptionInfo.EncryptionAtRest.DataVolumeKMSKeyId
+			encAtRestKMSKeyID = *apiCluster.EncryptionInfo.EncryptionAtRest.DataVolumeKMSKeyId
 			encAtRestEnabled = true
 		}
 	}
@@ -105,7 +105,7 @@ func (a *adapter) adaptCluster(apiCluster types.ClusterInfo) (*msk.Cluster, erro
 		},
 		EncryptionAtRest: msk.EncryptionAtRest{
 			Metadata:  metadata,
-			KMSKeyARN: trivyTypes.String(encAtRestKMSKeyId, metadata),
+			KMSKeyARN: trivyTypes.String(encAtRestKMSKeyID, metadata),
 			Enabled:   trivyTypes.Bool(encAtRestEnabled, metadata),
 		},
 		Logging: msk.Logging{

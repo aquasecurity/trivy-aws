@@ -100,11 +100,11 @@ func (a *adapter) adaptLogGroup(group types.LogGroup) (*cloudwatch.LogGroup, err
 
 	metadata := a.CreateMetadataFromARN(*group.Arn)
 
-	var kmsKeyId string
+	var kmsKeyID string
 	var retentionInDays int
 
 	if group.KmsKeyId != nil {
-		kmsKeyId = *group.KmsKeyId
+		kmsKeyID = *group.KmsKeyId
 	}
 
 	if group.RetentionInDays != nil {
@@ -135,7 +135,7 @@ func (a *adapter) adaptLogGroup(group types.LogGroup) (*cloudwatch.LogGroup, err
 		Metadata:        metadata,
 		Arn:             arn,
 		Name:            name,
-		KMSKeyID:        trivyTypes.String(kmsKeyId, metadata),
+		KMSKeyID:        trivyTypes.String(kmsKeyID, metadata),
 		RetentionInDays: trivyTypes.Int(retentionInDays, metadata),
 		MetricFilters:   metricFilters,
 	}, nil

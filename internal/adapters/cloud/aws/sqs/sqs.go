@@ -69,11 +69,11 @@ func (a *adapter) getQueues() (queues []sqs.Queue, err error) {
 
 }
 
-func (a *adapter) adaptQueue(queueUrl string) (*sqs.Queue, error) {
+func (a *adapter) adaptQueue(queueURL string) (*sqs.Queue, error) {
 
 	// make another call to get the attributes for the Queue
 	queueAttributes, err := a.client.GetQueueAttributes(a.Context(), &sqsApi.GetQueueAttributesInput{
-		QueueUrl: awssdk.String(queueUrl),
+		QueueUrl: awssdk.String(queueURL),
 		AttributeNames: []sqsTypes.QueueAttributeName{
 			sqsTypes.QueueAttributeNameSqsManagedSseEnabled,
 			sqsTypes.QueueAttributeNameKmsMasterKeyId,
@@ -90,7 +90,7 @@ func (a *adapter) adaptQueue(queueUrl string) (*sqs.Queue, error) {
 
 	queue := &sqs.Queue{
 		Metadata: queueMetadata,
-		QueueURL: trivyTypes.String(queueUrl, queueMetadata),
+		QueueURL: trivyTypes.String(queueURL, queueMetadata),
 		Policies: []iam.Policy{},
 		Encryption: sqs.Encryption{
 			Metadata:          queueMetadata,

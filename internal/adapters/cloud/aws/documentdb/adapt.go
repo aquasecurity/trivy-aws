@@ -83,13 +83,13 @@ func (a *adapter) adaptCluster(cluster docdbTypes.DBCluster) (*documentdb.Cluste
 		if err != nil {
 			return nil, err
 		}
-		var kmsKeyId string
+		var kmsKeyID string
 		if output.DBInstances[0].KmsKeyId != nil {
-			kmsKeyId = *output.DBInstances[0].KmsKeyId
+			kmsKeyID = *output.DBInstances[0].KmsKeyId
 		}
 		instances = append(instances, documentdb.Instance{
 			Metadata: metadata,
-			KMSKeyID: trivyTypes.String(kmsKeyId, metadata),
+			KMSKeyID: trivyTypes.String(kmsKeyID, metadata),
 		})
 	}
 

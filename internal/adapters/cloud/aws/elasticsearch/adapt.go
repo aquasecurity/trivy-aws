@@ -73,14 +73,14 @@ func (a *adapter) adaptDomain(apiDomain types.DomainInfo) (*elasticsearch.Domain
 	var transitEncryption bool
 	var atRestEncryption bool
 	var enforceHTTPS, dedicatedMasterEnabled bool
-	var tlsPolicy, cloudWatchLogGroupArn, kmskeyId, vpcId string
+	var tlsPolicy, cloudWatchLogGroupArn, kmskeyID, vpcID string
 
 	if status.ElasticsearchClusterConfig != nil {
 		dedicatedMasterEnabled = *status.ElasticsearchClusterConfig.DedicatedMasterEnabled
 	}
 
 	if status.VPCOptions != nil && status.VPCOptions.VPCId != nil {
-		vpcId = *status.VPCOptions.VPCId
+		vpcID = *status.VPCOptions.VPCId
 	}
 
 	if status.LogPublishingOptions != nil {
@@ -99,7 +99,7 @@ func (a *adapter) adaptDomain(apiDomain types.DomainInfo) (*elasticsearch.Domain
 	if status.EncryptionAtRestOptions != nil && status.EncryptionAtRestOptions.Enabled != nil {
 		atRestEncryption = *status.EncryptionAtRestOptions.Enabled
 		if status.EncryptionAtRestOptions.KmsKeyId != nil {
-			kmskeyId = *status.EncryptionAtRestOptions.KmsKeyId
+			kmskeyID = *status.EncryptionAtRestOptions.KmsKeyId
 		}
 	}
 
@@ -125,7 +125,7 @@ func (a *adapter) adaptDomain(apiDomain types.DomainInfo) (*elasticsearch.Domain
 		DomainName:             trivyTypes.String(*apiDomain.DomainName, metadata),
 		AccessPolicies:         trivyTypes.String(*status.AccessPolicies, metadata),
 		DedicatedMasterEnabled: trivyTypes.Bool(dedicatedMasterEnabled, metadata),
-		VpcId:                  trivyTypes.String(vpcId, metadata),
+		VpcId:                  trivyTypes.String(vpcID, metadata),
 		LogPublishing: elasticsearch.LogPublishing{
 			Metadata:              metadata,
 			AuditEnabled:          trivyTypes.Bool(auditEnabled, metadata),
@@ -138,7 +138,7 @@ func (a *adapter) adaptDomain(apiDomain types.DomainInfo) (*elasticsearch.Domain
 		AtRestEncryption: elasticsearch.AtRestEncryption{
 			Metadata: metadata,
 			Enabled:  trivyTypes.Bool(atRestEncryption, metadata),
-			KmsKeyId: trivyTypes.String(kmskeyId, metadata),
+			KmsKeyId: trivyTypes.String(kmskeyID, metadata),
 		},
 		Endpoint: elasticsearch.Endpoint{
 			Metadata:     metadata,

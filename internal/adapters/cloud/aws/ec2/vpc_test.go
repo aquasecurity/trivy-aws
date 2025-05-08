@@ -118,8 +118,8 @@ func Test_VPCFlowLogs(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			vpcId := bootstrapVPC(t, ra, tt.details)
-			defer destroyVPC(t, ra, vpcId)
+			vpcID := bootstrapVPC(t, ra, tt.details)
+			defer destroyVPC(t, ra, vpcID)
 
 			testState := &state.State{}
 			adapter := &adapter{}
@@ -173,7 +173,7 @@ func Test_VPCSecurityGroups(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			vpcId := bootstrapVPC(t, ra, tt.details)
+			vpcID := bootstrapVPC(t, ra, tt.details)
 
 			testState := &state.State{}
 			adapter := &adapter{}
@@ -186,7 +186,7 @@ func Test_VPCSecurityGroups(t *testing.T) {
 			sg := testState.AWS.EC2.SecurityGroups[0]
 			require.NotNil(t, sg)
 
-			destroyVPC(t, ra, vpcId)
+			destroyVPC(t, ra, vpcID)
 
 		})
 	}
