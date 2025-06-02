@@ -18,13 +18,13 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.27.1
 	github.com/aws/aws-sdk-go-v2/service/athena v1.50.5
 	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.46.1
-	github.com/aws/aws-sdk-go-v2/service/cloudtrail v1.48.4
+	github.com/aws/aws-sdk-go-v2/service/cloudtrail v1.49.0
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.45.0
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.50.0
 	github.com/aws/aws-sdk-go-v2/service/codebuild v1.61.0
 	github.com/aws/aws-sdk-go-v2/service/docdb v1.41.3
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.43.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.222.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.224.0
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.44.0
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.57.1
 	github.com/aws/aws-sdk-go-v2/service/efs v1.35.3
@@ -42,7 +42,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/neptune v1.37.0
 	github.com/aws/aws-sdk-go-v2/service/rds v1.96.0
 	github.com/aws/aws-sdk-go-v2/service/redshift v1.54.3
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.4
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.80.0
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.35.4
 	github.com/aws/aws-sdk-go-v2/service/sns v1.34.4
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.38.5
