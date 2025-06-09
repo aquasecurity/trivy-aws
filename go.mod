@@ -11,42 +11,42 @@ require (
 	github.com/aquasecurity/trivy v0.61.1-0.20250407075540-f1329c7ea1aa
 	github.com/aquasecurity/trivy-db v0.0.0-20250227071930-8bd8a9b89e2d
 	github.com/aws/aws-sdk-go-v2 v1.36.3
-	github.com/aws/aws-sdk-go-v2/config v1.29.14
-	github.com/aws/aws-sdk-go-v2/credentials v1.17.67
-	github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.39.0
-	github.com/aws/aws-sdk-go-v2/service/apigateway v1.30.1
-	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.27.1
-	github.com/aws/aws-sdk-go-v2/service/athena v1.50.5
+	github.com/aws/aws-sdk-go-v2/config v1.29.15
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.68
+	github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.39.1
+	github.com/aws/aws-sdk-go-v2/service/apigateway v1.31.1
+	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.28.1
+	github.com/aws/aws-sdk-go-v2/service/athena v1.51.0
 	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.46.1
-	github.com/aws/aws-sdk-go-v2/service/cloudtrail v1.48.4
-	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.45.0
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.50.0
+	github.com/aws/aws-sdk-go-v2/service/cloudtrail v1.49.1
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.45.1
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.50.1
 	github.com/aws/aws-sdk-go-v2/service/codebuild v1.61.0
-	github.com/aws/aws-sdk-go-v2/service/docdb v1.41.3
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.43.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.222.0
-	github.com/aws/aws-sdk-go-v2/service/ecr v1.44.0
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.57.1
-	github.com/aws/aws-sdk-go-v2/service/efs v1.35.3
-	github.com/aws/aws-sdk-go-v2/service/eks v1.64.0
-	github.com/aws/aws-sdk-go-v2/service/elasticache v1.46.0
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.45.2
-	github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.33.3
-	github.com/aws/aws-sdk-go-v2/service/emr v1.49.0
+	github.com/aws/aws-sdk-go-v2/service/docdb v1.41.4
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.43.2
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.224.1
+	github.com/aws/aws-sdk-go-v2/service/ecr v1.44.1
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.57.3
+	github.com/aws/aws-sdk-go-v2/service/efs v1.35.4
+	github.com/aws/aws-sdk-go-v2/service/eks v1.65.1
+	github.com/aws/aws-sdk-go-v2/service/elasticache v1.46.1
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.45.3
+	github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.33.4
+	github.com/aws/aws-sdk-go-v2/service/emr v1.49.1
 	github.com/aws/aws-sdk-go-v2/service/iam v1.42.0
 	github.com/aws/aws-sdk-go-v2/service/kafka v1.39.3
-	github.com/aws/aws-sdk-go-v2/service/kinesis v1.35.0
-	github.com/aws/aws-sdk-go-v2/service/kms v1.38.3
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.71.2
+	github.com/aws/aws-sdk-go-v2/service/kinesis v1.35.1
+	github.com/aws/aws-sdk-go-v2/service/kms v1.40.0
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.71.3
 	github.com/aws/aws-sdk-go-v2/service/mq v1.29.0
-	github.com/aws/aws-sdk-go-v2/service/neptune v1.37.0
-	github.com/aws/aws-sdk-go-v2/service/rds v1.96.0
-	github.com/aws/aws-sdk-go-v2/service/redshift v1.54.3
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.4
-	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.35.4
-	github.com/aws/aws-sdk-go-v2/service/sns v1.34.4
-	github.com/aws/aws-sdk-go-v2/service/sqs v1.38.5
-	github.com/aws/aws-sdk-go-v2/service/sts v1.33.19
+	github.com/aws/aws-sdk-go-v2/service/neptune v1.37.1
+	github.com/aws/aws-sdk-go-v2/service/rds v1.97.0
+	github.com/aws/aws-sdk-go-v2/service/redshift v1.54.4
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.80.1
+	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.35.5
+	github.com/aws/aws-sdk-go-v2/service/sns v1.34.5
+	github.com/aws/aws-sdk-go-v2/service/sqs v1.38.6
+	github.com/aws/aws-sdk-go-v2/service/sts v1.33.20
 	github.com/aws/aws-sdk-go-v2/service/workspaces v1.57.0
 	github.com/liamg/iamgo v0.0.9
 	github.com/spf13/cobra v1.9.1
