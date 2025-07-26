@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -55,12 +54,8 @@ func NewCmd() *cobra.Command {
 		Aliases: []string{},
 		Args:    cobra.ExactArgs(0),
 		Short:   "[EXPERIMENTAL] Scan AWS account",
-		Long: fmt.Sprintf(`Scan an AWS account for misconfigurations. It uses the same authentication methods as the AWS CLI. See https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html
-
-The following services are supported:
-
-- %s
-`, strings.Join(services, "\n- ")),
+		Long: fmt.Sprintf(`
+  Scan an AWS account for misconfigurations. It uses the same authentication methods as the AWS CLI.`),
 		Example: `  # basic scanning
   $ trivy aws --region us-east-1
 
