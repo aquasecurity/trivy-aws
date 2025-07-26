@@ -108,6 +108,16 @@ Scan Overview for AWS Account XXXXXXXXXXXX
 │ workspaces     │        0 │            0 │      0 │   0 │       0 │ just now     │
 └────────────────┴──────────┴──────────────┴────────┴─────┴─────────┴──────────────┘
 
+#### Reviewing Results Details
+
+To view misconfiguration details, use the `--format json` parameter.
+It's suggested to specify flags to limit the output to certain services and severities
+
+```shell
+# Extract Severity, Target (ARN) and Title for all misconfigurations
+$ trivy aws -s HIGH --service iam --format json | jq -r '.Results[]? | select(.Misconfigurations) | .Target as $target | .Misconfigurations[] | "[\(.Severity)] \($target): \(.Title)"'
+```
+
 ### Architecture
 
 Please see [Architecture.md](Architecture.md) for more information.
