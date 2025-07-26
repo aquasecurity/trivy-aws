@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/xerrors"
+	"gopkg.in/yaml.v3"
 
 	"github.com/aquasecurity/trivy-aws/pkg/flag"
 	"github.com/aquasecurity/trivy-aws/pkg/scanner"
@@ -55,6 +56,7 @@ func NewCmd() *cobra.Command {
 		Aliases: []string{},
 		Args:    cobra.ExactArgs(0),
 		Short:   "[EXPERIMENTAL] Scan AWS account",
+		Version: getPluginVersion(),
 		Long: fmt.Sprintf(`Scan an AWS account for misconfigurations. It uses the same authentication methods as the AWS CLI. See https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html
 
 The following services are supported:
@@ -122,7 +124,28 @@ The following services are supported:
 	globalFlags.AddFlags(cmd)
 	awsFlags.AddFlags(cmd)
 
+	cmd.SetVersionTemplate("{{.Version}}\n")
+	cmd.Flags().BoolP("version", "v", false, "version for aws")
+
 	return cmd
+}
+
+type PluginConfig struct {
+	Version string `yaml:"version"`
+}
+
+func getPluginVersion() string {
+	data, err := os.ReadFile("plugin.yaml")
+	if err != nil {
+		return "unknown"
+	}
+	
+	var config PluginConfig
+	if err := yaml.Unmarshal(data, &config); err != nil {
+		return "unknown"
+	}
+	
+	return fmt.Sprintf("Version: %s", config.Version)
 }
 
 func initConfig(configFile string, pathChanged bool) error {
