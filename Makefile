@@ -7,17 +7,17 @@ help: ## Show this help message
 	@echo "Available targets:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: local
-local: ## Build trivy-aws binary for local testing
+.PHONY: build-local
+build-local: ## Build trivy-aws for local testing
 	go build -o trivy-aws ./cmd/trivy-aws
 
 .PHONY: test
-test: ## Run tests
+test: ## Run go test
 	go test -race ./...
 
 PLATFORMS = linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64
 OUTPUTS = $(patsubst %,%/trivy-aws,$(PLATFORMS))
-build: clean $(OUTPUTS) ## Build for all platforms
+build: clean $(OUTPUTS) ## Build plugin for all platforms
 # os/arch/trivy-aws
 %/trivy-aws:
 	@mkdir -p $(dir $@); \
