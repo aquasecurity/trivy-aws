@@ -50,14 +50,16 @@ func (f *CloudFlagGroup) Flags() []trivyflag.Flagger {
 	}
 }
 
-func (f *CloudFlagGroup) ToOptions() (CloudOptions, error) {
-	if err := parseFlags(f); err != nil {
-		return CloudOptions{}, err
-	}
-	return CloudOptions{
+func (f *CloudFlagGroup) ToOptions(opts *trivyflag.Options) error {
+	return nil
+}
+
+func (f *CloudFlagGroup) ToPluginOptions(opts *Options) error {
+	opts.CloudOptions = CloudOptions{
 		UpdateCache: f.UpdateCache.Value(),
 		MaxCacheAge: f.MaxCacheAge.Value(),
-	}, nil
+	}
+	return nil
 }
 
 func parseFlags(fg trivyflag.FlagGroup) error {

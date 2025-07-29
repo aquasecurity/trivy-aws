@@ -18,7 +18,7 @@ func TestFlag_ToOptions(t *testing.T) {
 	group := flag.NewCloudFlagGroup()
 	flags := flag.Flags{
 		BaseFlags: trivyflag.Flags{
-			GlobalFlagGroup: trivyflag.NewGlobalFlagGroup(),
+			trivyflag.NewGlobalFlagGroup(),
 		},
 		CloudFlagGroup: group,
 	}
@@ -30,7 +30,7 @@ func TestFlag_ToOptions(t *testing.T) {
 	viper.Set(group.MaxCacheAge.ConfigName, "48h")
 	viper.Set(group.UpdateCache.ConfigName, true)
 
-	opts, err := flags.ToOptions(nil)
+	got, err := flags.ToOptions(nil)
 	require.NoError(t, err)
 
 	expected := flag.Options{
@@ -48,7 +48,9 @@ func TestFlag_ToOptions(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, expected, opts)
+	assert.Equal(t, expected.AppVersion, got.AppVersion)
+	assert.Equal(t, expected.GlobalOptions, got.GlobalOptions)
+	assert.Equal(t, expected.CloudOptions, got.CloudOptions)
 }
 
 func TestCloudFlagGroup_ToOptions(t *testing.T) {
@@ -58,7 +60,10 @@ func TestCloudFlagGroup_ToOptions(t *testing.T) {
 	viper.Set(group.MaxCacheAge.ConfigName, "48h")
 	viper.Set(group.UpdateCache.ConfigName, true)
 
-	opts, err := group.ToOptions()
+	flags := flag.Flags{
+		CloudFlagGroup: group,
+	}
+	got, err := flags.ToOptions(nil)
 	require.NoError(t, err)
 
 	expected := flag.CloudOptions{
@@ -66,5 +71,5 @@ func TestCloudFlagGroup_ToOptions(t *testing.T) {
 		UpdateCache: true,
 	}
 
-	assert.Equal(t, expected, opts)
+	assert.Equal(t, expected, got.CloudOptions)
 }

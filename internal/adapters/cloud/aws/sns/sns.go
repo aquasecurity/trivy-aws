@@ -71,7 +71,7 @@ func (a *adapter) adaptTopic(topic snsTypes.Topic) (*sns.Topic, error) {
 
 	topicMetadata := a.CreateMetadataFromARN(*topic.TopicArn)
 
-	t := sns.NewTopic(*topic.TopicArn, topicMetadata)
+	t := NewTopic(*topic.TopicArn, topicMetadata)
 	topicAttributes, err := a.client.GetTopicAttributes(a.Context(), &snsapi.GetTopicAttributesInput{
 		TopicArn: topic.TopicArn,
 	})
@@ -87,4 +87,15 @@ func (a *adapter) adaptTopic(topic snsTypes.Topic) (*sns.Topic, error) {
 
 	return t, nil
 
+}
+
+func NewTopic(arn string, metadata types.Metadata) *sns.Topic {
+	return &sns.Topic{
+		Metadata: metadata,
+		ARN:      types.String(arn, metadata),
+		Encryption: sns.Encryption{
+			Metadata: metadata,
+			KMSKeyID: types.StringDefault("", metadata),
+		},
+	}
 }

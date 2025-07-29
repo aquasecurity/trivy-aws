@@ -41,8 +41,12 @@ func (f *Flags) ToOptions(args []string) (Options, error) {
 	opts := Options{
 		Options: baseOptions,
 	}
+
 	if f.CloudFlagGroup != nil {
-		opts.CloudOptions, err = f.CloudFlagGroup.ToOptions()
+		if err := parseFlags(f.CloudFlagGroup); err != nil {
+			return Options{}, xerrors.Errorf("unable to parse cloud flag group: %w", err)
+		}
+		err = f.CloudFlagGroup.ToPluginOptions(&opts)
 		if err != nil {
 			return Options{}, xerrors.Errorf("cloud flag error: %w", err)
 		}
