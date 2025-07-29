@@ -99,6 +99,10 @@ func Write(ctx context.Context, rep *Report, opt flag.Options, fromCache bool) e
 
 	switch opt.Format {
 	case tableFormat:
+		// Skip table output if quiet flag is set
+		if opt.Quiet {
+			return nil
+		}
 
 		// ensure color/formatting is disabled for pipes/non-pty
 		var useANSI bool
@@ -138,7 +142,11 @@ func Write(ctx context.Context, rep *Report, opt flag.Options, fromCache bool) e
 }
 
 func filterResults(ctx context.Context, rep *Report, opt flag.Options, ignoreConf result.IgnoreConfig, filtered []types.Result) ([]types.Result, error) {
-	for _, resultsAtTime := range rep.Results {
+	for serviceName, resultsAtTime := range rep.Results {
+		// Skip services not in the filter list
+		if len(opt.Services) > 0 && !contains(opt.Services, serviceName) {
+			continue
+		}
 		for _, res := range resultsAtTime.Results {
 			resCopy := res
 			if err := result.FilterResult(ctx, &resCopy, ignoreConf, opt.FilterOpts()); err != nil {
