@@ -122,7 +122,6 @@ The following services are supported:
 	}
 
 	cmd.SetVersionTemplate("Version: {{.Version}}\n")
-	cmd.Flags().BoolP("version", "v", false, "version for aws plugin")
 
 	globalFlags.AddFlags(cmd)
 	awsFlags.AddFlags(cmd)
