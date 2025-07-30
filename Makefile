@@ -1,4 +1,6 @@
 SED=$(shell command -v gsed || command -v sed)
+VERSION := $(shell git describe --tags --always --dirty)
+VERSION_NO_V := $(shell echo $(VERSION) | sed 's/^v//')
 
 .PHONY: test
 test:
@@ -12,7 +14,7 @@ build: clean $(OUTPUTS)
 	@mkdir -p $(dir $@); \
 	GOOS=$(word 1,$(subst /, ,$*)); \
 	GOARCH=$(word 2,$(subst /, ,$*)); \
-	CGO_ENABLED=0 GOOS=$$GOOS GOARCH=$$GOARCH go build -ldflags "-s -w" -o trivy-aws-$$GOOS-$$GOARCH ./cmd/trivy-aws/main.go; \
+	CGO_ENABLED=0 GOOS=$$GOOS GOARCH=$$GOARCH go build -ldflags "-s -w -X 'github.com/aquasecurity/trivy-aws/internal/version.ver=$(VERSION_NO_V)'" -o trivy-aws-$$GOOS-$$GOARCH ./cmd/trivy-aws/main.go; \
 	if [ $$GOOS = "windows" ]; then \
 		mv trivy-aws-$$GOOS-$$GOARCH trivy-aws-$$GOOS-$$GOARCH.exe; \
 		tar -cvzf trivy-aws-$$GOOS-$$GOARCH.tar.gz plugin.yaml trivy-aws-$$GOOS-$$GOARCH.exe LICENSE; \
