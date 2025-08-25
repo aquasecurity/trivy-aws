@@ -8,7 +8,7 @@ require (
 	github.com/aquasecurity/go-mock-aws v0.0.0-20240523055201-a4152219967f
 	github.com/aquasecurity/iamgo v0.0.10
 	github.com/aquasecurity/loading v0.0.5
-	github.com/aquasecurity/table v1.10.0
+	github.com/aquasecurity/table v1.11.0
 	github.com/aquasecurity/tml v0.6.1
 	github.com/aquasecurity/trivy v0.64.1
 	github.com/aquasecurity/trivy-db v0.0.0-20250627124416-ca81c496a932
@@ -53,10 +53,10 @@ require (
 	github.com/liamg/iamgo v0.0.9
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.0
 	github.com/testcontainers/testcontainers-go v0.37.1-0.20250602105123-1720acdcb24e
 	github.com/testcontainers/testcontainers-go/modules/localstack v0.37.0
-	golang.org/x/term v0.32.0
+	golang.org/x/term v0.34.0
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9
 )
 
@@ -382,7 +382,7 @@ require (
 	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/sync v0.15.0 // indirect
-	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.26.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
 	golang.org/x/tools v0.34.0 // indirect
