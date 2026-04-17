@@ -6,9 +6,6 @@ on:
   schedule:
   - cron:  0 23 * * *
 
-env:
-  GO_VERSION: '1.22'
-
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -21,7 +18,7 @@ jobs:
 
     - uses: actions/setup-go@v5
       with:
-        go-version: ${{ env.GO_VERSION }}
+        go-version-file: go.mod
 
     - name: go mod tidy
       if: matrix.os == 'ubuntu-latest'
@@ -35,8 +32,7 @@ jobs:
     - name: Run non-localstack tests
       if: matrix.os != 'ubuntu-latest'
       run: make test-no-localstack
-      shell: bash
+
     - name: Run full tests
       if: matrix.os == 'ubuntu-latest'
       run: make test
-      shell: bash
