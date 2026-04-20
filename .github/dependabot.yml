@@ -19,6 +19,8 @@ updates:
           - "github.com/aquasecurity/trivy"
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -27,3 +29,5 @@ updates:
       github-actions:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
