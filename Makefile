@@ -12,8 +12,27 @@ build-local: ## Build trivy-aws for local testing
 	go build -o trivy-aws ./cmd/trivy-aws
 
 .PHONY: test
-test: ## Run go test
-	go test -race ./...
+test: emulator-image ## Run go test
+	AWS_EMULATOR_IMAGE=$(EMULATOR_IMAGE) go test -race ./...
+
+# AWS Emulator for adapter tests. Releases are listed at
+# https://downloads.aws.com/aws-emulator/packages/aws-emulator/LTS/versions.json
+EMULATOR_VERSION := 1.0.353
+EMULATOR_IMAGE := trivy-aws-emulator:$(EMULATOR_VERSION)
+EMULATOR_ARCH := $(subst arm64,aarch64,$(shell uname -m))
+# The package is downloaded on the host, because a download inside "docker build"
+# fails behind a proxy that replaces TLS certificates.
+EMULATOR_RPM := $(HOME)/.cache/trivy-aws/aws-emulator-$(EMULATOR_VERSION)-$(EMULATOR_ARCH)/aws-emulator.rpm
+
+$(EMULATOR_RPM):
+	mkdir -p $(dir $@)
+	curl -fsSL -o $@.tmp https://downloads.aws.com/aws-emulator/packages/aws-emulator/LTS/aws-emulator-$(EMULATOR_VERSION)-1-$(EMULATOR_ARCH).rpm
+	mv $@.tmp $@
+
+.PHONY: emulator-image
+emulator-image: $(EMULATOR_RPM) ## Build the AWS Emulator image for adapter tests
+	docker image inspect $(EMULATOR_IMAGE) >/dev/null 2>&1 || \
+		docker build -t $(EMULATOR_IMAGE) -f internal/adapters/cloud/aws/test/emulator/Dockerfile $(dir $(EMULATOR_RPM))
 
 PLATFORMS = linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64
 OUTPUTS = $(patsubst %,%/trivy-aws,$(PLATFORMS))
