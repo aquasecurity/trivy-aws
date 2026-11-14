@@ -73,9 +73,7 @@ func Test_S3BucketACLs(t *testing.T) {
 		},
 	}
 
-	ra, stack, err := test.CreateLocalstackAdapter(t)
-	defer func() { _ = stack.Stop() }()
-	require.NoError(t, err)
+	ra := test.CreateEmulatorAdapter(t)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -83,7 +81,7 @@ func Test_S3BucketACLs(t *testing.T) {
 
 			testState := &state.State{}
 			s3Adapter := &adapter{}
-			err = s3Adapter.Adapt(ra, testState)
+			err := s3Adapter.Adapt(ra, testState)
 			require.NoError(t, err)
 
 			require.Len(t, testState.AWS.S3.Buckets, 1)
@@ -131,9 +129,7 @@ func Test_S3BucketLogging(t *testing.T) {
 		},
 	}
 
-	ra, stack, err := test.CreateLocalstackAdapter(t)
-	defer func() { _ = stack.Stop() }()
-	require.NoError(t, err)
+	ra := test.CreateEmulatorAdapter(t)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -141,7 +137,7 @@ func Test_S3BucketLogging(t *testing.T) {
 
 			testState := &state.State{}
 			s3Adapter := &adapter{}
-			err = s3Adapter.Adapt(ra, testState)
+			err := s3Adapter.Adapt(ra, testState)
 			require.NoError(t, err)
 
 			if tt.details.loggingEnabled {
@@ -188,9 +184,7 @@ func Test_S3BucketVersioning(t *testing.T) {
 		},
 	}
 
-	ra, stack, err := test.CreateLocalstackAdapter(t)
-	defer func() { _ = stack.Stop() }()
-	require.NoError(t, err)
+	ra := test.CreateEmulatorAdapter(t)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -198,7 +192,7 @@ func Test_S3BucketVersioning(t *testing.T) {
 
 			testState := &state.State{}
 			s3Adapter := &adapter{}
-			err = s3Adapter.Adapt(ra, testState)
+			err := s3Adapter.Adapt(ra, testState)
 			require.NoError(t, err)
 
 			assert.Len(t, testState.AWS.S3.Buckets, 1)
@@ -260,9 +254,7 @@ func Test_S3PublicAccessBlock(t *testing.T) {
 		},
 	}
 
-	ra, stack, err := test.CreateLocalstackAdapter(t)
-	defer func() { _ = stack.Stop() }()
-	require.NoError(t, err)
+	ra := test.CreateEmulatorAdapter(t)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -270,7 +262,7 @@ func Test_S3PublicAccessBlock(t *testing.T) {
 
 			testState := &state.State{}
 			s3Adapter := &adapter{}
-			err = s3Adapter.Adapt(ra, testState)
+			err := s3Adapter.Adapt(ra, testState)
 			require.NoError(t, err)
 
 			assert.Len(t, testState.AWS.S3.Buckets, 1)
@@ -294,11 +286,19 @@ func bootstrapBucket(t *testing.T, ra *aws.RootAdapter, spec bucketDetails) {
 
 	api := s3api.NewFromConfig(ra.SessionConfig())
 
-	_, err := api.CreateBucket(ra.Context(), &s3api.CreateBucketInput{
+	input := &s3api.CreateBucketInput{
 		Bucket: awssdk.String(spec.bucketName),
-		ACL:    spec.acl,
-	})
+	}
+	// New buckets have ACLs disabled by default.
+	if spec.acl != "" {
+		input.ObjectOwnership = s3types.ObjectOwnershipBucketOwnerPreferred
+	}
+	_, err := api.CreateBucket(ra.Context(), input)
 	require.NoError(t, err)
+
+	if spec.acl != "" {
+		bootstrapBucketACL(t, api, ra.Context(), spec)
+	}
 
 	if spec.encrypted {
 		bootstrapBucketEncryption(t, api, ra.Context(), spec)
@@ -315,6 +315,20 @@ func bootstrapBucket(t *testing.T, ra *aws.RootAdapter, spec bucketDetails) {
 	if spec.publicAccessBlock != nil {
 		createPublicAccessBlock(t, api, ra.Context(), spec)
 	}
+}
+
+func bootstrapBucketACL(t *testing.T, api *s3api.Client, ctx context.Context, spec bucketDetails) {
+	// New buckets block public ACLs by default.
+	_, err := api.DeletePublicAccessBlock(ctx, &s3api.DeletePublicAccessBlockInput{
+		Bucket: awssdk.String(spec.bucketName),
+	})
+	require.NoError(t, err)
+
+	_, err = api.PutBucketAcl(ctx, &s3api.PutBucketAclInput{
+		Bucket: awssdk.String(spec.bucketName),
+		ACL:    spec.acl,
+	})
+	require.NoError(t, err)
 }
 
 func bootstrapBucketEncryption(t *testing.T, api *s3api.Client, ctx context.Context, spec bucketDetails) {

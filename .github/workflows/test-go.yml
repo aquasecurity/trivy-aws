@@ -43,6 +43,14 @@ jobs:
       if: matrix.os != 'ubuntu-latest'
       run: make test-no-localstack
       shell: bash
+
+    - name: Cache AWS Emulator package
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/trivy-aws
+        key: aws-emulator-${{ hashFiles('Makefile') }}
+
     - name: Run full tests
       if: matrix.os == 'ubuntu-latest'
       run: make test

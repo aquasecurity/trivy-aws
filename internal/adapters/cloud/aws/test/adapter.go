@@ -44,25 +44,30 @@ func CreateLocalstackAdapter(t *testing.T) (*aws.RootAdapter, *localstack.Stack,
 	l, err := getOrCreateLocalStack(ctx)
 	require.NoError(t, err)
 
-	cfg, err := createTestConfig(ctx, l)
+	cfg, err := createTestConfig(ctx, l.EndpointURL(),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("dummy", "dummy", "dummy")),
+	)
 	require.NoError(t, err)
 
-	ra := aws.NewRootAdapter(ctx, cfg, progress.NoProgress, log.New(log.NewHandler(io.Discard, nil)))
+	ra := newRootAdapter(ctx, cfg)
 	require.NotNil(t, ra)
 	return ra, l, err
 }
 
-func createTestConfig(ctx context.Context, l *localstack.Stack) (awssdk.Config, error) {
-	return config.LoadDefaultConfig(ctx,
+func newRootAdapter(ctx context.Context, cfg awssdk.Config) *aws.RootAdapter {
+	return aws.NewRootAdapter(ctx, cfg, progress.NoProgress, log.New(log.NewHandler(io.Discard, nil)))
+}
+
+func createTestConfig(ctx context.Context, endpointURL string, opts ...func(*config.LoadOptions) error) (awssdk.Config, error) {
+	return config.LoadDefaultConfig(ctx, append([]func(*config.LoadOptions) error{
 		config.WithRegion("us-east-1"),
-		config.WithEndpointResolverWithOptions(awssdk.EndpointResolverWithOptionsFunc(func(_, _ string, _ ...interface{}) (awssdk.Endpoint, error) {
+		config.WithEndpointResolverWithOptions(awssdk.EndpointResolverWithOptionsFunc(func(_, _ string, _ ...any) (awssdk.Endpoint, error) {
 			return awssdk.Endpoint{
 				PartitionID:       "aws",
 				SigningRegion:     "us-east-1",
-				URL:               l.EndpointURL(),
+				URL:               endpointURL,
 				HostnameImmutable: true,
 			}, nil
 		})),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("dummy", "dummy", "dummy")),
-	)
+	}, opts...)...)
 }
